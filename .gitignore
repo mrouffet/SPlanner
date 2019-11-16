@@ -1,0 +1,24 @@
+# UE4 Project directories to ignore
+
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# Visual Studio solutions
+
+*.sdf
+*.opensdf
+*.suo
+*.dp
+*.sln
+.vs/*
+
+# Build folders
+
+[Bb][Ii][Nn]/
+
+# Custom bat
+
+RebuildAll.bat
