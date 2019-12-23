@@ -11,6 +11,7 @@
 class USP_Goal;
 class USP_Task;
 class USP_ActionSet;
+class USP_POIActionSet;
 
 /**
 *	Planner behavior.
@@ -31,7 +32,7 @@ protected:
 
 	/** The action from Point of interest (ie: added to possible moves). */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
-	TArray<USP_ActionSet*> POIActionSets;
+	TArray<USP_POIActionSet*> POIActionSets;
 
 	/**
 	*	The current targeted goal.

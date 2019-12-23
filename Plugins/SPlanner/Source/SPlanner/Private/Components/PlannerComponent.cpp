@@ -9,6 +9,7 @@
 
 #include <Tasks/Task.h>
 #include <Tasks/ActionSet.h>
+#include <Tasks/POIActionSet.h>
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -46,6 +47,9 @@ void USP_PlannerComponent::SetCooldown(const USP_Task* Task)
 bool USP_PlannerComponent::IsInCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, false)
+
+	if(Task->GetCooldown() <= 0.0f)
+		return false;
 
 	return GetCooldown(Task) < Task->GetCooldown();
 }
@@ -115,20 +119,22 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 	// Add all available actions from POI.
 	for (int j = 0; j < POIActionSets.Num(); ++j)
 	{
-		const TArray<FSP_Action>& POIActions = POIActionSets[j]->GetActions();
+		const TArray<FSP_POIAction>& POIActions = POIActionSets[j]->GetActions();
 
 		for (int i = 0; i < POIActions.Num(); ++i)
 		{
 #if SP_DEBUG
 			if (!POIActions[i].Task)
 			{
-				SP_LOG(Error, "POI Task [ %d ] nullptr!", i);
+				SP_LOG(Error, "%s: POI Task [ %d ] nullptr!", *POIActionSets[j]->GetName(), i);
 				continue;
 			}
 #endif
 
-			if (!IsInCooldown(POIActions[i].Task))
-				ShuffledActions.Add(FSP_Action(POIActions[i], FMath::FRand()));
+			bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal);
+			
+			if (!IsInCooldown(POIActions[i].Task) && (bAchieveGoal || POIActions[i].ServedGoals.Find(Goal)))
+				ShuffledActions.Add(FSP_Action(POIActions[i].Task, POIActions[i].Weight * FMath::FRand(), bAchieveGoal));
 		}
 	}
 

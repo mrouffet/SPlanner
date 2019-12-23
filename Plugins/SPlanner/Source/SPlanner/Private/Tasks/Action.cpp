@@ -6,9 +6,6 @@ FSP_Action::FSP_Action(USP_Task* InTask, float InWeight, bool InbAchieveGoal) :
 	bAchieveGoal{ InbAchieveGoal }
 {
 }
-FSP_Action::FSP_Action(const FSP_Action& Other, float WeightMultiplier) :
-	Task{ Other.Task },
-	Weight{ Other.Weight * WeightMultiplier },
-	bAchieveGoal{ Other.bAchieveGoal }
+FSP_Action::FSP_Action(const FSP_Action& Other, float WeightMultiplier) : FSP_Action(Other.Task, Other.Weight * WeightMultiplier, Other.bAchieveGoal)
 {
 }
