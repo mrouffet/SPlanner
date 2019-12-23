@@ -25,6 +25,7 @@ public class SPlanner : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				"AIModule"
 			}
 		);
 
