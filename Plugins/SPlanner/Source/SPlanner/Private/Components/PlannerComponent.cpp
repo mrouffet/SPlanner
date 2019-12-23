@@ -12,6 +12,8 @@
 #include <Tasks/POIActionSet.h>
 
 #include <Components/TargetComponent.h>
+#include <Components/POIComponent.h>
+#include <Components/POIInteractZoneComponent.h>
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -124,24 +126,30 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 
 
 	// Add all available actions from POI.
-	for (int j = 0; j < POIActionSets.Num(); ++j)
+	if (POIInteractZone)
 	{
-		const TArray<FSP_POIAction>& POIActions = POIActionSets[j]->GetActions();
-
-		for (int i = 0; i < POIActions.Num(); ++i)
+		for (int j = 0; j < POIInteractZone->GetPOIs().Num(); ++j)
 		{
-#if SP_DEBUG
-			if (!POIActions[i].Task)
+			SP_RCHECK(POIInteractZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
+			SP_RCHECK(POIInteractZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %d ] action set nullptr!", false, *GetName(), j)
+
+			const TArray<FSP_POIAction>& POIActions = POIInteractZone->GetPOIs()[j]->GetActionSet()->GetActions();
+
+			for (int i = 0; i < POIActions.Num(); ++i)
 			{
-				SP_LOG(Error, "%s: POI Task [ %d ] nullptr!", *POIActionSets[j]->GetName(), i);
-				continue;
-			}
+#if SP_DEBUG
+				if (!POIActions[i].Task)
+				{
+					SP_LOG(Error, "%s: POI Task [ %d ] nullptr!", *POIInteractZone->GetPOIs()[j]->GetActionSet()->GetName(), i);
+					continue;
+				}
 #endif
 
-			bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal);
-			
-			if (!IsInCooldown(POIActions[i].Task) && (bAchieveGoal || POIActions[i].ServedGoals.Find(Goal)))
-				ShuffledActions.Add(FSP_Action(POIActions[i].Task, POIActions[i].Weight * FMath::FRand(), bAchieveGoal));
+				bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal);
+
+				if (!IsInCooldown(POIActions[i].Task) && (bAchieveGoal || POIActions[i].ServedGoals.Find(Goal)))
+					ShuffledActions.Add(FSP_Action(POIActions[i].Task, POIActions[i].Weight * FMath::FRand(), bAchieveGoal));
+			}
 		}
 	}
 
@@ -345,6 +353,13 @@ void USP_PlannerComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Target = Cast<USP_TargetComponent>(GetOwner()->GetComponentByClass(USP_TargetComponent::StaticClass()));
+
+	// Computed by server while owner replicated.
+	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
+	{
+		SetComponentTickEnabled(false);
+		return;
+	}
 
 	AskNewPlan();
 }

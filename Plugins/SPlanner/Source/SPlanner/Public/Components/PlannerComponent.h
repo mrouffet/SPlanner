@@ -14,6 +14,7 @@ class USP_ActionSet;
 class USP_POIActionSet;
 
 class USP_TargetComponent;
+class USP_POIInteractZoneComponent;
 
 /**
 *	Planner behavior.
@@ -31,10 +32,6 @@ protected:
 	/** Action sets depending on current goal. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Planner")
 	TMap<USP_Goal*, USP_ActionSet*> ActionsSets;
-
-	/** The action from Point of interest (ie: added to possible moves). */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
-	TArray<USP_POIActionSet*> POIActionSets;
 
 	/**
 	*	The current targeted goal.
@@ -118,6 +115,13 @@ protected:
 	void BeginPlay() override;
 
 public:
+	/**
+	*	The POI interact zone used.
+	*	Used to add action set from interactible POIs.
+	*/
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner|Planner")
+	USP_POIInteractZoneComponent* POIInteractZone = nullptr;
+
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Setter of Goal. */
