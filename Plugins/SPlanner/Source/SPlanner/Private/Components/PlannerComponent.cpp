@@ -11,6 +11,8 @@
 #include <Tasks/ActionSet.h>
 #include <Tasks/POIActionSet.h>
 
+#include <Components/TargetComponent.h>
+
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTickInEditor = false;
@@ -52,6 +54,11 @@ bool USP_PlannerComponent::IsInCooldown(const USP_Task* Task) const
 		return false;
 
 	return GetCooldown(Task) < Task->GetCooldown();
+}
+
+USP_TargetComponent* USP_PlannerComponent::GetTarget() const
+{
+	return Target;
 }
 
 void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
@@ -336,6 +343,8 @@ void USP_PlannerComponent::ExecuteTask(float DeltaTime)
 void USP_PlannerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Target = Cast<USP_TargetComponent>(GetOwner()->GetComponentByClass(USP_TargetComponent::StaticClass()));
 
 	AskNewPlan();
 }

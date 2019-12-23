@@ -13,6 +13,8 @@ class USP_Task;
 class USP_ActionSet;
 class USP_POIActionSet;
 
+class USP_TargetComponent;
+
 /**
 *	Planner behavior.
 *	Use planning to generate behavior using action set.
@@ -46,7 +48,7 @@ protected:
 	TMap<const USP_Task*, float> Cooldowns;
 
 	/** The current executed plan. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Planner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
 	TArray<USP_Task*> Plan;
 
 	/**
@@ -64,6 +66,10 @@ protected:
 	*	Must be init in cpp file (PS4 Standard).
 	*/
 	std::atomic<ESP_PlanState> PlanState;
+
+	/** Cached target component. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
+	USP_TargetComponent* Target = nullptr;
 
 	/**
 	*	Set new plan to execute and update PlanState.
@@ -129,6 +135,9 @@ public:
 	/** Helper function for cooldown check */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	bool IsInCooldown(const USP_Task* Task) const;
+
+	/** Getter of Target. */
+	USP_TargetComponent* GetTarget() const;
 
 	/**
 	*	Get a shuffled move list based on actions' weight and random.
