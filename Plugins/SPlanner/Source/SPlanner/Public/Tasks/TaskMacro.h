@@ -9,8 +9,8 @@
 *	Helper macro to call parent pre condition implementation.
 *	Should always be called in children PreCondition_Implementation override.
 */
-#define SP_TASK_SUPER_PRECONDITION(Implementation, Planner, PlannerFlags, ...)\
-	if (!Super::Implementation(Planner, PlannerFlags, ##__VA_ARGS__))\
+#define SP_TASK_SUPER_PRECONDITION(Planner, PlannerFlags, ...)\
+	if (!Super::PreCondition(Planner, PlannerFlags, ##__VA_ARGS__))\
 		return false;
 
 
@@ -18,8 +18,8 @@
 *	Helper macro to call parent post condition implementation.
 *	Should always be called in children PostCondition_Implementation override.
 */
-#define SP_TASK_SUPER_POSTCONDITION(Implementation, Planner, PlannerFlags, ...)\
-	PlannerFlags = Super::Implementation(Planner, PlannerFlags, ##__VA_ARGS__);
+#define SP_TASK_SUPER_POSTCONDITION(Planner, PlannerFlags, ...)\
+	PlannerFlags = Super::PostCondition(Planner, PlannerFlags, ##__VA_ARGS__);
 
 
 /**
