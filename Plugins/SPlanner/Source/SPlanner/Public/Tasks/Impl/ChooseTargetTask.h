@@ -22,7 +22,7 @@ protected:
 
 	/** Local offset to apply to the center. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
-		FVector Dimensions = FVector(100.0f, 100.0f, 100.0f);
+	FVector Dimensions = FVector(100.0f, 100.0f, 100.0f);
 
 public:
 	bool PreCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const override;

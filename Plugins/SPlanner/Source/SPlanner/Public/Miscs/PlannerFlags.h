@@ -11,6 +11,10 @@ enum class ESP_PlannerFlags : uint8
 
 	/** Transform has changed. */
 	PF_DirtyTransform		UMETA(Display = "DirtyTransform"),
+
+
+	/** The target will be a POI. */
+	PF_POITarget			UMETA(Display = "POITarget"),
 };
 
 ENUM_CLASS_FLAGS(ESP_PlannerFlags)
