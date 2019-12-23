@@ -32,24 +32,41 @@
 		return SuperState;
 
 
+
+#if SP_DEBUG
+
+/**
+*	Helper macro to check whether task execute debug is shown.
+*/
+#define SP_IF_TASK_EXECUTE(CheckSelected)\
+	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskExecute) && CheckSelected->IsSelectedInEditor())
+
 /**
 *	Helper macro to log task execute.
 */
-#if SP_DEBUG
+#define SP_LOG_TASK_EXECUTE(CheckSelected, Str, ...)\
+	SP_IF_TASK_EXECUTE(CheckSelected)\
+	SP_LOG_SCREEN_FULL(Display, USP_Settings::GetExecuteLogKey(), FColor::Green,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 
-#define SP_LOG_EXECUTE(CheckSelected, Str, ...)\
-	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Execute) && CheckSelected->IsSelectedInEditor())\
-		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetExecuteLogKey(), FColor::Green,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 
 /**
-*	Helper macro to log all task.
+*	Helper macro to check whether task execute debug is shown.
 */
-#define SP_LOG_TASK(CheckSelected, Str, ...)\
-	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Task) && CheckSelected->IsSelectedInEditor())\
-		SP_LOG_SCREEN_FULL(Display, -1.0f, FColor::Magenta,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
+#define SP_IF_TASK_TICK(CheckSelected)\
+	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskTick) && CheckSelected->IsSelectedInEditor())
+
+/**
+*	Helper macro to log all task ticks.
+*/
+#define SP_LOG_TASK_TICK(CheckSelected, Str, ...)\
+	SP_IF_TASK_TICK(CheckSelected)\
+	SP_LOG_SCREEN_FULL(Display, -1.0f, FColor::Magenta,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 #else
 
+#define SP_IF_TASK_EXECUTE(...)
 #define SP_LOG_EXECUTE(...)
+
+#define SP_IF_TASK_TICK(...)
 #define SP_LOG_TASK(...)
 
 #endif

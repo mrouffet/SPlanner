@@ -11,13 +11,13 @@ UENUM(Meta = (Bitflags))
 enum class ESP_DebugFlag : uint8
 {
 	/** Log move list and generated plan. */
-	PD_Plan			UMETA(DisplayName = "Plan"),
+	PD_Plan				UMETA(DisplayName = "Plan"),
 
 	/** Log task execution (1 time). */
-	PD_Execute		UMETA(DisplayName = "Execute"),
+	PD_TaskExecute		UMETA(DisplayName = "Execute"),
 
 	/** Log task execution frames. */
-	PD_Task			UMETA(DisplayName = "Task"),
+	PD_TaskTick			UMETA(DisplayName = "Task"),
 };
 
 ENUM_CLASS_FLAGS(ESP_DebugFlag);

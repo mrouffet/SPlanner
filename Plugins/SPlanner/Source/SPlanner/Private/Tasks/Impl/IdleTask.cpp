@@ -1,5 +1,7 @@
 #include <Tasks/Impl/IdleTask.h>
 
+#include <Components/PlannerComponent.h>
+
 uint32 USP_IdleTask::GetUserDataSize() const
 {
 	return sizeof(FTaskInfos);
@@ -11,7 +13,7 @@ ESP_PlanExecutionState USP_IdleTask::Begin(USP_PlannerComponent* Planner, uint8*
 
 	FTaskInfos* Infos = new(UserData) FTaskInfos{ FMath::RandRange(MinTime, MaxTime) };
 
-	SP_LOG_EXECUTE(Planner->GetOwner(), "%f", Infos->WaitTime)
+	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%f", Infos->WaitTime)
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }

@@ -25,10 +25,10 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 		
 
 #if SP_DEBUG
-	if (PlannerOwner->IsSelectedInEditor())
+	SP_IF_TASK_EXECUTE(PlannerOwner)
 		DrawDebugLine(PlannerOwner->GetWorld(), PlannerOwner->GetActorLocation(), TargetPosition, FColor::Cyan, false, USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
 
-	SP_LOG_EXECUTE(PlannerOwner, "%s", *TargetPosition.ToString())
+	SP_LOG_TASK_EXECUTE(PlannerOwner, "%s", *TargetPosition.ToString())
 #endif
 
 
