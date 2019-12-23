@@ -3,8 +3,6 @@
 #include <GameFramework/Actor.h>
 #include "POIActor.generated.h"
 
-class USphereComponent;
-
 class USP_POIComponent;
 
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|POI")
@@ -16,10 +14,6 @@ protected:
 	/** POI behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_POIComponent* PointOfInterest = nullptr;
-
-	/** Collider of POI interaction. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USphereComponent* SphereCollider = nullptr;
 
 public:
 	ASP_POIActor(const FObjectInitializer& ObjectInitializer);

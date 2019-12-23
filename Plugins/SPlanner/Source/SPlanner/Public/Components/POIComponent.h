@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Components/ActorComponent.h>
+#include <Components/SphereComponent.h>
 #include "POIComponent.generated.h"
 
 class USP_POIActionSet;
@@ -10,7 +10,7 @@ class USP_POIActionSet;
 *	Grant special tasks to planner.
 */
 UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), DisplayName = "PointOfInterest", ClassGroup = "SPlanner|POI")
-class SPLANNER_API USP_POIComponent : public UActorComponent
+class SPLANNER_API USP_POIComponent : public USphereComponent
 {
 	GENERATED_BODY()
 
@@ -20,6 +20,8 @@ protected:
 	USP_POIActionSet* ActionsSet;
 
 public:
+	USP_POIComponent(const FObjectInitializer& ObjectInitializer);
+
 	/** Getter of ActionsSet. */
 	USP_POIActionSet* GetActionSet() const;
 };
