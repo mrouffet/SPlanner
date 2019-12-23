@@ -46,7 +46,7 @@
 */
 #define SP_LOG_TASK_EXECUTE(CheckSelected, Str, ...)\
 	SP_IF_TASK_EXECUTE(CheckSelected)\
-	SP_LOG_SCREEN_FULL(Display, USP_Settings::GetExecuteLogKey(), FColor::Green,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
+	SP_LOG_SCREEN_FULL(Display, USP_Settings::GetTaskExecuteLogKey(), FColor::Green,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 
 
 /**

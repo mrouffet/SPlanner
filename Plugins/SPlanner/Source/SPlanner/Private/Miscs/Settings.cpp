@@ -1,5 +1,9 @@
 #include <Miscs/Settings.h>
 
+#if WITH_EDITORONLY_DATA
+	static int TaskExecuteKeyOffset = 0;
+#endif
+
 uint8 USP_Settings::GetDebugMask()
 {
 #if WITH_EDITORONLY_DATA
@@ -33,13 +37,25 @@ int USP_Settings::GetPlanLogKey()
 
 	return -1;
 }
-int USP_Settings::GetExecuteLogKey()
+int USP_Settings::GetTaskExecuteLogKey()
 {
 #if WITH_EDITORONLY_DATA
-	return GetDefault<USP_Settings>()->DebugLogKey + 2;
+	return GetDefault<USP_Settings>()->DebugLogKey + 2 + TaskExecuteKeyOffset;
 #endif
 
 	return -1;
+}
+void USP_Settings::IncrementTaskExecuteLogKey()
+{
+#if WITH_EDITORONLY_DATA
+	++TaskExecuteKeyOffset;
+#endif
+}
+void USP_Settings::ResetTaskExecuteLogKey()
+{
+#if WITH_EDITORONLY_DATA
+	TaskExecuteKeyOffset = 0;
+#endif
 }
 
 uint8 USP_Settings::GetMaxPlannerDepth()

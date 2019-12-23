@@ -171,6 +171,14 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 
 void USP_PlannerComponent::AskNewPlan()
 {
+	SP_CHECK(PlanState != ESP_PlanState::PS_Computing, "Plan already being computed!")
+
+#if SP_DEBUG
+	// Reset debug keys.
+	if (GetOwner()->IsSelectedInEditor())
+		USP_Settings::ResetTaskExecuteLogKey();
+#endif
+
 	Plan.Empty();
 
 	// Wait for new plan computation.
@@ -291,6 +299,12 @@ bool USP_PlannerComponent::BeginNextTask()
 
 	++CurrentPlanIndex;
 	
+#if SP_DEBUG
+	// Update debug keys.
+	if(GetOwner()->IsSelectedInEditor())
+		USP_Settings::IncrementTaskExecuteLogKey();
+#endif
+
 	// No other task left.
 	if (CurrentPlanIndex == Plan.Num())
 	{

@@ -54,11 +54,11 @@ protected:
 	uint8 MaxPlannerDepth = 5u;
 
 public:
-	/** Static accessor of debugFlags. */
+	/** Static accessor of DebugMask. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static uint8 GetDebugMask();
 
-	/** Static accessor of debugScreenDisplayTime. */
+	/** Static accessor of DebugScreenDisplayTime. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static float GetDebugScreenDisplayTime();
 
@@ -70,11 +70,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static int GetPlanLogKey();
 
-	/** Static accessor of ExecuteLogKey. */
+	/** Static accessor of TaskExecuteLogKey. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
-	static int GetExecuteLogKey();
+	static int GetTaskExecuteLogKey();
 
-	/** Static accessor of maxPlannerDepth */
+	/** Static accessor to increment TaskExecuteLogKey. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	static void IncrementTaskExecuteLogKey();
+
+	/** Static accessor to reset TaskExecuteLogKey. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	static void ResetTaskExecuteLogKey();
+
+	/** Static accessor of MaxPlannerDepth */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Settings")
 	static uint8 GetMaxPlannerDepth();
 };
