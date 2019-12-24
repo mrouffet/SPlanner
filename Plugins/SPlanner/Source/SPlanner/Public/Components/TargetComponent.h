@@ -62,6 +62,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
 	AActor* GetActor() const;
 
+	/** Getter of any kind of actor */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
+	AActor* GetAnyActor() const;
+
 	/** Getter of Actor as player */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
 	AActor* GetPlayer() const;

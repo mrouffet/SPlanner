@@ -47,9 +47,23 @@ FVector USP_TargetComponent::GetAnyPosition() const
 }
 AActor* USP_TargetComponent::GetActor() const
 {
-	SP_RCHECK(State == ESP_TargetState::TS_Actor || State == ESP_TargetState::TS_Player, "Bad target!", nullptr)
+	SP_RCHECK(State == ESP_TargetState::TS_Actor, "Bad target!", nullptr)
 
 	return Actor;
+}
+AActor* USP_TargetComponent::GetAnyActor() const
+{
+	if (State == ESP_TargetState::TS_Actor || State == ESP_TargetState::TS_Player)
+		return Actor;
+	else if (State == ESP_TargetState::TS_POI)
+	{
+		SP_RCHECK_NULLPTR(POI, nullptr)
+		return POI->GetOwner();
+	}
+
+	SP_LOG(Error, "Bad target type!")
+
+	return nullptr;
 }
 AActor* USP_TargetComponent::GetPlayer() const
 {
@@ -63,6 +77,7 @@ USP_POIComponent* USP_TargetComponent::GetPOI() const
 
 	return POI;
 }
+
 
 void USP_TargetComponent::SetPosition(const FVector& InPosition)
 {
