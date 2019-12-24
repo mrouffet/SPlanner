@@ -11,7 +11,7 @@ class SPLANNER_API USP_IdleTask : public USP_Task
 {
 	GENERATED_BODY()
 	
-	struct FTaskInfos
+	struct FSP_TaskInfos
 	{
 		float WaitTime = -1.0f;
 		float CurrTime = 0.0f;

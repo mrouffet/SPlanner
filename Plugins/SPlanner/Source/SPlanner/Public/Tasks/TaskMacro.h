@@ -60,7 +60,7 @@
 */
 #define SP_LOG_TASK_TICK(CheckSelected, Str, ...)\
 	SP_IF_TASK_TICK(CheckSelected)\
-	SP_LOG_SCREEN_FULL(Display, -1.0f, FColor::Magenta,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
+	SP_LOG_SCREEN_FULL(Display, -1, FColor::Magenta,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 #else
 
 #define SP_IF_TASK_EXECUTE(...)
