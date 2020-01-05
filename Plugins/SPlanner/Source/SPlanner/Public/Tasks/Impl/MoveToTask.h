@@ -34,7 +34,7 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 protected:
 	/** The radius to accept the move to as completed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	float AcceptanceRadius = 20.0f;
+	float AcceptanceRadius = 10.0f;
 
 	/** Check if owner actor has reached its target. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Task|MoveTo")

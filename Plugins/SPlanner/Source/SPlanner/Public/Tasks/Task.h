@@ -14,7 +14,7 @@ class USP_PlannerComponent;
 /**
  *	Planner task base.
  */
-UCLASS(Abstract, ClassGroup = "SPlanner|Task")
+UCLASS(Abstract, Blueprintable, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_Task : public UDataAsset
 {
 	GENERATED_BODY()

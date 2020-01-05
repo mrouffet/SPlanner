@@ -38,20 +38,30 @@ float USP_PlannerComponent::GetCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, -1.0f)
 
-	const float* CooldownPtr = Cooldowns.Find(Task);
+	const float* const CooldownPtr = Cooldowns.Find(Task);
 
-	return CooldownPtr ? GetWorld()->GetTimeSeconds() - *CooldownPtr : 0.0f;
+	return CooldownPtr ? GetWorld()->GetTimeSeconds() - *CooldownPtr : FLT_MAX;
 }
 void USP_PlannerComponent::SetCooldown(const USP_Task* Task)
 {
 	SP_CHECK_NULLPTR(Task)
 
-	Cooldowns[Task] = GetWorld()->GetTimeSeconds() + Task->GetCooldown();
+	// Never save task without cooldown.
+	if(Task->GetCooldown() <= 0.0f)
+		return;
+
+	float* const CooldownPtr = Cooldowns.Find(Task);
+
+	if (CooldownPtr)
+		*CooldownPtr = GetWorld()->GetTimeSeconds() + Task->GetCooldown();
+	else
+		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Task->GetCooldown());
 }
 bool USP_PlannerComponent::IsInCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, false)
 
+	// Never check task without cooldown.
 	if(Task->GetCooldown() <= 0.0f)
 		return false;
 
@@ -145,9 +155,10 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 				}
 #endif
 
-				bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal);
+				// Use INDEX_NONE to convert int32 to bool.
+				bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal) != INDEX_NONE;
 
-				if (!IsInCooldown(POIActions[i].Task) && (bAchieveGoal || POIActions[i].ServedGoals.Find(Goal)))
+				if (!IsInCooldown(POIActions[i].Task) && (bAchieveGoal || POIActions[i].ServedGoals.Find(Goal) != INDEX_NONE))
 					ShuffledActions.Add(FSP_Action(POIActions[i].Task, POIActions[i].Weight * FMath::FRand(), bAchieveGoal));
 			}
 		}
@@ -319,7 +330,11 @@ bool USP_PlannerComponent::BeginNextTask()
 	// Can't begin task, Plan got invalid: ask a new one.
 	if (Plan[CurrentPlanIndex]->Begin(this, TaskUserData.GetData()) != ESP_PlanExecutionState::PES_Succeed) 
 	{
+		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
+			SetCooldown(Plan[CurrentPlanIndex]);
+			
 		AskNewPlan();
+
 		return false;
 	}
 
@@ -332,9 +347,15 @@ bool USP_PlannerComponent::EndTask()
 	// Can't end task, Plan got invalid: ask a new one.
 	if (Plan[CurrentPlanIndex]->End(this, TaskUserData.GetData()) != ESP_PlanExecutionState::PES_Succeed)
 	{
+		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
+			SetCooldown(Plan[CurrentPlanIndex]);
+
 		AskNewPlan();
+
 		return false;
 	}
+
+	SetCooldown(Plan[CurrentPlanIndex]);
 
 	return true;
 }
@@ -352,7 +373,12 @@ void USP_PlannerComponent::ExecuteTask(float DeltaTime)
 
 	// Process task result.
 	if (TickResult == ESP_PlanExecutionState::PES_Failed)			// Plan got invalid: ask a new one.
+	{
+		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
+			SetCooldown(Plan[CurrentPlanIndex]);
+
 		AskNewPlan();
+	}
 	else if (TickResult == ESP_PlanExecutionState::PES_Succeed)		// Task succeed.
 	{
 		if (!EndTask())
