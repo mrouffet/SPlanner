@@ -10,10 +10,9 @@
 
 class USP_Goal;
 class USP_Task;
-class USP_ActionSet;
-class USP_POIActionSet;
 
 class USP_TargetComponent;
+class USP_ActionSetComponent;
 class USP_InteractZoneComponent;
 
 /**
@@ -29,10 +28,6 @@ class SPLANNER_API USP_PlannerComponent : public UActorComponent
 	friend class FSP_PlanConstructTask;
 
 protected:
-	/** Action sets depending on current goal. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Planner")
-	TMap<USP_Goal*, USP_ActionSet*> ActionsSets;
-
 	/**
 	*	The current targeted goal.
 	*	Editor set default value.
@@ -63,10 +58,6 @@ protected:
 	*	Must be init in cpp file (PS4 Standard).
 	*/
 	std::atomic<ESP_PlanState> PlanState;
-
-	/** Cached target component. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
-	USP_TargetComponent* Target = nullptr;
 
 	/**
 	*	Set new plan to execute and update PlanState.
@@ -115,6 +106,14 @@ protected:
 	void BeginPlay() override;
 
 public:
+	/** Action set component used. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
+	USP_ActionSetComponent* ActionSet = nullptr;
+
+	/** Target component used. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
+	USP_TargetComponent* Target = nullptr;
+	
 	/**
 	*	The POI interact zone used.
 	*	Used to add action set from interactible POIs.

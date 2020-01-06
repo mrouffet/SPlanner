@@ -11,8 +11,9 @@
 #include <Tasks/ActionSet.h>
 #include <Tasks/POIActionSet.h>
 
-#include <Components/TargetComponent.h>
 #include <Components/POIComponent.h>
+#include <Components/TargetComponent.h>
+#include <Components/ActionSetComponent.h>
 #include <Components/InteractZoneComponent.h>
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -110,22 +111,22 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledActions) const
 {
 	SP_RCHECK_NULLPTR(Goal, false)
+	SP_RCHECK_NULLPTR(ActionSet, false)
 
-	const USP_ActionSet* const* const ActionSetPtr = ActionsSets.Find(Goal);
-
-	SP_RCHECK(ActionSetPtr && *ActionSetPtr, "No action set for goal [ %s ]", false , *Goal->GetName())
+	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(Goal);
+	SP_RCHECK_NULLPTR(CurrActionSet, false)
 
 	// Pairs with random applied to action's weight.
 
 	// Add all available actions.
-	const TArray<FSP_Action>& Actions = (*ActionSetPtr)->GetActions();
+	const TArray<FSP_Action>& Actions = CurrActionSet->GetActions();
 
 	for (int i = 0; i < Actions.Num(); ++i)
 	{
 #if SP_DEBUG
 		if (!Actions[i].Task)
 		{
-			SP_LOG(Error, "%s: Task [ %d ] nullptr!", *(*ActionSetPtr)->GetName(), i);
+			SP_LOG(Error, "%s: Task [ %d ] nullptr!", *CurrActionSet->GetName(), i);
 			continue;
 		}
 #endif
@@ -238,7 +239,7 @@ void USP_PlannerComponent::ConstructPlan()
 	}
 
 	if(!bCanAchievePlan)
-		SP_LOG_SCREEN(Error, FColor::Red, "%s can't achieve goal %s", *(*ActionsSets.Find(Goal))->GetName(), *Goal->GetName())
+		SP_LOG_SCREEN(Error, FColor::Red, "%s can't achieve goal %s", *ActionSet->GetActionSet(Goal)->GetName(), *Goal->GetName())
 #endif
 
 	TArray<USP_Task*> NewPlan;
@@ -385,8 +386,6 @@ void USP_PlannerComponent::ExecuteTask(float DeltaTime)
 void USP_PlannerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Target = Cast<USP_TargetComponent>(GetOwner()->GetComponentByClass(USP_TargetComponent::StaticClass()));
 
 	// Computed by server while owner replicated.
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
