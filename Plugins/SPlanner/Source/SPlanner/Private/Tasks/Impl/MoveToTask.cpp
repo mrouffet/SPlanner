@@ -14,8 +14,11 @@ bool USP_MoveToTask::HasReachedPosition(const USP_PlannerComponent* Planner) con
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	if(ACharacter* Character = Cast<ACharacter>(Planner->GetOwner()))
-		return HasReachedPosition(Character, Planner->GetTarget()->GetAnyPosition());
+	if(AAIController* Controller = Cast<AAIController>(Planner->GetOwner()))
+	{
+		if (ACharacter* Character = Cast<ACharacter>(Controller->GetPawn()))
+			return HasReachedPosition(Character, Planner->GetTarget()->GetAnyPosition());
+	}
 
 	return HasReachedPosition(Planner->GetOwner(), Planner->GetTarget()->GetAnyPosition());
 }
@@ -106,10 +109,7 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint
 
 
 	// Use AIController pathfinding MoveTo.
-	const ACharacter* const Character = Cast<ACharacter>(Planner->GetOwner());
-	SP_RCHECK_NULLPTR(Character, ESP_PlanExecutionState::PES_Failed)
-
-	AAIController* const Controller = Character->GetController<AAIController>();
+	AAIController* const Controller = Cast<AAIController>(Planner->GetOwner());
 	SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
 
@@ -139,7 +139,7 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
 	{
-		SP_LOG_TASK_TICK(Character, "Move request failed!")
+		SP_LOG_TASK_TICK(Controller, "Move request failed!")
 		return ESP_PlanExecutionState::PES_Failed;
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -148,7 +148,7 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
 
-	SP_LOG_TASK_EXECUTE(Character, "Pathfinding: %s", *Planner->GetTarget()->GetAnyPosition().ToString())
+	SP_LOG_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->GetTarget()->GetAnyPosition().ToString())
 
 	// Bind completed event.
 	Infos->Controller = Controller;
@@ -173,7 +173,10 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_PlannerCompo
 	}
 	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
 	{
-		const ACharacter* const Character = Cast<ACharacter>(Planner->GetOwner());
+		const AAIController* const Controller = Cast<AAIController>(Planner->GetOwner());
+		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
+
+		const ACharacter* const Character = Cast<ACharacter>(Controller->GetPawn());
 		SP_RCHECK_NULLPTR(Character, ESP_PlanExecutionState::PES_Failed)
 
 		// Wait for complete stop.

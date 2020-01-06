@@ -3,7 +3,7 @@
 #include <GameFramework/Character.h>
 #include "PlannerCharacter.generated.h"
 
-class USP_PlannerComponent;
+class USP_ActionSetComponent;
 class USP_TargetComponent;
 class USP_InteractZoneComponent;
 
@@ -18,7 +18,7 @@ class SPLANNER_API ASP_PlannerCharacter : public ACharacter
 protected:
 	/** Planning behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Planner")
-	USP_PlannerComponent* Planner = nullptr;
+	USP_ActionSetComponent* ActionSet = nullptr;
 
 	/** Target behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Planner")
