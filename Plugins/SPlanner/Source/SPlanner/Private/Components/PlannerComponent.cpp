@@ -13,7 +13,7 @@
 
 #include <Components/TargetComponent.h>
 #include <Components/POIComponent.h>
-#include <Components/POIInteractZoneComponent.h>
+#include <Components/InteractZoneComponent.h>
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -136,24 +136,18 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 
 
 	// Add all available actions from POI.
-	if (POIInteractZone)
+	if (InteractZone)
 	{
-		for (int j = 0; j < POIInteractZone->GetPOIs().Num(); ++j)
+		for (int j = 0; j < InteractZone->GetPOIs().Num(); ++j)
 		{
-			SP_RCHECK(POIInteractZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
-			SP_RCHECK(POIInteractZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %d ] action set nullptr!", false, *GetName(), j)
+			SP_RCHECK(InteractZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
+			SP_RCHECK(InteractZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %d ] action set nullptr!", false, *GetName(), j)
 
-			const TArray<FSP_POIAction>& POIActions = POIInteractZone->GetPOIs()[j]->GetActionSet()->GetActions();
+			const TArray<FSP_POIAction>& POIActions = InteractZone->GetPOIs()[j]->GetActionSet()->GetActions();
 
 			for (int i = 0; i < POIActions.Num(); ++i)
 			{
-#if SP_DEBUG
-				if (!POIActions[i].Task)
-				{
-					SP_LOG(Error, "%s: POI Task [ %d ] nullptr!", *POIInteractZone->GetPOIs()[j]->GetActionSet()->GetName(), i);
-					continue;
-				}
-#endif
+				SP_CCHECK(POIActions[i].Task, "%s: POI Task [ %d ] nullptr!", *InteractZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
 
 				// Use INDEX_NONE to convert int32 to bool.
 				bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal) != INDEX_NONE;

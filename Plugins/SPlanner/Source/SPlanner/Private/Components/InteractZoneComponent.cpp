@@ -1,20 +1,20 @@
-#include <Components/POIInteractZoneComponent.h>
+#include <Components/InteractZoneComponent.h>
 
 #include <Debug/Debug.h>
 
 #include <Components/POIComponent.h>
 
-USP_POIInteractZoneComponent::USP_POIInteractZoneComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+USP_InteractZoneComponent::USP_InteractZoneComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SphereRadius = 100.0f;
 }
 
-const TArray<USP_POIComponent*>& USP_POIInteractZoneComponent::GetPOIs() const
+const TArray<USP_POIComponent*>& USP_InteractZoneComponent::GetPOIs() const
 {
 	return POIs;
 }
 
-void USP_POIInteractZoneComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp,
+void USP_InteractZoneComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex,
@@ -27,7 +27,7 @@ void USP_POIInteractZoneComponent::OnOverlapBegin(UPrimitiveComponent* Overlappe
 		POIs.Add(POI);
 }
 
-void USP_POIInteractZoneComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp,
+void USP_InteractZoneComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex)
@@ -45,7 +45,7 @@ void USP_POIInteractZoneComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedC
 	}
 }
 
-void USP_POIInteractZoneComponent::BeginPlay()
+void USP_InteractZoneComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -55,10 +55,10 @@ void USP_POIInteractZoneComponent::BeginPlay()
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
-	OnComponentBeginOverlap.AddDynamic(this, &USP_POIInteractZoneComponent::OnOverlapBegin);
-	OnComponentEndOverlap.AddDynamic(this, &USP_POIInteractZoneComponent::OnOverlapEnd);
+	OnComponentBeginOverlap.AddDynamic(this, &USP_InteractZoneComponent::OnOverlapBegin);
+	OnComponentEndOverlap.AddDynamic(this, &USP_InteractZoneComponent::OnOverlapEnd);
 }
-void USP_POIInteractZoneComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void USP_InteractZoneComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	
@@ -68,6 +68,6 @@ void USP_POIInteractZoneComponent::EndPlay(const EEndPlayReason::Type EndPlayRea
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
-	OnComponentBeginOverlap.RemoveDynamic(this, &USP_POIInteractZoneComponent::OnOverlapBegin);
-	OnComponentEndOverlap.RemoveDynamic(this, &USP_POIInteractZoneComponent::OnOverlapEnd);
+	OnComponentBeginOverlap.RemoveDynamic(this, &USP_InteractZoneComponent::OnOverlapBegin);
+	OnComponentEndOverlap.RemoveDynamic(this, &USP_InteractZoneComponent::OnOverlapEnd);
 }

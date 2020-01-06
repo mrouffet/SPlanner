@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Components/SphereComponent.h>
-#include "POIInteractZoneComponent.generated.h"
+#include "InteractZoneComponent.generated.h"
 
 class USP_POIComponent;
 
@@ -9,8 +9,8 @@ class USP_POIComponent;
  *	Implementation of planner interact zone.
  *	Used to pickup POI action set.
  */
-UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), DisplayName = "POIInteractZone", ClassGroup = "SPlanner|InteractZone")
-class SPLANNER_API USP_POIInteractZoneComponent : public USphereComponent
+UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), DisplayName = "InteractZone", ClassGroup = "SPlanner|InteractZone")
+class SPLANNER_API USP_InteractZoneComponent : public USphereComponent
 {
 	GENERATED_BODY()
 	
@@ -41,7 +41,7 @@ protected:
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	USP_POIInteractZoneComponent(const FObjectInitializer& ObjectInitializer);
+	USP_InteractZoneComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Getter of POIs. */
 	const TArray<USP_POIComponent*>& GetPOIs() const;

@@ -4,7 +4,7 @@
 
 #include <Components/PlannerComponent.h>
 #include <Components/TargetComponent.h>
-#include <Components/POIInteractZoneComponent.h>
+#include <Components/InteractZoneComponent.h>
 
 ASP_PlannerCharacter::ASP_PlannerCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -14,6 +14,6 @@ ASP_PlannerCharacter::ASP_PlannerCharacter(const FObjectInitializer& ObjectIniti
 
 	Target = CreateDefaultSubobject<USP_TargetComponent>(TEXT("Target"));
 
-	POIInteractZone = CreateDefaultSubobject<USP_POIInteractZoneComponent>(TEXT("POIInteractZone"));
-	Planner->POIInteractZone = POIInteractZone;
+	InteractZone = CreateDefaultSubobject<USP_InteractZoneComponent>(TEXT("InteractZone"));
+	Planner->InteractZone = InteractZone;
 }

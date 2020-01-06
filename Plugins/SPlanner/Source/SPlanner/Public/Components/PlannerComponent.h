@@ -14,7 +14,7 @@ class USP_ActionSet;
 class USP_POIActionSet;
 
 class USP_TargetComponent;
-class USP_POIInteractZoneComponent;
+class USP_InteractZoneComponent;
 
 /**
 *	Planner behavior.
@@ -120,7 +120,7 @@ public:
 	*	Used to add action set from interactible POIs.
 	*/
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner|Planner")
-	USP_POIInteractZoneComponent* POIInteractZone = nullptr;
+	USP_InteractZoneComponent* InteractZone = nullptr;
 
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
 
