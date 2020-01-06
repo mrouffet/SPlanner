@@ -86,6 +86,31 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 /** Helper check Owner*/
 #define SP_RCHECK_OWNER(ReturnType, ...) SP_RCHECK(GetOwner(), "Owner nullptr!", ReturnType, ##__VA_ARGS__)
 
+
+/**
+*	Assertion like check.
+*	Implementation of check with continue.
+*/
+#define SP_CCHECK(Predicate, Str, ...)\
+	if(!(Predicate))\
+	{\
+		SP_LOG(Error, Str, ##__VA_ARGS__)\
+		continue;\
+	}
+
+/** Helper check for nullptr objects. */
+#define SP_CCHECK_NULLPTR(Object, ...) SP_CCHECK(Object, #Object " is nullptr!", ##__VA_ARGS__)
+
+/** Helper check for GameState type.*/
+#define SP_CCHECK_GAMESTATE(GameStateType, ...) SP_CCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ##__VA_ARGS__)
+
+/** Helper check Authority */
+#define SP_CCHECK_AUTHORITY(...) SP_CCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ##__VA_ARGS__)
+
+/** Helper check Owner*/
+#define SP_CCHECK_OWNER(...) SP_CCHECK(GetOwner(), "Owner nullptr!", ##__VA_ARGS__)
+
+
 #else
 
 #define SP_WFILE_NAME L""
@@ -95,6 +120,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 #define SP_LOG_SCREEN(...)
 #define SP_LOG_SCREEN_FULL(...)
 
+
 #define SP_CHECK(...)
 
 #define SP_CHECK_NULLPTR(...)
@@ -102,11 +128,20 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 #define SP_CHECK_AUTHORITY(...)
 #define SP_CHECK_OWNER(...)
 
+
 #define SP_RCHECK(...)
 
 #define SP_RCHECK_NULLPTR(...)
 #define SP_RCHECK_GAMESTATE(...)
 #define SP_RCHECK_AUTHORITY(...)
 #define SP_RCHECK_OWNER(...)
+
+
+#define SP_CCHECK(...)
+
+#define SP_CCHECK_NULLPTR(...)
+#define SP_CCHECK_GAMESTATE(...)
+#define SP_CCHECK_AUTHORITY(...)
+#define SP_CCHECK_OWNER(...)
 
 #endif
