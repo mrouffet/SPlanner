@@ -80,6 +80,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 	if (PlanState == ESP_PlanState::PS_Valid)
 		SP_LOG(Warning, "Set new plan while still valid!")
 
+#if SP_DEBUG_EDITOR
 	// Log plan.
 	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
 	{
@@ -97,6 +98,8 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 
 		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanLogKey(), FColor::Orange, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
 	}
+#endif
+
 #endif
 
 	if (InPlan.Num() != 0)
@@ -123,13 +126,7 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 
 	for (int i = 0; i < Actions.Num(); ++i)
 	{
-#if SP_DEBUG
-		if (!Actions[i].Task)
-		{
-			SP_LOG(Error, "%s: Task [ %d ] nullptr!", *CurrActionSet->GetName(), i);
-			continue;
-		}
-#endif
+		SP_CCHECK(Actions[i].Task, "%s: Task [ %d ] nullptr!", *CurrActionSet->GetName(), i)
 
 		if (!IsInCooldown(Actions[i].Task))
 			ShuffledActions.Add(FSP_Action(Actions[i], FMath::FRand()));
@@ -179,7 +176,7 @@ void USP_PlannerComponent::AskNewPlan()
 {
 	SP_CHECK(PlanState != ESP_PlanState::PS_Computing, "Plan already being computed!")
 
-#if SP_DEBUG
+#if SP_DEBUG_EDITOR
 	// Reset debug keys.
 	if (GetOwner()->IsSelectedInEditor())
 		USP_Settings::ResetTaskExecuteLogKey();
@@ -209,6 +206,8 @@ void USP_PlannerComponent::ConstructPlan()
 #endif
 
 #if SP_DEBUG
+
+#if SP_DEBUG_EDITOR
 	// Log available shuffled task.
 	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
 	{
@@ -226,6 +225,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetMoveListLogKey(), FColor::Yellow, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
 	}
+#endif
 
 	// Check plan can be achieved.
 	bool bCanAchievePlan = false;
@@ -305,7 +305,7 @@ bool USP_PlannerComponent::BeginNextTask()
 
 	++CurrentPlanIndex;
 	
-#if SP_DEBUG
+#if SP_DEBUG_EDITOR
 	// Update debug keys.
 	if(GetOwner()->IsSelectedInEditor())
 		USP_Settings::IncrementTaskExecuteLogKey();
