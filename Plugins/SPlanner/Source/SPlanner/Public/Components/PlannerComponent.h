@@ -35,6 +35,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Planner")
 	USP_Goal* Goal = nullptr;
 
+	/**
+	*	Minimum time to wait before constructing a new plan.
+	*	Use <= 0 to compute instantly.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Planner")
+	float TimeBeforeConstructPlan = -1.0f;
+
+	/** Timer handle before calling ConstructPlan() */
+	FTimerHandle ConstructPlanTimer;
+
 	/** Cooldown of all tasks of this planner. */
 	UPROPERTY(Transient)
 	TMap<const USP_Task*, float> Cooldowns;

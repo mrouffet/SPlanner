@@ -1,5 +1,7 @@
 #include <Components/PlannerComponent.h>
 
+#include <TimerManager.h>
+
 #include <Debug/Debug.h>
 
 #include <Miscs/FlagHelper.h>
@@ -104,7 +106,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 
 	if (InPlan.Num() != 0)
 	{
-		Plan = InPlan;
+		Plan = std::move(InPlan);
 		PlanState = ESP_PlanState::PS_Valid;
 	}
 	else
@@ -174,6 +176,7 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 
 void USP_PlannerComponent::AskNewPlan()
 {
+	SP_CHECK(PlanState != ESP_PlanState::PS_Valid, "Plan still valid!")
 	SP_CHECK(PlanState != ESP_PlanState::PS_Computing, "Plan already being computed!")
 
 #if SP_DEBUG_EDITOR
@@ -184,13 +187,26 @@ void USP_PlannerComponent::AskNewPlan()
 
 	Plan.Empty();
 
+	ESP_PlanState PrevState = PlanState;
+
 	// Wait for new plan computation.
 	PlanState = ESP_PlanState::PS_Computing;
 
 	CurrentPlanIndex = -1;
 
-	// Queue plan construction in thread.
-	(new FAutoDeleteAsyncTask<FSP_PlanConstructTask>(this))->StartBackgroundTask();
+	if (TimeBeforeConstructPlan <= 0.0f)
+	{
+		// Queue plan construction in thread.
+		(new FAutoDeleteAsyncTask<FSP_PlanConstructTask>(this))->StartBackgroundTask();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer,
+			[this](){ (new FAutoDeleteAsyncTask<FSP_PlanConstructTask>(this))->StartBackgroundTask(); },
+			TimeBeforeConstructPlan,
+			false
+		);
+	}
 }
 void USP_PlannerComponent::ConstructPlan()
 {
@@ -314,6 +330,8 @@ bool USP_PlannerComponent::BeginNextTask()
 	// No other task left.
 	if (CurrentPlanIndex == Plan.Num())
 	{
+		PlanState = ESP_PlanState::PS_Finished;
+
 		AskNewPlan();
 		return false;
 	}
@@ -328,6 +346,8 @@ bool USP_PlannerComponent::BeginNextTask()
 		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
 			SetCooldown(Plan[CurrentPlanIndex]);
 			
+		PlanState = ESP_PlanState::PS_Invalid;
+
 		AskNewPlan();
 
 		return false;
@@ -344,6 +364,8 @@ bool USP_PlannerComponent::EndTask()
 	{
 		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
 			SetCooldown(Plan[CurrentPlanIndex]);
+
+		PlanState = ESP_PlanState::PS_Invalid;
 
 		AskNewPlan();
 
@@ -371,6 +393,8 @@ void USP_PlannerComponent::ExecuteTask(float DeltaTime)
 	{
 		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
 			SetCooldown(Plan[CurrentPlanIndex]);
+
+		PlanState = ESP_PlanState::PS_Invalid;
 
 		AskNewPlan();
 	}
