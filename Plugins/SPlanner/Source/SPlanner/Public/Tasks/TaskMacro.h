@@ -27,15 +27,13 @@
 *	Should always be called in children Execute_Implementation override.
 */
 #define SP_TASK_SUPER(Implementation, ...)\
-	ESP_PlanExecutionState SuperState = Super::Implementation(##__VA_ARGS__);\
+	ESP_PlanExecutionState SuperState = Super::Implementation(__VA_ARGS__);\
 	if (SuperState != ESP_PlanExecutionState::PES_Succeed)\
 		return SuperState;
 
 
 
-#if SP_DEBUG
-
-#if WITH_EDITOR
+#if SP_DEBUG_EDITOR
 
 /**
 *	Helper macro to check whether task execute debug is shown.
@@ -49,12 +47,6 @@
 #define SP_IF_TASK_TICK(CheckSelected)\
 	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskTick) && CheckSelected->IsSelectedInEditor())
 
-#else
-
-#define SP_IF_TASK_EXECUTE(...)
-#define SP_IF_TASK_TICK(...)
-
-#endif
 
 /**
 *	Helper macro to log task execute.
@@ -62,7 +54,6 @@
 #define SP_LOG_TASK_EXECUTE(CheckSelected, Str, ...)\
 	SP_IF_TASK_EXECUTE(CheckSelected)\
 	SP_LOG_SCREEN_FULL(Display, USP_Settings::GetTaskExecuteLogKey(), FColor::Green,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
-
 
 /**
 *	Helper macro to log all task ticks.

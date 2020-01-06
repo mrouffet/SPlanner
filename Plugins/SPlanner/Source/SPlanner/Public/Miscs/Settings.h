@@ -54,6 +54,7 @@ protected:
 	uint8 MaxPlannerDepth = 5u;
 
 public:
+#if WITH_EDITOR
 	/** Static accessor of DebugMask. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static uint8 GetDebugMask();
@@ -81,6 +82,7 @@ public:
 	/** Static accessor to reset TaskExecuteLogKey. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static void ResetTaskExecuteLogKey();
+#endif
 
 	/** Static accessor of MaxPlannerDepth */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Settings")

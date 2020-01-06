@@ -52,7 +52,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_Pla
 	if(POIs.Num() == 0)
 		return ESP_PlanExecutionState::PES_Failed;
 
-#if SP_DEBUG
+#if SP_DEBUG_EDITOR
 
 	USP_POIComponent* TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
 	Planner->GetTarget()->SetPOI(TargetPOI);

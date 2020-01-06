@@ -55,7 +55,7 @@ protected:
 	/**
 	*	The current plan state.
 	*	Must be thread safe (called by Planner in thread).
-	*	Must be init in cpp file (PS4 Standard).
+	*	Must be init in cpp file (Standard).
 	*/
 	std::atomic<ESP_PlanState> PlanState;
 

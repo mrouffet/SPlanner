@@ -21,7 +21,7 @@ USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectIniti
 	bTickInEditor = false;
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// Must be init in cpp file (PS4 Standard).
+	// Must be init in cpp file (Standard).
 	PlanState = ESP_PlanState::PS_Invalid;
 }
 

@@ -24,7 +24,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 	Planner->GetTarget()->SetPosition(TargetPosition);
 		
 
-#if SP_DEBUG
+#if SP_DEBUG_EDITOR
 	SP_IF_TASK_EXECUTE(PlannerOwner)
 		DrawDebugLine(PlannerOwner->GetWorld(), PlannerOwner->GetActorLocation(), TargetPosition, FColor::Cyan, false, USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
 
