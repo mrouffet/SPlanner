@@ -4,13 +4,13 @@
 #include "FlagHelper.generated.h"
 
 /** Helper macro to check a flag in mask. */
-#define IS_FLAG_SET(BitMask, Flag) (BitMask & (1 << static_cast<uint8>(Flag)))
+#define SP_IS_FLAG_SET(BitMask, Flag) (BitMask & (1 << static_cast<uint8>(Flag)))
 
 /** Helper macro to add a flag to mask. */
-#define ADD_FLAG(BitMask, Flag) (BitMask |= 1 << static_cast<uint8>(Flag))
+#define SP_ADD_FLAG(BitMask, Flag) (BitMask |= 1 << static_cast<uint8>(Flag))
 
 /** Helper macro to remove a flag to mask. */
-#define REMOVE_FLAG(BitMask, Flag) (BitMask &= ~(1 << static_cast<uint8>(Flag)))
+#define SP_REMOVE_FLAG(BitMask, Flag) (BitMask &= ~(1 << static_cast<uint8>(Flag)))
 
 UCLASS(Category = "SPlanner|Misc")
 class SPLANNER_API USP_FlagHelper : public UObject

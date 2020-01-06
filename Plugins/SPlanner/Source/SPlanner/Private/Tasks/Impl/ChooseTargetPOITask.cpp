@@ -14,7 +14,7 @@ int USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, 
 {
 	SP_TASK_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	return ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_POITarget);
+	return SP_ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_POITarget);
 }
 
 ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_PlannerComponent* Planner, uint8* UserData)

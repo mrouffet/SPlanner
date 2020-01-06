@@ -39,7 +39,7 @@
 *	Helper macro to check whether task execute debug is shown.
 */
 #define SP_IF_TASK_EXECUTE(CheckSelected)\
-	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskExecute) && CheckSelected->IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskExecute) && CheckSelected->IsSelectedInEditor())
 
 /**
 *	Helper macro to log task execute.
@@ -53,7 +53,7 @@
 *	Helper macro to check whether task execute debug is shown.
 */
 #define SP_IF_TASK_TICK(CheckSelected)\
-	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskTick) && CheckSelected->IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskTick) && CheckSelected->IsSelectedInEditor())
 
 /**
 *	Helper macro to log all task ticks.

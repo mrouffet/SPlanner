@@ -80,7 +80,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 		SP_LOG(Warning, "Set new plan while still valid!")
 
 	// Log plan.
-	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
 	{
 		FString PlanDebugStr = "Goal: " + Goal->GetName() + " --- Plan: ";
 
@@ -113,7 +113,7 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 
 	const USP_ActionSet* const* const ActionSetPtr = ActionsSets.Find(Goal);
 
-	SP_RCHECK(ActionSetPtr || *ActionSetPtr, "No action set for goal [ %s ]", false , *Goal->GetName())
+	SP_RCHECK(ActionSetPtr && *ActionSetPtr, "No action set for goal [ %s ]", false , *Goal->GetName())
 
 	// Pairs with random applied to action's weight.
 
@@ -209,7 +209,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 #if SP_DEBUG
 	// Log available shuffled task.
-	if (IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
 	{
 		FString PlanDebugStr = "Move list: ";
 

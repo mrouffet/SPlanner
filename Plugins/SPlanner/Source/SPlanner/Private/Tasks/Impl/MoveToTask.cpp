@@ -76,11 +76,11 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, int Plann
 	SP_RCHECK_NULLPTR(Planner->GetTarget(), false)
 
 	// New target will be set.
-	if(IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget))
+	if(SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget))
 		return true;
 
 	// Check valid target and has not already moved.
-	if (!Planner->GetTarget()->IsValid() || IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform))
+	if (!Planner->GetTarget()->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform))
 		return false;
 
 	return !HasReachedPosition(Planner);
@@ -89,7 +89,7 @@ int USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, int Plann
 {
 	SP_TASK_SUPER_POSTCONDITION(Planner, PlannerFlags)
 	
-	return ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform);
+	return SP_ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform);
 }
 
 ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint8* UserData)
