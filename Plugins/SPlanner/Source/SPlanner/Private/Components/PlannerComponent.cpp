@@ -394,7 +394,8 @@ void USP_PlannerComponent::BeginPlay()
 		return;
 	}
 
-	AskNewPlan();
+	if(Goal) // Ask plan with default goal.
+		AskNewPlan();
 }
 void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
