@@ -15,7 +15,7 @@ class SPLANNER_API USP_POIActionSet : public UDataAsset
 
 protected:
 	/** List of available actions. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Action")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	TArray<FSP_POIAction> Actions;
 
 public:

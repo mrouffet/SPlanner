@@ -15,7 +15,7 @@ class SPLANNER_API ASP_PlannerController : public AAIController
 
 protected:
 	/** Planning behavior. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Planner")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_PlannerComponent* Planner = nullptr;
 
 	void OnPossess(APawn* InPawn) override;

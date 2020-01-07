@@ -33,7 +33,7 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 
 protected:
 	/** The radius to accept the move to as completed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|MoveTo")
 	float AcceptanceRadius = 10.0f;
 
 	/** Check if owner actor has reached its target. */
@@ -55,7 +55,7 @@ protected:
 	uint32 GetUserDataSize() const override;
 
 	/** Callback when a movement is completed by the AI Controller. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|AI|Character")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task|MoveTo")
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 public:

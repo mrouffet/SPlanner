@@ -16,16 +16,16 @@ class SPLANNER_API ASP_PlannerCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	/** Planning behavior. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Planner")
+	/** Action set used by Planner. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_ActionSetComponent* ActionSet = nullptr;
 
 	/** Target behavior. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Planner")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_TargetComponent* Target = nullptr;
 
 	/** POI Interact zone behavior. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Planner")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_InteractZoneComponent* InteractZone = nullptr;
 
 public:

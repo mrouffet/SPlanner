@@ -15,4 +15,5 @@ ASP_PlannerCharacter::ASP_PlannerCharacter(const FObjectInitializer& ObjectIniti
 	Target = CreateDefaultSubobject<USP_TargetComponent>(TEXT("Target"));
 
 	InteractZone = CreateDefaultSubobject<USP_InteractZoneComponent>(TEXT("InteractZone"));
+	InteractZone->SetupAttachment(RootComponent);
 }

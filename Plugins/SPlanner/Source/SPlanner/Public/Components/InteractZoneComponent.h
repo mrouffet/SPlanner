@@ -19,6 +19,7 @@ protected:
 	*	Interactible POIs.
 	*	POI currently overlapping this zone.
 	*/
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	TArray<USP_POIComponent*> POIs;
 
 	/** Callback function bind to component begin overlap. */

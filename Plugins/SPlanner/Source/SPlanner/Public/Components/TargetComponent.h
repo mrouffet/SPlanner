@@ -38,7 +38,7 @@ protected:
 	};
 
 	/** The current target state. */
-	UPROPERTY(BlueprintReadOnly, Category = "SPlanner|Target")
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
 	ESP_TargetState State = ESP_TargetState::TS_None;
 
 public:

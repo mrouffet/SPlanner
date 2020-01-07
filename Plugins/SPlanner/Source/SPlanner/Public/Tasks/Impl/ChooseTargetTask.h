@@ -13,15 +13,15 @@ class SPLANNER_API USP_ChooseTargetTask : public USP_Task
 	
 protected:
 	/** Set auto rotation to target. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|ChooseTarget")
 	bool bAutoLookAt = true;
 
 	/** Local offset to apply to the center. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|ChooseTarget")
 	FVector LocalOffset;
 
 	/** Local offset to apply to the center. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Target")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|ChooseTarget")
 	FVector Dimensions = FVector(100.0f, 100.0f, 100.0f);
 
 public:

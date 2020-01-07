@@ -32,14 +32,14 @@ protected:
 	*	The current targeted goal.
 	*	Editor set default value.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Planner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_Goal* Goal = nullptr;
 
 	/**
 	*	Minimum time to wait before constructing a new plan.
 	*	Use <= 0 to compute instantly.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Planner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	float TimeBeforeConstructPlan = -1.0f;
 
 	/** Timer handle before calling ConstructPlan() */
@@ -50,7 +50,7 @@ protected:
 	TMap<const USP_Task*, float> Cooldowns;
 
 	/** The current executed plan. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	TArray<USP_Task*> Plan;
 
 	/**

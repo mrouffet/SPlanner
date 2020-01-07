@@ -16,7 +16,7 @@ class SPLANNER_API USP_POIComponent : public USphereComponent
 
 protected:
 	/** Action sets granted by this POI. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|POI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_POIActionSet* ActionsSet;
 
 public:

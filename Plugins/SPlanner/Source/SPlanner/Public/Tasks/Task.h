@@ -21,11 +21,11 @@ class SPLANNER_API USP_Task : public UDataAsset
 
 protected:
 	/** Should use cooldown even if the task has failed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	bool bUseCooldownOnFailed = true;
 
 	/** The cooldown of this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	float Cooldown = 0.0f;
 
 	/** Blueprint event called by Begin(). */
