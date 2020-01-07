@@ -108,6 +108,9 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 	{
 		Plan = std::move(InPlan);
 		PlanState = ESP_PlanState::PS_Valid;
+
+		// Execute plan in tick.
+		SetComponentTickEnabled(true);
 	}
 	else
 		PlanState = ESP_PlanState::PS_Invalid;
@@ -264,7 +267,13 @@ void USP_PlannerComponent::ConstructPlan()
 	if (ConstructPlan_Internal(ShuffledActions, NewPlan))
 		SetNewPlan(std::move(NewPlan));
 	else
-		PlanState = ESP_PlanState::PS_WaitForCooldown; // No plan found at this time, wait for cooldowns.
+	{
+		// No plan found at this time, wait for cooldowns.
+		PlanState = ESP_PlanState::PS_WaitForCooldown;
+
+		// Check cooldowns in tick.
+		SetComponentTickEnabled(true);
+	}
 }
 bool USP_PlannerComponent::ConstructPlan_Internal(const TArray<FSP_Action>& AvailableActions, TArray<USP_Task*>& OutPlan, int PlannerFlags, uint8 CurrDepth) const
 {
@@ -411,23 +420,20 @@ void USP_PlannerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Computed by server while owner replicated.
-	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
-	{
-		SetComponentTickEnabled(false);
-		return;
-	}
+	// Start disabled: Simulated client or wait for plan.
+	SetComponentTickEnabled(false);
 
-	if(Goal) // Ask plan with default goal.
+	// Computed by server only while owner is replicated.
+	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
+		return;
+
+	// Ask plan with default goal.
+	if(Goal)
 		AskNewPlan();
 }
 void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	/** Wait for AI Planner computation */
-	if (PlanState == ESP_PlanState::PS_Computing)
-		return;
 
 	// Check new task availability.
 	if (PlanState == ESP_PlanState::PS_WaitForCooldown)
@@ -436,7 +442,7 @@ void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 		return;
 	}
 
-	SP_CHECK(PlanState != ESP_PlanState::PS_Invalid, "Update invalid plan!")
+	SP_CHECK(PlanState == ESP_PlanState::PS_Valid, "Try to update invalid plan!")
 
 	ExecuteTask(DeltaTime);
 }
