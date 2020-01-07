@@ -35,13 +35,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_Goal* Goal = nullptr;
 
-	/**
-	*	Minimum time to wait before constructing a new plan.
-	*	Use <= 0 to compute instantly.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float TimeBeforeConstructPlan = -1.0f;
-
 	/** Timer handle before calling ConstructPlan() */
 	FTimerHandle ConstructPlanTimer;
 
@@ -114,8 +107,23 @@ protected:
 
 
 	void BeginPlay() override;
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
+	/**
+	*	Whether this planner should register itself in the AIDirector.
+	*	Require AIDirector actor in scene while true.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bAutoRegisterInAIDirector = false;
+
+	/**
+	*	Minimum time to wait before constructing a new plan.
+	*	Use <= 0 to compute instantly.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	float TimeBeforeConstructPlan = -1.0f;
+
 	/** Action set component used. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
 	USP_ActionSetComponent* ActionSet = nullptr;

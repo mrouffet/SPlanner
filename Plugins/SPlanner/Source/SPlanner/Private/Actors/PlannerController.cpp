@@ -8,6 +8,7 @@
 ASP_PlannerController::ASP_PlannerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	Planner = CreateDefaultSubobject<USP_PlannerComponent>(TEXT("Planner"));
+	Planner->bAutoRegisterInAIDirector = true;
 }
 
 void ASP_PlannerController::OnPossess(APawn* InPawn)

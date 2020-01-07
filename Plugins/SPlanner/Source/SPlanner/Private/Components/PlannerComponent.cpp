@@ -13,6 +13,8 @@
 #include <Tasks/ActionSet.h>
 #include <Tasks/POIActionSet.h>
 
+#include <Actors/AIDirector.h>
+
 #include <Components/POIComponent.h>
 #include <Components/TargetComponent.h>
 #include <Components/ActionSetComponent.h>
@@ -430,6 +432,22 @@ void USP_PlannerComponent::BeginPlay()
 	// Ask plan with default goal.
 	if(Goal)
 		AskNewPlan();
+
+	// Register in AIDirector.
+	if(bAutoRegisterInAIDirector)
+		ASP_AIDirector::Register(this);
+}
+void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// Computed by server only while owner is replicated.
+	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
+		return;
+
+	// Unregister from AIDirector.
+	if(bAutoRegisterInAIDirector)
+		ASP_AIDirector::TryUnRegister(this); // Try unregister: AIDirector can be destroyed first during scene travel or quit game.
 }
 void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
