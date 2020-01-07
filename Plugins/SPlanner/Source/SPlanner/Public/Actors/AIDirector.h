@@ -3,6 +3,8 @@
 #include <GameFramework/Actor.h>
 #include "AIDirector.generated.h"
 
+class USP_Goal;
+
 class USP_PlannerComponent;
 class USP_ActionSetComponent;
 
@@ -20,9 +22,8 @@ protected:
 	*/
 	static ASP_AIDirector* Instance;
 
-	/** All planner registered (currently in use). */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_PlannerComponent*> Planners;
+	/** All planner registered (currently in use) for each goal. */
+	TMap<USP_Goal*, TArray<USP_PlannerComponent*>> GoalPlannersMap;
 
 	/** Use planning behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
@@ -46,6 +47,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|AIDirector")
 	void OnUnRegister_Internal(USP_PlannerComponent* InPlanner);
 
+	/** Callback function bound to registered Planner.OnGoalChange. */
+	UFUNCTION(Category = "SPlanner|AIDirector")
+	virtual void OnRegistedPlannerGoalChange(USP_PlannerComponent* InPlanner, USP_Goal* OldGoal, USP_Goal* NewGoal);
+
 	void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
@@ -59,6 +64,14 @@ public:
 	FSP_AIDirectorRegisterDelegate OnUnRegister;
 
 	ASP_AIDirector(const FObjectInitializer& ObjectInitializer);
+
+	/** Getter of total planner registered num. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
+	int GetPlannerNum() const;
+
+	/** Getter of planners with goal in GoalPlannersMap. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
+	const TArray<USP_PlannerComponent*>& GetAllPlannersWithGoal(USP_Goal* Goal);
 
 	/**
 	*	Register planner in AIDirector instance planner list.

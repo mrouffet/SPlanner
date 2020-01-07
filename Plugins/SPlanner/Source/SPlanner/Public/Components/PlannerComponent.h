@@ -15,6 +15,8 @@ class USP_TargetComponent;
 class USP_ActionSetComponent;
 class USP_InteractZoneComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_PlannerGoalDelegate, USP_PlannerComponent*, Planner, USP_Goal*, OldGoal, USP_Goal*, NewGoal);
+
 /**
 *	Planner behavior.
 *	Use planning to generate behavior using action set.
@@ -125,21 +127,28 @@ public:
 	float TimeBeforeConstructPlan = -1.0f;
 
 	/** Action set component used. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_ActionSetComponent* ActionSet = nullptr;
 
 	/** Target component used. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Planner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_TargetComponent* Target = nullptr;
 	
 	/**
 	*	The POI interact zone used.
 	*	Used to add action set from interactible POIs.
 	*/
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner|Planner")
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner")
 	USP_InteractZoneComponent* InteractZone = nullptr;
 
+	/** Callback event when goal is changed. */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
+	FSP_PlannerGoalDelegate OnGoalChange;
+
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
+
+	/** Getter of Goal. */
+	USP_Goal* GetGoal() const;
 
 	/** Setter of Goal. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")

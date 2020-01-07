@@ -29,12 +29,20 @@ USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectIniti
 	PlanState = ESP_PlanState::PS_Invalid;
 }
 
+USP_Goal* USP_PlannerComponent::GetGoal() const
+{
+	return Goal;
+}
+
 void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 {
 	if (Goal == InGoal)
 		return;
 
+	USP_Goal* OldGoal = Goal;
 	Goal = InGoal;
+
+	OnGoalChange.Broadcast(this, OldGoal, Goal);
 
 	AskNewPlan();
 }
