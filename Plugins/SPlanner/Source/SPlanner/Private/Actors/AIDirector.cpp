@@ -44,6 +44,15 @@ int ASP_AIDirector::GetPlannerNum() const
 
 	return Num;
 }
+TArray<USP_PlannerComponent*> ASP_AIDirector::GetAllPlanners() const
+{
+	TArray<USP_PlannerComponent*> Planners;
+
+	for (auto it = GoalPlannersMap.begin(); it != GoalPlannersMap.end(); ++it)
+		Planners.Append(it->Value);
+
+	return Planners;
+}
 const TArray<USP_PlannerComponent*>& ASP_AIDirector::GetAllPlannersWithGoal(USP_Goal* Goal)
 {
 	TArray<USP_PlannerComponent*>* Planners = GoalPlannersMap.Find(Goal);
@@ -53,6 +62,13 @@ const TArray<USP_PlannerComponent*>& ASP_AIDirector::GetAllPlannersWithGoal(USP_
 		return GoalPlannersMap.Add(Goal, {});
 	
 	return *Planners;
+}
+
+ASP_AIDirector* ASP_AIDirector::GetInstance()
+{
+	SP_RCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.", nullptr)
+
+	return Instance;
 }
 
 void ASP_AIDirector::Register(USP_PlannerComponent* InPlanner)

@@ -69,9 +69,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
 	int GetPlannerNum() const;
 
+	/** Getter of all planners registered. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
+	TArray<USP_PlannerComponent*> GetAllPlanners() const;
+
 	/** Getter of planners with goal in GoalPlannersMap. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
 	const TArray<USP_PlannerComponent*>& GetAllPlannersWithGoal(USP_Goal* Goal);
+
+	/** Getter of Instance. */
+	UFUNCTION(BlueprintPure, DisplayName = "GetAIDirector", Category = "SPlanner|AIDirector")
+	static ASP_AIDirector* GetInstance();
 
 	/**
 	*	Register planner in AIDirector instance planner list.
