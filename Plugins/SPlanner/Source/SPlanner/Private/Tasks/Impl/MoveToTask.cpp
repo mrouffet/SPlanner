@@ -199,3 +199,19 @@ ESP_PlanExecutionState USP_MoveToTask::End(USP_PlannerComponent* Planner, uint8*
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
+
+bool USP_MoveToTask::Cancel(USP_PlannerComponent* Planner, uint8* UserData)
+{
+	if (!Super::Cancel(Planner, UserData))
+		return false;
+
+	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
+
+	// Bound controller: Request succeeded.
+	if(Infos->Controller)
+		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
+	
+	Infos->~FSP_TaskInfos();
+
+	return true;
+}

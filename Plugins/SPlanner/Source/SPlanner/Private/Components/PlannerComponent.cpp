@@ -38,12 +38,22 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 	if (Goal == InGoal)
 		return;
 
+	// Cancel previous plan.
+	if (PlanState == ESP_PlanState::PS_Valid)
+		CancelTask();
+
+	// Out dated plan.
+	if(PlanState != ESP_PlanState::PS_WaitForCompute)
+		PlanState = ESP_PlanState::PS_Invalid;
+
 	USP_Goal* OldGoal = Goal;
 	Goal = InGoal;
 
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
 
-	AskNewPlan();
+	// Do not ask again if already / still waiting for computation.
+	if (PlanState != ESP_PlanState::PS_WaitForCompute)
+		AskNewPlan();
 }
 
 float USP_PlannerComponent::GetCooldown(const USP_Task* Task) const
@@ -112,9 +122,6 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 	{
 		Plan = std::move(InPlan);
 		PlanState = ESP_PlanState::PS_Valid;
-
-		// Execute plan in tick.
-		SetComponentTickEnabled(true);
 	}
 	else
 		PlanState = ESP_PlanState::PS_Invalid;
@@ -184,7 +191,7 @@ bool USP_PlannerComponent::GetShuffledActions(TArray<FSP_Action>& ShuffledAction
 void USP_PlannerComponent::AskNewPlan()
 {
 	SP_CHECK(PlanState != ESP_PlanState::PS_Valid, "Plan still valid!")
-	SP_CHECK(PlanState != ESP_PlanState::PS_Computing, "Plan already being computed!")
+	SP_CHECK(PlanState != ESP_PlanState::PS_WaitForCompute, "Plan already waiting for being computed!")
 
 #if SP_DEBUG_EDITOR
 	// Reset debug keys.
@@ -197,7 +204,7 @@ void USP_PlannerComponent::AskNewPlan()
 	ESP_PlanState PrevState = PlanState;
 
 	// Wait for new plan computation.
-	PlanState = ESP_PlanState::PS_Computing;
+	PlanState = ESP_PlanState::PS_WaitForCompute;
 
 	CurrentPlanIndex = -1;
 
@@ -217,6 +224,10 @@ void USP_PlannerComponent::AskNewPlan()
 }
 void USP_PlannerComponent::ConstructPlan()
 {
+	SP_CHECK(PlanState == ESP_PlanState::PS_WaitForCompute, "PlanState must be waiting for computation at this point. This should never happen.")
+
+	PlanState = ESP_PlanState::PS_Computing;
+
 	TArray<FSP_Action> ShuffledActions;
 	
 	// Query shuffled tasks.
@@ -269,14 +280,15 @@ void USP_PlannerComponent::ConstructPlan()
 
 	// Planner Computation.
 	if (ConstructPlan_Internal(ShuffledActions, NewPlan))
-		SetNewPlan(std::move(NewPlan));
+	{
+		// Plan still being computed by this thread (not cancelled with AskNewPlan or SetNewGoal on main thread).
+		if(PlanState == ESP_PlanState::PS_Computing)
+			SetNewPlan(std::move(NewPlan));
+	}
 	else
 	{
 		// No plan found at this time, wait for cooldowns.
 		PlanState = ESP_PlanState::PS_WaitForCooldown;
-
-		// Check cooldowns in tick.
-		SetComponentTickEnabled(true);
 	}
 }
 bool USP_PlannerComponent::ConstructPlan_Internal(const TArray<FSP_Action>& AvailableActions, TArray<USP_Task*>& OutPlan, FSP_PlannerFlags PlannerFlags, uint8 CurrDepth) const
@@ -368,27 +380,6 @@ bool USP_PlannerComponent::BeginNextTask()
 
 	return true;
 }
-bool USP_PlannerComponent::EndTask()
-{
-	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
-
-	// Can't end task, Plan got invalid: ask a new one.
-	if (Plan[CurrentPlanIndex]->End(this, TaskUserData.GetData()) != ESP_PlanExecutionState::PES_Succeed)
-	{
-		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
-			SetCooldown(Plan[CurrentPlanIndex]);
-
-		PlanState = ESP_PlanState::PS_Invalid;
-
-		AskNewPlan();
-
-		return false;
-	}
-
-	SetCooldown(Plan[CurrentPlanIndex]);
-
-	return true;
-}
 void USP_PlannerComponent::ExecuteTask(float DeltaTime)
 {
 	// Execute first task begin on main thread.
@@ -419,17 +410,56 @@ void USP_PlannerComponent::ExecuteTask(float DeltaTime)
 		BeginNextTask();
 	}
 }
+bool USP_PlannerComponent::EndTask()
+{
+	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
+
+	// Can't end task, Plan got invalid: ask a new one.
+	if (Plan[CurrentPlanIndex]->End(this, TaskUserData.GetData()) != ESP_PlanExecutionState::PES_Succeed)
+	{
+		if (Plan[CurrentPlanIndex]->GetUseCooldownOnFailed())
+			SetCooldown(Plan[CurrentPlanIndex]);
+
+		PlanState = ESP_PlanState::PS_Invalid;
+
+		AskNewPlan();
+
+		return false;
+	}
+
+	SetCooldown(Plan[CurrentPlanIndex]);
+
+	return true;
+}
+void USP_PlannerComponent::CancelTask()
+{
+	SP_CHECK(PlanState == ESP_PlanState::PS_Valid, "Try to cancel invalid plan!")
+
+	// Plan not started.
+	if (CurrentPlanIndex == -1)
+		return;
+
+	SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!")
+
+#if SP_DEBUG
+	SP_CHECK(Plan[CurrentPlanIndex]->Cancel(this, TaskUserData.GetData()), "Cancel failed!")
+#else
+	Plan[CurrentPlanIndex]->Cancel(this, TaskUserData.GetData());
+#endif
+}
 
 void USP_PlannerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Start disabled: Simulated client or wait for plan.
-	SetComponentTickEnabled(false);
-
 	// Computed by server only while owner is replicated.
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
+	{
+		// Simulated client.
+		SetComponentTickEnabled(false);
+
 		return;
+	}
 
 	// Ask plan with default goal.
 	if(Goal)
@@ -461,8 +491,10 @@ void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 		CheckCooldowns();
 		return;
 	}
-
-	SP_CHECK(PlanState == ESP_PlanState::PS_Valid, "Try to update invalid plan!")
+	
+	// Wait for computation.
+	if (PlanState != ESP_PlanState::PS_Valid)
+		return;
 
 	ExecuteTask(DeltaTime);
 }

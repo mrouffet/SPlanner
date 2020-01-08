@@ -60,3 +60,14 @@ ESP_PlanExecutionState USP_Task::End(USP_PlannerComponent* Planner, uint8* UserD
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
+
+bool USP_Task::Cancel(USP_PlannerComponent* Planner, uint8* UserData)
+{
+	SP_RCHECK_NULLPTR(Planner, false)
+
+#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
+		OnCancel(Planner);
+#endif
+
+	return true;
+}

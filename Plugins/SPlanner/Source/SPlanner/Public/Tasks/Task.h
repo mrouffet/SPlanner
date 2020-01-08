@@ -41,6 +41,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Task")
 	void OnEnd(USP_PlannerComponent* Planner);
 
+	/** Blueprint event called by End(). */
+	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Task")
+	void OnCancel(USP_PlannerComponent* Planner);
+
 public:
 	/** Gette of bUseCooldownOnFailed. */
 	bool GetUseCooldownOnFailed() const;
@@ -69,19 +73,25 @@ public:
 
 	/**
 	*	The begin implementation of the task.
-	*	This is executed by the SP_PlannableComponent (main thread).
+	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
 	virtual ESP_PlanExecutionState Begin(USP_PlannerComponent* Planner, uint8* UserData);
 
 	/**
-	*	The implementation of the task.
-	*	This is executed by the PlannableComponent (main thread).
+	*	The tick implementation of the task.
+	*	This is executed by the PlannerComponent (main thread).
 	*/
 	virtual ESP_PlanExecutionState Tick(float DeltaSeconds, USP_PlannerComponent* Planner, uint8* UserData);
 
 	/**
-	*	The begin implementation of the task.
-	*	This is executed by the SP_PlannableComponent (main thread).
+	*	The end implementation of the task.
+	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
 	virtual ESP_PlanExecutionState End(USP_PlannerComponent* Planner, uint8* UserData);
+
+	/**
+	*	The cancel implementation of the task.
+	*	This is executed by the SP_PlannerComponent (main thread).
+	*/
+	virtual bool Cancel(USP_PlannerComponent* Planner, uint8* UserData);
 };

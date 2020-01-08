@@ -18,6 +18,9 @@ enum class ESP_PlanState : uint8
 	/** Being computing by planner. */
 	PS_Computing				UMETA(Display = "Computing"),
 
+	/** In queue for computation by planner. */
+	PS_WaitForCompute			UMETA(Display = "Computing"),
+
 	/** Finished with success planner. */
 	PS_Finished					UMETA(Display = "Finished"),
 };

@@ -65,4 +65,6 @@ public:
 	ESP_PlanExecutionState Begin(USP_PlannerComponent* Planner, uint8* UserData) override;
 	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_PlannerComponent* Planner, uint8* UserData) override;
 	ESP_PlanExecutionState End(USP_PlannerComponent* Planner, uint8* UserData) override;
+
+	bool Cancel(USP_PlannerComponent* Planner, uint8* UserData) override;
 };

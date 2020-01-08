@@ -96,6 +96,13 @@ protected:
 	bool BeginNextTask();
 
 	/**
+	*	Execute the current task of the Plan.
+	*	Use CurrentPlanIndex and Plan.
+	*	Called on main thread.
+	*/
+	void ExecuteTask(float DeltaTime);
+
+	/**
 	*	End the current task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
 	*	Return Result == ESP_PlanExecutionState::PES_Succeed.
@@ -103,11 +110,11 @@ protected:
 	bool EndTask();
 
 	/**
-	*	Execute the current task of the Plan.
+	*	Cancel the current task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
 	*	Called on main thread.
 	*/
-	void ExecuteTask(float DeltaTime);
+	void CancelTask();
 
 
 	void BeginPlay() override;
