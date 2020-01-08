@@ -69,13 +69,19 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
 	int GetPlannerNum() const;
 
-	/** Getter of all planners registered. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
-	TArray<USP_PlannerComponent*> GetAllPlanners() const;
+	/** Getter (query) of all planners registered. */
+	TArray<USP_PlannerComponent*> QueryAllPlanners() const;
 
-	/** Getter of planners with goal in GoalPlannersMap. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|AIDirector")
-	const TArray<USP_PlannerComponent*>& GetAllPlannersWithGoal(USP_Goal* Goal);
+	/**
+	*	Blueprint getter (query) of all planners registered.
+	*	Need to be BlueprintCallable and non-const to force Unreal to cache resulted array.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AIDirector")
+	TArray<USP_PlannerComponent*> QueryAllPlanners();
+
+	/** Getter (query) of planners with goal in GoalPlannersMap. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AIDirector")
+	const TArray<USP_PlannerComponent*>& QueryAllPlannersWithGoal(USP_Goal* Goal);
 
 	/** Getter of Instance. */
 	UFUNCTION(BlueprintPure, DisplayName = "GetAIDirector", Category = "SPlanner|AIDirector")

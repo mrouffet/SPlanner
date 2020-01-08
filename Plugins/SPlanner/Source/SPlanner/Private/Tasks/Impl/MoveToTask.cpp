@@ -207,8 +207,7 @@ bool USP_MoveToTask::Cancel(USP_PlannerComponent* Planner, uint8* UserData)
 
 	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
-	// Bound controller: Request succeeded.
-	if(Infos->Controller)
+	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
 		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
 	
 	Infos->~FSP_TaskInfos();

@@ -44,7 +44,7 @@ int ASP_AIDirector::GetPlannerNum() const
 
 	return Num;
 }
-TArray<USP_PlannerComponent*> ASP_AIDirector::GetAllPlanners() const
+TArray<USP_PlannerComponent*> ASP_AIDirector::QueryAllPlanners() const
 {
 	TArray<USP_PlannerComponent*> Planners;
 
@@ -53,7 +53,12 @@ TArray<USP_PlannerComponent*> ASP_AIDirector::GetAllPlanners() const
 
 	return Planners;
 }
-const TArray<USP_PlannerComponent*>& ASP_AIDirector::GetAllPlannersWithGoal(USP_Goal* Goal)
+TArray<USP_PlannerComponent*> ASP_AIDirector::QueryAllPlanners()
+{
+	// Call const implementation.
+	return static_cast<const ASP_AIDirector*>(this)->QueryAllPlanners();
+}
+const TArray<USP_PlannerComponent*>& ASP_AIDirector::QueryAllPlannersWithGoal(USP_Goal* Goal)
 {
 	TArray<USP_PlannerComponent*>* Planners = GoalPlannersMap.Find(Goal);
 
