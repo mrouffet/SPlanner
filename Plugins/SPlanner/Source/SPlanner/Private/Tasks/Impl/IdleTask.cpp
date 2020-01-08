@@ -17,7 +17,6 @@ ESP_PlanExecutionState USP_IdleTask::Begin(USP_PlannerComponent* Planner, uint8*
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
-
 ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_PlannerComponent* Planner, uint8* UserData)
 {
 	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
@@ -31,7 +30,6 @@ ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_PlannerCompone
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-
 ESP_PlanExecutionState USP_IdleTask::End(USP_PlannerComponent* Planner, uint8* UserData)
 {
 	SP_TASK_SUPER(End, Planner, UserData)

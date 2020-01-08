@@ -7,5 +7,5 @@ bool UMoveToPOITask::PreCondition(const USP_PlannerComponent* Planner, int Plann
 {
 	SP_TASK_SUPER_PRECONDITION(Planner, PlannerFlags)
 
-	return Planner->GetTarget()->GetState() == ESP_TargetState::TS_POI;
+	return Planner->Target->GetState() == ESP_TargetState::TS_POI;
 }

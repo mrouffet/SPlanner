@@ -55,7 +55,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_Pla
 #if SP_DEBUG_EDITOR
 
 	USP_POIComponent* TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
-	Planner->GetTarget()->SetPOI(TargetPOI);
+	Planner->Target->SetPOI(TargetPOI);
 
 	SP_IF_TASK_EXECUTE(PlannerOwner)
 		DrawDebugLine(PlannerOwner->GetWorld(), PlannerOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), FColor::Cyan, false, USP_Settings::GetDebugScreenDisplayTime() / 2.0f);

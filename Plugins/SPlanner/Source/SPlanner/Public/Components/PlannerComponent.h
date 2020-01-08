@@ -166,9 +166,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	bool IsInCooldown(const USP_Task* Task) const;
 
-	/** Getter of Target. */
-	USP_TargetComponent* GetTarget() const;
-
 	/**
 	*	Get a shuffled move list based on actions' weight and random.
 	*	Executed on external thread.

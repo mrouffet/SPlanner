@@ -3,7 +3,6 @@
 #include <Components/ActorComponent.h>
 #include "TargetComponent.generated.h"
 
-class AActor;
 class USP_POIComponent;
 
 /**
@@ -34,6 +33,7 @@ protected:
 	{
 		FVector Position;
 		AActor* Actor;
+		APawn* Player;
 		USP_POIComponent* POI;
 	};
 
@@ -68,7 +68,7 @@ public:
 
 	/** Getter of Actor as player */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
-	AActor* GetPlayer() const;
+	APawn* GetPlayer() const;
 
 	/** Getter of TargetPOI */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
@@ -84,7 +84,7 @@ public:
 
 	/** Setter of Actor as player */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Target")
-	void SetPlayer(AActor* InPlayer);
+	void SetPlayer(APawn* InPlayer);
 
 	/** Setter of POI */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Target")

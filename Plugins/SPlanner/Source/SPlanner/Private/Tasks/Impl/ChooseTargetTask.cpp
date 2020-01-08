@@ -7,8 +7,11 @@ bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, int
 {
 	SP_TASK_SUPER_PRECONDITION(Planner, PlannerFlags)
 
-	// Valid target component and not already re-targeted.
-	return Planner->GetTarget() && !SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget);
+	// Valid Target component.
+	SP_RCHECK_NULLPTR(Planner->Target, false)
+
+	// Not already re-targeted.
+	return !SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget);
 }
 int USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
 {
@@ -21,7 +24,8 @@ ESP_PlanExecutionState USP_ChooseTargetTask::Tick(float DeltaSeconds, USP_Planne
 {
 	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
 
-	SP_RCHECK_NULLPTR(Planner->GetTarget(), ESP_PlanExecutionState::PES_Failed)
+	// Valid Target component.
+	SP_RCHECK_NULLPTR(Planner->Target, ESP_PlanExecutionState::PES_Failed)
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }

@@ -21,7 +21,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 	FVector TargetPosition = PlannerOwner->GetActorLocation() + PlannerOwner->GetActorRotation().RotateVector(LocalOffset) +
 		FVector(FMath::RandRange(-1.0f, 1.0f) * Dimensions.X, +FMath::RandRange(-1.0f, 1.0f) * Dimensions.Y, 0.0f);
 
-	Planner->GetTarget()->SetPosition(TargetPosition);
+	Planner->Target->SetPosition(TargetPosition);
 		
 
 #if SP_DEBUG_EDITOR

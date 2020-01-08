@@ -17,10 +17,10 @@ bool USP_MoveToTask::HasReachedPosition(const USP_PlannerComponent* Planner) con
 	if(AAIController* Controller = Cast<AAIController>(Planner->GetOwner()))
 	{
 		if (ACharacter* Character = Cast<ACharacter>(Controller->GetPawn()))
-			return HasReachedPosition(Character, Planner->GetTarget()->GetAnyPosition());
+			return HasReachedPosition(Character, Planner->Target->GetAnyPosition());
 	}
 
-	return HasReachedPosition(Planner->GetOwner(), Planner->GetTarget()->GetAnyPosition());
+	return HasReachedPosition(Planner->GetOwner(), Planner->Target->GetAnyPosition());
 }
 bool USP_MoveToTask::HasReachedPosition(AActor* Actor, const FVector& TargetPosition) const
 {
@@ -76,14 +76,14 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, int Plann
 {
 	SP_TASK_SUPER_PRECONDITION(Planner, PlannerFlags)
 
-	SP_RCHECK_NULLPTR(Planner->GetTarget(), false)
+	SP_RCHECK_NULLPTR(Planner->Target, false)
 
 	// New target will be set.
 	if(SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget))
 		return true;
 
 	// Check valid target and has not already moved.
-	if (!Planner->GetTarget()->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform))
+	if (!Planner->Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform))
 		return false;
 
 	return !HasReachedPosition(Planner);
@@ -116,9 +116,9 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint
 	// Create MoveRequest.
 	FAIMoveRequest MoveRequest;
 
-	if(Planner->GetTarget()->GetState() == ESP_TargetState::TS_Position)
-		MoveRequest.SetGoalLocation(Planner->GetTarget()->GetPosition());
-	else if(AActor* GoalActor = Planner->GetTarget()->GetAnyActor())
+	if(Planner->Target->GetState() == ESP_TargetState::TS_Position)
+		MoveRequest.SetGoalLocation(Planner->Target->GetPosition());
+	else if(AActor* GoalActor = Planner->Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
 	else
 	{
@@ -148,7 +148,7 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
 
-	SP_LOG_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->GetTarget()->GetAnyPosition().ToString())
+	SP_LOG_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
 	Infos->Controller = Controller;

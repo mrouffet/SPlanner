@@ -33,9 +33,11 @@ FVector USP_TargetComponent::GetAnyPosition() const
 	case ESP_TargetState::TS_Position:
 		return Position;
 	case ESP_TargetState::TS_Actor:
-	case ESP_TargetState::TS_Player:
 		SP_RCHECK_NULLPTR(Actor, FVector::ZeroVector)
 		return Actor->GetActorLocation();
+	case ESP_TargetState::TS_Player:
+		SP_RCHECK_NULLPTR(Player, FVector::ZeroVector)
+		return Player->GetActorLocation();
 	case ESP_TargetState::TS_POI:
 		SP_RCHECK_NULLPTR(POI, FVector::ZeroVector)
 		SP_RCHECK_NULLPTR(POI->GetOwner(), FVector::ZeroVector)
@@ -53,23 +55,27 @@ AActor* USP_TargetComponent::GetActor() const
 }
 AActor* USP_TargetComponent::GetAnyActor() const
 {
-	if (State == ESP_TargetState::TS_Actor || State == ESP_TargetState::TS_Player)
-		return Actor;
-	else if (State == ESP_TargetState::TS_POI)
+	switch (State)
 	{
+	case ESP_TargetState::TS_Actor:
+		return Actor;
+	case ESP_TargetState::TS_Player:
+		return Player;
+	case ESP_TargetState::TS_POI:
 		SP_RCHECK_NULLPTR(POI, nullptr)
 		return POI->GetOwner();
+	default:
+		SP_LOG(Error, "Bad target type!")
+		break;
 	}
-
-	SP_LOG(Error, "Bad target type!")
 
 	return nullptr;
 }
-AActor* USP_TargetComponent::GetPlayer() const
+APawn* USP_TargetComponent::GetPlayer() const
 {
 	SP_RCHECK(State == ESP_TargetState::TS_Player, "Bad target!", nullptr)
 
-	return Actor;
+	return Player;
 }
 USP_POIComponent* USP_TargetComponent::GetPOI() const
 {
@@ -91,11 +97,11 @@ void USP_TargetComponent::SetActor(AActor* InActor)
 	Actor = InActor;
 	State = ESP_TargetState::TS_Actor;
 }
-void USP_TargetComponent::SetPlayer(AActor* InPlayer)
+void USP_TargetComponent::SetPlayer(APawn* InPlayer)
 {
 	SP_CHECK_NULLPTR(InPlayer)
 
-	Actor = InPlayer;
+	Player = InPlayer;
 	State = ESP_TargetState::TS_Player;
 }
 void USP_TargetComponent::SetPOI(USP_POIComponent* InPOI)

@@ -81,11 +81,6 @@ bool USP_PlannerComponent::IsInCooldown(const USP_Task* Task) const
 	return GetCooldown(Task) < Task->GetCooldown();
 }
 
-USP_TargetComponent* USP_PlannerComponent::GetTarget() const
-{
-	return Target;
-}
-
 void USP_PlannerComponent::SetNewPlan(TArray<USP_Task*>&& InPlan)
 {
 #if SP_DEBUG
