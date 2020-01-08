@@ -4,17 +4,18 @@
 	#include <DrawDebugHelpers.h>
 #endif
 
-#include <Miscs/PlannerFlags.h>
-
 #include <Components/POIComponent.h>
 #include <Components/TargetComponent.h>
 #include <Components/PlannerComponent.h>
 
-int USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+FSP_PlannerFlags USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_TASK_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	return SP_ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_POITarget);
+	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_POI);
+	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Actor);
+
+	return PlannerFlags;
 }
 
 ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_PlannerComponent* Planner, uint8* UserData)

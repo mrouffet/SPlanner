@@ -2,6 +2,7 @@
 
 #include <Miscs/Settings.h>
 #include <Miscs/PlanState.h>
+#include <Miscs/Flags/PlannerFlags.h>
 
 #include <Tasks/TaskMacro.h>
 
@@ -56,7 +57,7 @@ public:
 	*	This is called by the Planner to generate an action plan.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task")
-	virtual bool PreCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const;
+	virtual bool PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const;
 
 	/**
 	*	The post condition of the task.
@@ -64,7 +65,7 @@ public:
 	*	This is executed by the Planner to generate an action plan.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task")
-	virtual int PostCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const;
+	virtual FSP_PlannerFlags PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const;
 
 	/**
 	*	The begin implementation of the task.

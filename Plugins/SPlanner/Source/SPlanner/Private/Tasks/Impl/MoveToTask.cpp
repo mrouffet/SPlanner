@@ -4,8 +4,6 @@
 #include <GameFramework/Character.h>
 #include <Components/CapsuleComponent.h>
 
-#include <Miscs/PlannerFlags.h>
-
 #include <Components/PlannerComponent.h>
 #include <Components/TargetComponent.h>
 #include <Components/POIComponent.h>
@@ -72,27 +70,30 @@ void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPat
 	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
-bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_TASK_SUPER_PRECONDITION(Planner, PlannerFlags)
 
 	SP_RCHECK_NULLPTR(Planner->Target, false)
 
 	// New target will be set.
-	if(SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget))
+	if(SP_IS_FLAG_SET(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Dirty))
 		return true;
 
 	// Check valid target and has not already moved.
-	if (!Planner->Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform))
+	if (!Planner->Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyPosition))
 		return false;
 
 	return !HasReachedPosition(Planner);
 }
-int USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+FSP_PlannerFlags USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_TASK_SUPER_POSTCONDITION(Planner, PlannerFlags)
 	
-	return SP_ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_DirtyTransform);
+	SP_ADD_FLAG(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyPosition);
+	SP_ADD_FLAG(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyRotation);
+
+	return PlannerFlags;
 }
 
 ESP_PlanExecutionState USP_MoveToTask::Begin(USP_PlannerComponent* Planner, uint8* UserData)

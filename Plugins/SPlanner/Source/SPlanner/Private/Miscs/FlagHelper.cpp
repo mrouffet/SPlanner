@@ -1,4 +1,4 @@
-#include <Miscs/FlagHelper.h>
+#include <Miscs/Flags/FlagHelper.h>
 
 bool USP_FlagHelper::IsFlagSet(int BitMask, uint8 Flag)
 {

@@ -3,6 +3,8 @@
 #include <atomic>
 
 #include <Miscs/PlanState.h>
+#include <Miscs/Flags/PlannerFlags.h>
+
 #include <Tasks/Action.h>
 
 #include <Components/ActorComponent.h>
@@ -81,7 +83,7 @@ protected:
 	*	Return true on construction succeed.
 	*	Executed on external thread.
 	*/
-	bool ConstructPlan_Internal(const TArray<FSP_Action>& AvailableActions, TArray<USP_Task*>& Plan, int PlannerFlags = 0, uint8 CurrDepth = 0) const;
+	bool ConstructPlan_Internal(const TArray<FSP_Action>& AvailableActions, TArray<USP_Task*>& Plan, FSP_PlannerFlags PlannerFlags = FSP_PlannerFlags(), uint8 CurrDepth = 0) const;
 
 	/** Check new task availability to request new plan generation. */
 	void CheckCooldowns();

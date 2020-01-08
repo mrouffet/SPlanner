@@ -15,13 +15,13 @@ uint32 USP_Task::GetUserDataSize() const
 	return 0u;
 }
 
-bool USP_Task::PreCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+bool USP_Task::PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
 	return true;
 }
-int USP_Task::PostCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+FSP_PlannerFlags USP_Task::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_RCHECK_NULLPTR(Planner, PlannerFlags)
 

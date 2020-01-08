@@ -4,7 +4,6 @@
 
 #include <Debug/Debug.h>
 
-#include <Miscs/FlagHelper.h>
 #include <Miscs/PlanConstructTask.h>
 
 #include <Goal/Goal.h>
@@ -280,7 +279,7 @@ void USP_PlannerComponent::ConstructPlan()
 		SetComponentTickEnabled(true);
 	}
 }
-bool USP_PlannerComponent::ConstructPlan_Internal(const TArray<FSP_Action>& AvailableActions, TArray<USP_Task*>& OutPlan, int PlannerFlags, uint8 CurrDepth) const
+bool USP_PlannerComponent::ConstructPlan_Internal(const TArray<FSP_Action>& AvailableActions, TArray<USP_Task*>& OutPlan, FSP_PlannerFlags PlannerFlags, uint8 CurrDepth) const
 {
 	if (CurrDepth > USP_Settings::GetMaxPlannerDepth())
 		return false;

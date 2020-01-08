@@ -1,9 +1,8 @@
 #include <Tasks/Impl/ChooseTargetTask.h>
 
-#include <Miscs/PlannerFlags.h>
 #include <Components/PlannerComponent.h>
 
-bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_TASK_SUPER_PRECONDITION(Planner, PlannerFlags)
 
@@ -11,13 +10,19 @@ bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, int
 	SP_RCHECK_NULLPTR(Planner->Target, false)
 
 	// Not already re-targeted.
-	return !SP_IS_FLAG_SET(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget);
+	return !SP_IS_FLAG_SET(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Dirty);
 }
-int USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const
+FSP_PlannerFlags USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
 {
 	SP_TASK_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	return SP_ADD_FLAG(PlannerFlags, ESP_PlannerFlags::PF_DirtyTarget);
+	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Dirty);
+	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Position);
+
+	if(bAutoLookAt)
+		SP_ADD_FLAG(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyRotation);
+
+	return PlannerFlags;
 }
 
 ESP_PlanExecutionState USP_ChooseTargetTask::Tick(float DeltaSeconds, USP_PlannerComponent* Planner, uint8* UserData)

@@ -12,5 +12,5 @@ class SPLANNER_API UMoveToPOITask : public USP_MoveToTask
 	GENERATED_BODY()
 
 public:
-	bool PreCondition(const USP_PlannerComponent* Planner, int PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
 };

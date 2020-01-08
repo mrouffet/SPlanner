@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Debug/Debug.h>
-#include <Miscs/FlagHelper.h>
+#include <Miscs/Flags/FlagHelper.h>
 
 #define SP_TASK_BLUEPRINT_IMPLEMENTABLE 1
 
