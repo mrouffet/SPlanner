@@ -5,9 +5,11 @@
 #include <Components/SP_TargetComponent.h>
 #include <Components/SP_InteractZoneComponent.h>
 
+FName ASP_AIController::PlannerComponentName(TEXT("Planner"));
+
 ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	Planner = CreateDefaultSubobject<USP_AIPlannerComponent>(TEXT("Planner"));
+	Planner = CreateOptionalDefaultSubobject<USP_AIPlannerComponent>(PlannerComponentName);
 	Planner->bAutoRegisterInDirector = true;
 }
 

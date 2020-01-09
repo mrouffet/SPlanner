@@ -11,12 +11,7 @@ ASP_Director* ASP_Director::Instance = nullptr;
 
 ASP_Director::ASP_Director(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	// TODO: Add Director Planner.
-	//Planner = CreateDefaultSubobject<USP_PlannerComponent>("Planner");
-	//Planner->bAutoRegisterInDirector = false; // Should never set to true for AIDirector's planner.
-
-	ActionSet = CreateDefaultSubobject<USP_ActionSetComponent>("ActionSet");
-	//Planner->ActionSet = ActionSet;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ASP_Director::BeginPlay()

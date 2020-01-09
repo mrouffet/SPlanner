@@ -221,7 +221,11 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 			--Index; // Remove Begin depth incrementation.
 	}
 
+#if SP_DEBUG
 	// TODO: Use Forced Actions.
+	if(PlannerActions.ForcedActions.Num())
+		SP_LOG(Warning, "Forced actions not implemented yet! ActionSet: %s", *ActionSet->GetActionSet(Goal)->GetName())
+#endif
 
 	for (int i = Index; i < Actions->Num(); ++i)
 	{

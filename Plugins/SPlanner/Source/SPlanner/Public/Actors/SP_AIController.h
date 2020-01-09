@@ -22,5 +22,8 @@ protected:
 	void OnUnPossess() override;
 
 public:
+	/** Name of the PlannerComponent. Use this name if you want to prevent creation of the component (with ObjectInitializer.DoNotCreateDefaultSubobject). */
+	static FName PlannerComponentName;
+
 	ASP_AIController(const FObjectInitializer& ObjectInitializer);
 };

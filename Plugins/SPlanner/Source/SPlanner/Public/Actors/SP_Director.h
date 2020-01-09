@@ -25,13 +25,6 @@ protected:
 	/** All planner registered (currently in use) for each goal. */
 	TMap<USP_Goal*, TArray<USP_PlannerComponent*>> GoalPlannersMap;
 
-	/** Use planning behavior. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_PlannerComponent* Planner = nullptr;
-
-	/** Action set used by Planner. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_ActionSetComponent* ActionSet = nullptr;
 
 	/**
 	*	Callback function when planner get registered.
