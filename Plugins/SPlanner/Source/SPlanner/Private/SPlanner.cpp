@@ -1,4 +1,4 @@
-#include "SPlanner.h"
+#include <SPlanner.h>
 
 #define LOCTEXT_NAMESPACE "FSPlannerModule"
 
