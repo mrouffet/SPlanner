@@ -1,14 +1,14 @@
 #include <Actors/SP_AIController.h>
 
-#include <Components/SP_PlannerComponent.h>
+#include <Components/Planners/SP_AIPlannerComponent.h>
 #include <Components/SP_ActionSetComponent.h>
 #include <Components/SP_TargetComponent.h>
 #include <Components/SP_InteractZoneComponent.h>
 
 ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	Planner = CreateDefaultSubobject<USP_PlannerComponent>(TEXT("Planner"));
-	Planner->bAutoRegisterInAIDirector = true;
+	Planner = CreateDefaultSubobject<USP_AIPlannerComponent>(TEXT("Planner"));
+	Planner->bAutoRegisterInDirector = true;
 }
 
 void ASP_AIController::OnPossess(APawn* InPawn)

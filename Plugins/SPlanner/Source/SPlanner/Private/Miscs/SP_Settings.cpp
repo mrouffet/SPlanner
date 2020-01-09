@@ -12,7 +12,7 @@ float USP_Settings::GetDebugScreenDisplayTime()
 	return GetDefault<USP_Settings>()->DebugScreenDisplayTime;
 }
 
-int USP_Settings::GetMoveListLogKey()
+int USP_Settings::GetActionListLogKey()
 {
 	return GetDefault<USP_Settings>()->DebugLogKey;
 }
@@ -33,8 +33,3 @@ void USP_Settings::ResetTaskExecuteLogKey()
 	TaskExecuteKeyOffset = 0;
 }
 #endif
-
-uint8 USP_Settings::GetMaxPlannerDepth()
-{
-	return GetDefault<USP_Settings>()->MaxPlannerDepth;
-}

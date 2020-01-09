@@ -12,14 +12,11 @@ enum class ESP_PlanState : uint8
 	/** Error occured while generating. */
 	PS_Invalid					UMETA(Display = "Invalid"),
 
-	/** Can't be generated, waiting for cooldowns. */
-	PS_WaitForCooldown			UMETA(Display = "WaitForCooldown"),
-
 	/** Being computing by planner. */
 	PS_Computing				UMETA(Display = "Computing"),
 
 	/** In queue for computation by planner. */
-	PS_WaitForCompute			UMETA(Display = "Computing"),
+	PS_WaitForCompute			UMETA(Display = "WaitForCompute"),
 
 	/** Finished with success planner. */
 	PS_Finished					UMETA(Display = "Finished"),

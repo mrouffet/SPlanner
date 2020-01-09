@@ -1,6 +1,6 @@
 #include <Components/SP_POIComponent.h>
 
-USP_POIComponent::USP_POIComponent(const FObjectInitializer& ObjectInitializer)
+USP_POIComponent::USP_POIComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SphereRadius = 50.0f;
 }

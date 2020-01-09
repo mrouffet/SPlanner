@@ -3,7 +3,7 @@
 #include <AIController.h>
 #include "SP_AIController.generated.h"
 
-class USP_PlannerComponent;
+class USP_AIPlannerComponent;
 
 /**
 *	SPlanner controller implementation.
@@ -16,7 +16,7 @@ class SPLANNER_API ASP_AIController : public AAIController
 protected:
 	/** Planning behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_PlannerComponent* Planner = nullptr;
+	USP_AIPlannerComponent* Planner = nullptr;
 
 	void OnPossess(APawn* InPawn) override;
 	void OnUnPossess() override;

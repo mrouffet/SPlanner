@@ -46,13 +46,6 @@ protected:
 	int DebugLogKey = 12158;
 #endif
 
-	/**
-	*	The maximum planner depth while building a plan.
-	*	Plan generation complexity: O(!n), n = MaxPlannerDepth.
-	*/
-	UPROPERTY(Config, EditAnywhere)
-	uint8 MaxPlannerDepth = 5u;
-
 public:
 #if WITH_EDITOR
 	/** Static accessor of DebugMask. */
@@ -65,7 +58,7 @@ public:
 
 	/** Static accessor of MoveListLogKey. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
-	static int GetMoveListLogKey();
+	static int GetActionListLogKey();
 
 	/** Static accessor of PlanLogKey. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
@@ -83,8 +76,4 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static void ResetTaskExecuteLogKey();
 #endif
-
-	/** Static accessor of MaxPlannerDepth */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Settings")
-	static uint8 GetMaxPlannerDepth();
 };
