@@ -143,7 +143,7 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, ui
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
 	{
-		SP_LOG_TASK_TICK(Controller, "Move request failed!")
+		SP_LOG_TASK_EXECUTE(Controller, "Move request failed!")
 		return ESP_PlanExecutionState::PES_Failed;
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -187,7 +187,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		if (Character->GetVelocity().SizeSquared() != 0.0f)
 			return ESP_PlanExecutionState::PES_Running;
 
-		SP_LOG_TASK_TICK(Character, "Succeed")
+		SP_LOG_TASK_TICK(Controller, "Succeed")
 
 		return ESP_PlanExecutionState::PES_Succeed;
 	}

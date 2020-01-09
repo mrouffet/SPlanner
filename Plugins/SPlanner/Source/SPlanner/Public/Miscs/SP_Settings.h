@@ -26,7 +26,7 @@ ENUM_CLASS_FLAGS(ESP_DebugFlag);
 /**
  *	SPlanner static settings.
  */
-UCLASS(Config = Game, defaultconfig, DisplayName = "SPlanner")
+UCLASS(Config = Game, DisplayName = "SPlanner") // WARNING: Add defaultconfig to save UPROPERTY(Config).
 class SPLANNER_API USP_Settings : public UDeveloperSettings
 {
 	GENERATED_BODY()

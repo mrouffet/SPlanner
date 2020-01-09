@@ -172,7 +172,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 		if (PlannerActions.Actions.Num() != 0)
 		{
-			if(PlanDebugStr != "Move list: ")
+			if(PlanDebugStr != "Action list: ")
 				PlanDebugStr += "\nCore: ";
 
 			for (int i = 0; i < PlannerActions.Actions.Num(); ++i)
@@ -180,7 +180,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 			PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
 		}
-		else if (PlanDebugStr == "Move list: ")
+		else if (PlanDebugStr == "Action list: ")
 			PlanDebugStr += "null";
 
 		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetActionListLogKey(), FColor::Yellow, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)

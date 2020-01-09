@@ -24,6 +24,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|ChooseTarget")
 	FVector Dimensions = FVector(100.0f, 100.0f, 100.0f);
 
+#if WITH_EDITOR
+	UPROPERTY(EditAnywhere, Category = "SPlanner|ChooseTarget")
+	FColor DebugColor = FColor::Yellow;
+
+	UPROPERTY(EditAnywhere, Category = "SPlanner|ChooseTarget")
+	float DebugDrawTime = 2.0f;
+#endif
+
 public:
 	bool PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
 	FSP_PlannerFlags PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;

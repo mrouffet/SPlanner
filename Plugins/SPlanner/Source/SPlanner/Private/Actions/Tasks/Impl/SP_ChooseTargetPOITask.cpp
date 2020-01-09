@@ -22,20 +22,20 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 {
 	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
 
-	AActor* PlannerOwner = Planner->GetOwner();
-	SP_RCHECK_NULLPTR(PlannerOwner, ESP_PlanExecutionState::PES_Failed)
+	AActor* TargetOwner = Planner->Target->GetOwner();
+	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
 
 	FCollisionQueryParams QParams;
-	QParams.AddIgnoredActor(PlannerOwner);
+	QParams.AddIgnoredActor(TargetOwner);
 
-	FVector Start = PlannerOwner->GetActorLocation() + PlannerOwner->GetActorRotation().RotateVector(LocalOffset);
+	FVector Start = TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset);
 
 	TArray<FHitResult> HitInfos;
 	Planner->GetWorld()->SweepMultiByChannel(
 		HitInfos,
 		Start,
 		Start + FVector(0.0f, 0.0f, 0.1f),
-		PlannerOwner->GetActorRotation().Quaternion(),
+		TargetOwner->GetActorRotation().Quaternion(),
 		ECollisionChannel::ECC_Pawn,
 		FCollisionShape::MakeBox(Dimensions / 2.0f),
 		QParams
@@ -58,10 +58,18 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 	USP_POIComponent* TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
 	Planner->Target->SetPOI(TargetPOI);
 
-	SP_IF_TASK_EXECUTE(PlannerOwner)
-		DrawDebugLine(PlannerOwner->GetWorld(), PlannerOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), FColor::Cyan, false, USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
+	SP_IF_TASK_EXECUTE(Planner->GetOwner())
+	{
+		DrawDebugSphere(TargetOwner->GetWorld(),
+			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
+			Dimensions.X > Dimensions.Y ? Dimensions.X : Dimensions.Y,
+			25, DebugColor, false,
+			USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
 
-	SP_LOG_TASK_EXECUTE(PlannerOwner, "%s", *TargetPOI->GetOwner()->GetName())
+		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), DebugColor, false, DebugDrawTime);
+	}
+
+	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPOI->GetOwner()->GetName())
 
 #else
 

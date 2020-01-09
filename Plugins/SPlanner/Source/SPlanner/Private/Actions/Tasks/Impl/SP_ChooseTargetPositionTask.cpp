@@ -13,27 +13,35 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 {
 	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
 
-	AActor* PlannerOwner = Planner->GetOwner();
-	SP_RCHECK_NULLPTR(PlannerOwner, ESP_PlanExecutionState::PES_Failed)
+	AActor* TargetOwner = Planner->Target->GetOwner();
+	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
 
 
 	// Random position with character's Z (only use XY).
-	FVector TargetPosition = PlannerOwner->GetActorLocation() + PlannerOwner->GetActorRotation().RotateVector(LocalOffset) +
+	FVector TargetPosition = TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset) +
 		FVector(FMath::RandRange(-1.0f, 1.0f) * Dimensions.X, +FMath::RandRange(-1.0f, 1.0f) * Dimensions.Y, 0.0f);
 
 	Planner->Target->SetPosition(TargetPosition);
 		
 
 #if SP_DEBUG_EDITOR
-	SP_IF_TASK_EXECUTE(PlannerOwner)
-		DrawDebugLine(PlannerOwner->GetWorld(), PlannerOwner->GetActorLocation(), TargetPosition, FColor::Cyan, false, USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
+	SP_IF_TASK_EXECUTE(Planner->GetOwner())
+	{
+		DrawDebugSphere(TargetOwner->GetWorld(),
+			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
+			Dimensions.X > Dimensions.Y ? Dimensions.X : Dimensions.Y,
+			25, DebugColor, false,
+			USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
 
-	SP_LOG_TASK_EXECUTE(PlannerOwner, "%s", *TargetPosition.ToString())
+		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPosition, DebugColor, false, DebugDrawTime);
+	}
+
+	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPosition.ToString())
 #endif
 
 
 	if (bAutoLookAt)
-		PlannerOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(PlannerOwner->GetActorLocation(), TargetPosition));
+		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), TargetPosition));
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
