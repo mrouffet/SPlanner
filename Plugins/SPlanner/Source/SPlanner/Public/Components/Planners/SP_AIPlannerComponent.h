@@ -53,7 +53,7 @@ protected:
 	*	Use CurrentPlanIndex and Plan.
 	*	Return Result == ESP_PlanExecutionState::PES_Succeed.
 	*/
-	bool EndTask();
+	bool EndTask(ESP_PlanExecutionState TickResult);
 
 	FSP_PlannerActionSet CreatePlannerActionSet() override;
 

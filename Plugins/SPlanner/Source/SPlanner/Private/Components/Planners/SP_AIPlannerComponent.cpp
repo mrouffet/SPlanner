@@ -135,24 +135,22 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	ESP_PlanExecutionState TickResult = CurrentTask->Tick(DeltaTime, this, TaskUserData.GetData());
 
 	// Process task result.
-	if (TickResult == ESP_PlanExecutionState::PES_Failed)			// Plan got invalid: ask a new one.
+	if (TickResult == ESP_PlanExecutionState::PES_Running)
+		return;
+
+	// Always end task (Tick succeed or failed).
+	if (!EndTask(TickResult)) // End Failed: New plan already asked.
+		return;
+
+	if (TickResult == ESP_PlanExecutionState::PES_Failed) // Plan got invalid: ask a new one.
 	{
-		if (CurrentTask->GetUseCooldownOnFailed())
-			SetCooldown(CurrentTask);
-
 		PlanState = ESP_PlanState::PS_Invalid;
-
 		AskNewPlan();
 	}
-	else if (TickResult == ESP_PlanExecutionState::PES_Succeed)		// Task succeed.
-	{
-		if (!EndTask())
-			return;
-
+	else // Task succeed.
 		BeginNextTask();
-	}
 }
-bool USP_AIPlannerComponent::EndTask()
+bool USP_AIPlannerComponent::EndTask(ESP_PlanExecutionState TickResult)
 {
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
 
@@ -172,7 +170,9 @@ bool USP_AIPlannerComponent::EndTask()
 		return false;
 	}
 
-	SetCooldown(CurrentTask);
+	// Tick can have failed.
+	if(TickResult == ESP_PlanExecutionState::PES_Succeed || CurrentTask->GetUseCooldownOnFailed())
+		SetCooldown(CurrentTask);
 
 	return true;
 }
