@@ -9,7 +9,7 @@ FSP_PlanConstructTask::FSP_PlanConstructTask(USP_PlannerComponent* _Planner) : P
 
 void FSP_PlanConstructTask::DoWork()
 {
-	SP_CHECK_NULLPTR(Planner)
+	SP_SCHECK_NULLPTR(Planner)
 
 	Planner->ConstructPlan();
 }

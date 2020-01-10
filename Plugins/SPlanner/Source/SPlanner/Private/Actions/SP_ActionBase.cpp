@@ -11,7 +11,7 @@ FSP_ActionBase::FSP_ActionBase(USP_ActionStep* InStep) : Step{ InStep }
 #if WITH_EDITOR
 FString FSP_ActionBase::GetDebugStr() const
 {
-	SP_RCHECK_NULLPTR(Step, FString())
+	SP_SRCHECK_NULLPTR(Step, FString())
 
 	return Step->GetName();
 }

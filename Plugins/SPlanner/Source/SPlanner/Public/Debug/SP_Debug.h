@@ -28,5 +28,5 @@ public:
 	*	Use custom color.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Debug")
-	static void LogScreenColor(UObject* Caller, const FString& Str = "Hello", ESP_DebugVerbosity Verbosity = ESP_DebugVerbosity::DV_Display, const FColor& Color = FColor::Cyan);
+	static void LogScreenFull(UObject* Caller, const FString& Str = "Hello", ESP_DebugVerbosity Verbosity = ESP_DebugVerbosity::DV_Display, FLinearColor Color = FLinearColor::Yellow, float Time = 5.0f);
 };

@@ -67,20 +67,20 @@ const TArray<USP_PlannerComponent*>& ASP_Director::QueryAllPlannersWithGoal(USP_
 
 ASP_Director* ASP_Director::GetInstance()
 {
-	SP_RCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.", nullptr)
+	SP_SRCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.", nullptr)
 
 	return Instance;
 }
 
 void ASP_Director::Register(USP_PlannerComponent* InPlanner)
 {
-	SP_CHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.")
+	SP_SCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.")
 
 	Instance->OnRegister_Internal(InPlanner);
 }
 void ASP_Director::UnRegister(USP_PlannerComponent* InPlanner)
 {
-	SP_CHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.")
+	SP_SCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.")
 
 	Instance->OnUnRegister_Internal(InPlanner);
 }
