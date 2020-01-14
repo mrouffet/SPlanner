@@ -14,6 +14,7 @@ class USP_ActionStep;
 struct FSP_PlannerActionSet;
 
 class USP_ActionSetComponent;
+class USP_PlannerLODComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_PlannerGoalDelegate, USP_PlannerComponent*, Planner, USP_Goal*, OldGoal, USP_Goal*, NewGoal);
 
@@ -71,7 +72,11 @@ protected:
 	*	Return true on construction succeed.
 	*	Executed on external thread.
 	*/
-	bool ConstructPlan_Internal(const FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, FSP_PlannerFlags PlannerFlags = FSP_PlannerFlags(), uint8 CurrDepth = 0u) const;
+	bool ConstructPlan_Internal(const FSP_PlannerActionSet& PlannerActions,
+		TArray<USP_ActionStep*>& OutPlan,
+		uint8 MaxDepth,
+		uint8 CurrDepth = 0u,
+		FSP_PlannerFlags PlannerFlags = FSP_PlannerFlags()) const;
 
 	/** Callback function called when a plan's construction failed (no valid plan found). */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
@@ -88,9 +93,18 @@ public:
 	/**
 	*	The maximum planner depth while building a plan.
 	*	Plan generation complexity: O(!n), n = MaxPlannerDepth.
+	*	Get overridden by SP_PlannerLODComponent.
 	*/
 	UPROPERTY(Config, EditAnywhere)
-	uint8 MaxPlannerDepth = 5u;
+	uint8 DefaultMaxPlannerDepth = 5u;
+
+	/**
+	*	Minimum time to wait before constructing a new plan.
+	*	Use <= 0 to compute instantly.
+	*	Get overridden by SP_PlannerLODComponent.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	float DefaultTimeBeforeConstructPlan = -1.0f;
 
 	/**
 	*	Whether this planner should register itself in the Director.
@@ -99,16 +113,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	bool bAutoRegisterInDirector = false;
 
-	/**
-	*	Minimum time to wait before constructing a new plan.
-	*	Use <= 0 to compute instantly.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float TimeBeforeConstructPlan = -1.0f;
-
 	/** Action set component used. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_ActionSetComponent* ActionSet = nullptr;
+
+	/** LOD component used  for plan generation. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	USP_PlannerLODComponent* LOD = nullptr;
 
 	/** Callback event when goal is changed. */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")

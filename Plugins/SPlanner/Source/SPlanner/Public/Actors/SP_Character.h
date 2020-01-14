@@ -6,6 +6,7 @@
 class USP_ActionSetComponent;
 class USP_TargetComponent;
 class USP_InteractZoneComponent;
+class USP_PlannerLODComponent;
 
 /**
 *	SPlanner character implementation.
@@ -27,6 +28,10 @@ protected:
 	/** POI Interact zone behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_InteractZoneComponent* InteractZone = nullptr;
+
+	/** LOD behavior. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	USP_PlannerLODComponent* PlannerLOD = nullptr;
 
 public:
 	ASP_Character(const FObjectInitializer& ObjectInitializer);

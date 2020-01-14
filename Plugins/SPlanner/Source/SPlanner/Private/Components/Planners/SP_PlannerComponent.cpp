@@ -15,6 +15,7 @@
 #include <Actors/SP_Director.h>
 
 #include <Components/SP_ActionSetComponent.h>
+#include <Components/LODs/SP_PlannerLODComponent.h>
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -122,6 +123,16 @@ void USP_PlannerComponent::AskNewPlan()
 	// Wait for new plan computation.
 	PlanState = ESP_PlanState::PS_WaitForCompute;
 
+	float TimeBeforeConstructPlan = DefaultTimeBeforeConstructPlan;
+
+	if (LOD)
+	{
+		if (LOD->GetIsInRange())
+			TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan(this);
+		else
+			return; // LOD not active
+	}
+
 	if (TimeBeforeConstructPlan <= 0.0f)
 	{
 		// Queue plan construction in thread.
@@ -189,8 +200,18 @@ void USP_PlannerComponent::ConstructPlan()
 
 	TArray<USP_ActionStep*> NewPlan;
 
+	int8 MaxDepth = DefaultMaxPlannerDepth;
+
+	if (LOD)
+	{
+		if (LOD->GetIsInRange())
+			MaxDepth = LOD->GetMaxPlannerDepth(this);
+		else
+			MaxDepth = -1; // LOD not active
+	}
+
 	// Planner Computation.
-	if (ConstructPlan_Internal(PlannerActions, NewPlan))
+	if (MaxDepth > 0 && ConstructPlan_Internal(PlannerActions, NewPlan, MaxDepth))
 	{
 		// Plan still being computed by this thread (not cancelled with AskNewPlan or SetNewGoal on main thread).
 		if(PlanState == ESP_PlanState::PS_Computing)
@@ -204,9 +225,13 @@ void USP_PlannerComponent::ConstructPlan()
 		OnPlanConstructionFailed();
 	}
 }
-bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, FSP_PlannerFlags PlannerFlags, uint8 CurrDepth) const
+bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& PlannerActions,
+	TArray<USP_ActionStep*>& OutPlan,
+	uint8 MaxDepth,
+	uint8 CurrDepth,
+	FSP_PlannerFlags PlannerFlags) const
 {
-	if (CurrDepth > MaxPlannerDepth)
+	if (CurrDepth > MaxDepth)
 		return false;
 
 	int Index = CurrDepth;
@@ -239,7 +264,7 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 		OutPlan.Add(Action.Step);
 
 		// Check if action achieve plan or plan with this task achieve plan.
-		if (Action.bAchievePlan || ConstructPlan_Internal(PlannerActions, OutPlan, Action.Step->PostCondition(this, PlannerFlags), CurrDepth + 1))
+		if (Action.bAchievePlan || ConstructPlan_Internal(PlannerActions, OutPlan, MaxDepth, CurrDepth + 1, Action.Step->PostCondition(this, PlannerFlags)))
 			return true;
 
 		// Plan generation failed, remove this task from plan.

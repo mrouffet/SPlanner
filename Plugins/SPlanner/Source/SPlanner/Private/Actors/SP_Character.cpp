@@ -5,6 +5,7 @@
 #include <Components/SP_ActionSetComponent.h>
 #include <Components/SP_TargetComponent.h>
 #include <Components/SP_InteractZoneComponent.h>
+#include <Components/LODs/SP_PlannerLODComponent.h>
 
 ASP_Character::ASP_Character(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -16,4 +17,7 @@ ASP_Character::ASP_Character(const FObjectInitializer& ObjectInitializer) : Supe
 
 	InteractZone = CreateDefaultSubobject<USP_InteractZoneComponent>(TEXT("InteractZone"));
 	InteractZone->SetupAttachment(RootComponent);
+
+	PlannerLOD = CreateDefaultSubobject<USP_PlannerLODComponent>(TEXT("PlannerLOD"));
+	PlannerLOD->SetupAttachment(RootComponent);
 }
