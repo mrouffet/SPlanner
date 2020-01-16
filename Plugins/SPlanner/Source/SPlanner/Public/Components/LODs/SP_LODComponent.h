@@ -10,7 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSP_LODDelegate);
 *	SPlanner LOD base behavior.
 *	Use radius and collision with camera to trigger OnEnterRange / OnExitRange events.
 */
-UCLASS(Abstract, Blueprintable, BlueprintType, ClassGroup = "SPlanner|LOD")
+UCLASS(Abstract, Blueprintable, BlueprintType, DisplayName = "LODComponent", ClassGroup = "SPlanner|LOD", meta=(BlueprintSpawnableComponent))
 class SPLANNER_API USP_LODComponent : public USphereComponent
 {
 	GENERATED_BODY()
