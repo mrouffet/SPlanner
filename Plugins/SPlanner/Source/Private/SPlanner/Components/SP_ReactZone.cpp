@@ -10,7 +10,7 @@ USP_ReactZone::USP_ReactZone(const FObjectInitializer& ObjectInitializer) : Supe
 	bWantsInitializeComponent = true;
 
 	// Default active radius.
-	SphereRadius = 500.0f;
+	SphereRadius = 400.0f;
 
 	// Set overlaps.
 	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -33,13 +33,35 @@ void USP_ReactZone::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 		return;
 
 	SP_CHECK_NULLPTR(Planner)
+
+	if (EnterCooldown > 0.0f)
+	{
+		// Wait for cooldown.
+		float WaitTime = GetWorld()->GetTimeSeconds() - CurrEnterCooldown;
+
+		if (WaitTime > EnterCooldown)
+		{
+			// Call this again after wait time.
+			GetWorld()->GetTimerManager().SetTimer(Timer,
+				[this, OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, &SweepResult]
+				{
+					OnBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+				},
+				WaitTime - EnterCooldown + 0.01f, // ensure float precision.
+				false);
+
+			return;
+		}
+
+		CurrEnterCooldown = GetWorld()->GetTimeSeconds();
+	}
 	
 	if(bSavePreviousGoal)
 		ExitGoal = Planner->GetGoal();
 
 	Planner->SetGoal(EnterGoal);
 
-	GetWorld()->GetTimerManager().ClearTimer(ExitTimer);
+	GetWorld()->GetTimerManager().ClearTimer(Timer);
 }
 void USP_ReactZone::OnEndOverlap(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
@@ -52,10 +74,17 @@ void USP_ReactZone::OnEndOverlap(UPrimitiveComponent* OverlappedComp,
 
 	SP_CHECK_NULLPTR(Planner)
 
+	// Timer waiting for enter cooldown.
+	if(GetWorld()->GetTimerManager().IsTimerPending(Timer))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(Timer);
+		return;
+	}
+
 	if (DelayOnExit < 0.0f)
 		Planner->SetGoal(ExitGoal);
 	else
-		GetWorld()->GetTimerManager().SetTimer(ExitTimer, [this] { Planner->SetGoal(ExitGoal); }, DelayOnExit, false);
+		GetWorld()->GetTimerManager().SetTimer(Timer, [this] { Planner->SetGoal(ExitGoal); }, DelayOnExit, false);
 }
 
 void USP_ReactZone::InitializeComponent()

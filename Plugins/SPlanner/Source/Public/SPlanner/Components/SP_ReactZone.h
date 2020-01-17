@@ -17,6 +17,13 @@ class SPLANNER_API USP_ReactZone : public USphereComponent
 	
 protected:
 	/**
+	*	The cooldowon before applying next EnterGoal on end overlap.
+	*	use < 0 for no cooldown.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	float EnterCooldown = -1.0f;
+
+	/**
 	*	The delay before applying ExitGoal on end overlap.
 	*	use < 0 for no delay.
 	*/
@@ -39,8 +46,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner", meta=(EditCondition="!bSavePreviousGoal"))
 	USP_Goal* ExitGoal = nullptr;
 
-	/** Timer handle before setting ExitGoal after DelayOnExit. */
-	FTimerHandle ExitTimer;
+	/** The current saved cooldown.*/
+	float CurrEnterCooldown = 0.0f;
+
+	/** Timer handle used for cooldown or before setting ExitGoal after DelayOnExit. */
+	FTimerHandle Timer;
 
 	/** Callback function bound to OnComponentBeginOverlap. */
 	UFUNCTION(Category = "SPlanner|ReactZone")
