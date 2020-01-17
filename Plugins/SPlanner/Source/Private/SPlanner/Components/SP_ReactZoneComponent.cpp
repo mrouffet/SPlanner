@@ -1,11 +1,11 @@
-#include <SPlanner/Components/SP_ReactZone.h>
+#include <SPlanner/Components/SP_ReactZoneComponent.h>
 
 #include <TimerManager.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 #include <SPlanner/Components/Planners/SP_PlannerComponent.h>
 
-USP_ReactZone::USP_ReactZone(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+USP_ReactZoneComponent::USP_ReactZoneComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
 
@@ -21,7 +21,7 @@ USP_ReactZone::USP_ReactZone(const FObjectInitializer& ObjectInitializer) : Supe
 	SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
-void USP_ReactZone::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
+void USP_ReactZoneComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex,
@@ -63,7 +63,7 @@ void USP_ReactZone::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 
 	GetWorld()->GetTimerManager().ClearTimer(Timer);
 }
-void USP_ReactZone::OnEndOverlap(UPrimitiveComponent* OverlappedComp,
+void USP_ReactZoneComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex)
@@ -87,17 +87,17 @@ void USP_ReactZone::OnEndOverlap(UPrimitiveComponent* OverlappedComp,
 		GetWorld()->GetTimerManager().SetTimer(Timer, [this] { Planner->SetGoal(ExitGoal); }, DelayOnExit, false);
 }
 
-void USP_ReactZone::InitializeComponent()
+void USP_ReactZoneComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	OnComponentBeginOverlap.AddDynamic(this, &USP_ReactZone::OnBeginOverlap);
-	OnComponentEndOverlap.AddDynamic(this, &USP_ReactZone::OnEndOverlap);
+	OnComponentBeginOverlap.AddDynamic(this, &USP_ReactZoneComponent::OnBeginOverlap);
+	OnComponentEndOverlap.AddDynamic(this, &USP_ReactZoneComponent::OnEndOverlap);
 }
-void USP_ReactZone::UninitializeComponent()
+void USP_ReactZoneComponent::UninitializeComponent()
 {
 	Super::UninitializeComponent();
 
-	OnComponentBeginOverlap.RemoveDynamic(this, &USP_ReactZone::OnBeginOverlap);
-	OnComponentEndOverlap.RemoveDynamic(this, &USP_ReactZone::OnEndOverlap);
+	OnComponentBeginOverlap.RemoveDynamic(this, &USP_ReactZoneComponent::OnBeginOverlap);
+	OnComponentEndOverlap.RemoveDynamic(this, &USP_ReactZoneComponent::OnEndOverlap);
 }

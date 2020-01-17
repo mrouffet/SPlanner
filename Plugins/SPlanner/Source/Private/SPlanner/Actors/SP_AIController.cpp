@@ -4,6 +4,7 @@
 #include <SPlanner/Components/SP_ActionSetComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 #include <SPlanner/Components/SP_InteractZoneComponent.h>
+#include <SPlanner/Components/SP_ReactZoneComponent.h>
 #include <SPlanner/Components/LODs/SP_PlannerLODComponent.h>
 
 FName ASP_AIController::PlannerComponentName(TEXT("Planner"));
@@ -22,6 +23,13 @@ void ASP_AIController::OnPossess(APawn* InPawn)
 	Planner->Target = Cast<USP_TargetComponent>(InPawn->GetComponentByClass(USP_TargetComponent::StaticClass()));
 	Planner->InteractZone = Cast<USP_InteractZoneComponent>(InPawn->GetComponentByClass(USP_InteractZoneComponent::StaticClass()));
 	Planner->LOD = Cast<USP_PlannerLODComponent>(InPawn->GetComponentByClass(USP_PlannerLODComponent::StaticClass()));
+
+	// Setup pawn react zones.
+	TArray<USP_ReactZoneComponent*> ReactZones;
+	InPawn->GetComponents<USP_ReactZoneComponent>(ReactZones, true);
+
+	for (int i = 0; i < ReactZones.Num(); ++i)
+		ReactZones[i]->Planner = Planner;
 }
 void ASP_AIController::OnUnPossess()
 {

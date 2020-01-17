@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Components/SphereComponent.h>
-#include "SP_ReactZone.generated.h"
+#include "SP_ReactZoneComponent.generated.h"
 
 class USP_Goal;
 
@@ -11,7 +11,7 @@ class USP_PlannerComponent;
  *	React zone implementation: switch goal on enter / exit.
  */
 UCLASS(Blueprintable, BlueprintType, DisplayName = "ReactZone", ClassGroup = "SPlanner|ReactZone", meta=(BlueprintSpawnableComponent))
-class SPLANNER_API USP_ReactZone : public USphereComponent
+class SPLANNER_API USP_ReactZoneComponent : public USphereComponent
 {
 	GENERATED_BODY()
 	
@@ -76,5 +76,5 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "SPlanner")
 	USP_PlannerComponent* Planner = nullptr;
 
-	USP_ReactZone(const FObjectInitializer& ObjectInitializer);
+	USP_ReactZoneComponent(const FObjectInitializer& ObjectInitializer);
 };
