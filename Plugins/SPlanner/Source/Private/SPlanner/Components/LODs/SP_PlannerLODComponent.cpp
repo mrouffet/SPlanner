@@ -2,6 +2,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Components/Planners/SP_PlannerComponent.h>
+
 USP_PlannerLODComponent::USP_PlannerLODComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	FRichCurve* const MaxPlannerDepthCurve_Internal = MaxPlannerDepthCurve.GetRichCurve();
