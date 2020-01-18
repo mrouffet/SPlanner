@@ -19,6 +19,8 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 {
 	// Execute task in tick or check cooldowns.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	bWantsInitializeComponent = true;
 }
 
 float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
@@ -53,6 +55,12 @@ bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 		return false;
 
 	return GetCooldown(Task) < Task->GetCooldown();
+}
+
+void USP_AIPlannerComponent::OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal)
+{
+	if (bResetTargetOnGoalChange && Target)
+		Target->Clear();
 }
 
 void USP_AIPlannerComponent::CheckCooldowns()
@@ -139,42 +147,34 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 		return;
 
 	// Always end task (Tick succeed or failed).
-	if (!EndTask(TickResult)) // End Failed: New plan already asked.
-		return;
+	bool EndTaskResult = EndTask();
 
-	if (TickResult == ESP_PlanExecutionState::PES_Failed) // Plan got invalid: ask a new one.
+	if (!EndTaskResult || TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
+		if (CurrentTask->GetUseCooldownOnFailed())
+			SetCooldown(CurrentTask);
+
+		// Plan got invalid: ask a new one.
 		PlanState = ESP_PlanState::PS_Invalid;
+
 		AskNewPlan();
 	}
-	else // Task succeed.
+	else
+	{
+		// Task succeed.
+		SetCooldown(CurrentTask);
+
 		BeginNextTask();
+	}
 }
-bool USP_AIPlannerComponent::EndTask(ESP_PlanExecutionState TickResult)
+bool USP_AIPlannerComponent::EndTask()
 {
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
 
 	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
-	// Can't end task, Plan got invalid: ask a new one.
-	if (CurrentTask->End(this, TaskUserData.GetData()) != ESP_PlanExecutionState::PES_Succeed)
-	{
-		if (CurrentTask->GetUseCooldownOnFailed())
-			SetCooldown(CurrentTask);
-
-		PlanState = ESP_PlanState::PS_Invalid;
-
-		AskNewPlan();
-
-		return false;
-	}
-
-	// Tick can have failed.
-	if(TickResult == ESP_PlanExecutionState::PES_Succeed || CurrentTask->GetUseCooldownOnFailed())
-		SetCooldown(CurrentTask);
-
-	return true;
+	return CurrentTask->End(this, TaskUserData.GetData()) == ESP_PlanExecutionState::PES_Succeed;
 }
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet()
@@ -288,13 +288,39 @@ void USP_AIPlannerComponent::OnPlanCancelled_Implementation()
 #endif
 }
 
+void USP_AIPlannerComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	// Server only while owner is replicated.
+	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
+		return;
+	
+	OnGoalChange.AddDynamic(this, &USP_AIPlannerComponent::OnGoalChange_Bind);
+}
+void USP_AIPlannerComponent::UninitializeComponent()
+{
+	Super::UninitializeComponent();
+
+	// Server only while owner is replicated.
+	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
+		return;
+
+	OnGoalChange.RemoveDynamic(this, &USP_AIPlannerComponent::OnGoalChange_Bind);
+}
+
 void USP_AIPlannerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// Computed by server only while owner is replicated.
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
-		SetComponentTickEnabled(false); // Simulated client.
+	{
+		// Simulated client.
+
+		SetComponentTickEnabled(false);
+		return;
+	}
 }
 void USP_AIPlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

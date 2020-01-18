@@ -31,6 +31,10 @@ protected:
 	/** Allocated memory for user data during task execution. */
 	TArray<uint8> TaskUserData;
 
+	/** Callback function bind to OnGoalChange. */
+	UFUNCTION(Category = "SPlanner|Planner")
+	void OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal);
+
 	/** Check new task availability to request new plan generation. */
 	void CheckCooldowns();
 
@@ -53,7 +57,7 @@ protected:
 	*	Use CurrentPlanIndex and Plan.
 	*	Return Result == ESP_PlanExecutionState::PES_Succeed.
 	*/
-	bool EndTask(ESP_PlanExecutionState TickResult);
+	bool EndTask();
 
 	FSP_PlannerActionSet CreatePlannerActionSet() override;
 
@@ -69,13 +73,20 @@ protected:
 	*/
 	void OnPlanCancelled_Implementation() override;
 
+	void InitializeComponent() override;
+	void UninitializeComponent() override;
+
 	void BeginPlay() override;
 
 public:
+	/** Should reset target on goal change. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SPlanner")
+	bool bResetTargetOnGoalChange = true;
+	
 	/** Target component used. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_TargetComponent* Target = nullptr;
-	
+
 	/**
 	*	The POI interact zone used.
 	*	Used to add action set from interactible POIs.
