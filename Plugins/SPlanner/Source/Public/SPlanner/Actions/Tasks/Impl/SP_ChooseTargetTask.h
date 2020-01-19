@@ -24,7 +24,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|ChooseTarget")
 	FVector Dimensions = FVector(100.0f, 100.0f, 100.0f);
 
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "SPlanner|ChooseTarget")
 	FColor DebugColor = FColor::Yellow;
 
