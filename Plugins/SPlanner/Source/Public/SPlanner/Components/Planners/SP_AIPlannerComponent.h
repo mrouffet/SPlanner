@@ -6,7 +6,7 @@
 class USP_Task;
 
 class USP_TargetComponent;
-class USP_InteractZoneComponent;
+class USP_POIZoneComponent;
 
 /**
 *	Planner behavior.
@@ -71,7 +71,7 @@ protected:
 	*	Use CurrentPlanIndex and Plan.
 	*	Called on main thread.
 	*/
-	void OnPlanCancelled_Implementation() override;
+	void CancelPlan_Implementation() override;
 
 	void InitializeComponent() override;
 	void UninitializeComponent() override;
@@ -92,7 +92,7 @@ public:
 	*	Used to add action set from interactible POIs.
 	*/
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner")
-	USP_InteractZoneComponent* InteractZone = nullptr;
+	USP_POIZoneComponent* POIZone = nullptr;
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
 

@@ -13,7 +13,7 @@
 #include <SPlanner/Components/SP_POIComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 #include <SPlanner/Components/SP_ActionSetComponent.h>
-#include <SPlanner/Components/SP_InteractZoneComponent.h>
+#include <SPlanner/Components/Zones/SP_POIZoneComponent.h>
 
 USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -198,18 +198,18 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet()
 	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(CooldownPredicate());
 
 	// Add all available actions from POI.
-	if (InteractZone)
+	if (POIZone)
 	{
-		for (int j = 0; j < InteractZone->GetPOIs().Num(); ++j)
+		for (int j = 0; j < POIZone->GetPOIs().Num(); ++j)
 		{
-			SP_CCHECK(InteractZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
-			SP_CCHECK(InteractZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %s ] action set nullptr!", false, *GetName(), *InteractZone->GetPOIs()[j]->GetOwner()->GetName())
+			SP_CCHECK(POIZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
+			SP_CCHECK(POIZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %s ] action set nullptr!", false, *GetName(), *POIZone->GetPOIs()[j]->GetOwner()->GetName())
 
-			const TArray<FSP_POIAction>& POIActions = InteractZone->GetPOIs()[j]->GetActionSet()->GetActions();
+			const TArray<FSP_POIAction>& POIActions = POIZone->GetPOIs()[j]->GetActionSet()->GetActions();
 
 			for (int i = 0; i < POIActions.Num(); ++i)
 			{
-				SP_CCHECK(POIActions[i].Task, "%s: POI Task [ %d ] nullptr!", *InteractZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
+				SP_CCHECK(POIActions[i].Task, "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
 
 				// Use INDEX_NONE to convert int32 to bool.
 				bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal) != INDEX_NONE;
@@ -268,9 +268,9 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation()
 
 	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, this, &USP_AIPlannerComponent::AskNewPlan, MinCooldown, false);
 }
-void USP_AIPlannerComponent::OnPlanCancelled_Implementation()
+void USP_AIPlannerComponent::CancelPlan_Implementation()
 {
-	Super::OnPlanCancelled_Implementation();
+	Super::CancelPlan_Implementation();
 
 	// Plan not started.
 	if (CurrentPlanIndex == -1)

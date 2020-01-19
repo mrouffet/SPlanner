@@ -3,7 +3,7 @@
 
 #include <Curves/CurveFloat.h>
 
-#include <SPlanner/Components/LODs/SP_LODComponent.h>
+#include <SPlanner/Components/Zones/SP_LODComponent.h>
 #include "SP_PlannerLODComponent.generated.h"
 
 class USP_PlannerComponent;
@@ -33,9 +33,9 @@ public:
 
 	/** Getter of MaxPlannerDepth using MaxPlannerDepthCurve */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|LOD")
-	int GetMaxPlannerDepth(USP_PlannerComponent* Planner) const;
+	int GetMaxPlannerDepth() const;
 
 	/** Getter of MaxPlannerDepth using MaxPlannerDepthCurve */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|LOD")
-	float GetTimeBeforeConstructPlan(USP_PlannerComponent* Planner) const;
+	float GetTimeBeforeConstructPlan() const;
 };

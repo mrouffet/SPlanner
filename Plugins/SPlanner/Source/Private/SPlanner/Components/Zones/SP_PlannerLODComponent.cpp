@@ -1,4 +1,4 @@
-#include <SPlanner/Components/LODs/SP_PlannerLODComponent.h>
+#include <SPlanner/Components/Zones/SP_PlannerLODComponent.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
@@ -18,11 +18,11 @@ USP_PlannerLODComponent::USP_PlannerLODComponent(const FObjectInitializer& Objec
 	TimeBeforeConstructPlanCurve_Internal->AddKey(5000.0f, 10.0f);
 }
 
-int USP_PlannerLODComponent::GetMaxPlannerDepth(USP_PlannerComponent* Planner) const
+int USP_PlannerLODComponent::GetMaxPlannerDepth() const
 {
-	return static_cast<int>(MaxPlannerDepthCurve.GetRichCurveConst()->Eval(GetDistanceFromCamera(Planner)));
+	return static_cast<int>(MaxPlannerDepthCurve.GetRichCurveConst()->Eval(GetClosestDistance()));
 }
-float USP_PlannerLODComponent::GetTimeBeforeConstructPlan(USP_PlannerComponent* Planner) const
+float USP_PlannerLODComponent::GetTimeBeforeConstructPlan() const
 {
-	return TimeBeforeConstructPlanCurve.GetRichCurveConst()->Eval(GetDistanceFromCamera(Planner));
+	return TimeBeforeConstructPlanCurve.GetRichCurveConst()->Eval(GetClosestDistance());
 }

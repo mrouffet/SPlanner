@@ -15,7 +15,7 @@
 #include <SPlanner/Actors/SP_Director.h>
 
 #include <SPlanner/Components/SP_ActionSetComponent.h>
-#include <SPlanner/Components/LODs/SP_PlannerLODComponent.h>
+#include <SPlanner/Components/Zones/SP_PlannerLODComponent.h>
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,7 +37,7 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 
 	// Cancel previous plan.
 	if (PlanState == ESP_PlanState::PS_Valid)
-		OnPlanCancelled();
+		CancelPlan();
 
 	// Out dated plan.
 	if (PlanState != ESP_PlanState::PS_WaitForCompute)
@@ -55,6 +55,11 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 	// Do not ask again if already / still waiting for computation.
 	if (PlanState != ESP_PlanState::PS_WaitForCompute)
 		AskNewPlan();
+}
+
+void USP_PlannerComponent::CancelPlan_Implementation()
+{
+	SP_CHECK(PlanState == ESP_PlanState::PS_Valid, "Try to cancel invalid plan!")
 }
 
 void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
@@ -127,8 +132,8 @@ void USP_PlannerComponent::AskNewPlan()
 
 	if (LOD)
 	{
-		if (LOD->GetIsInRange())
-			TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan(this);
+		if (LOD->IsInRange())
+			TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan();
 		else
 			return; // LOD not active
 	}
@@ -204,8 +209,8 @@ void USP_PlannerComponent::ConstructPlan()
 
 	if (LOD)
 	{
-		if (LOD->GetIsInRange())
-			MaxDepth = LOD->GetMaxPlannerDepth(this);
+		if (LOD->IsInRange())
+			MaxDepth = LOD->GetMaxPlannerDepth();
 		else
 			MaxDepth = -1; // LOD not active
 	}
@@ -276,10 +281,6 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 
 void USP_PlannerComponent::OnPlanConstructionFailed_Implementation()
 {
-}
-void USP_PlannerComponent::OnPlanCancelled_Implementation()
-{
-	SP_CHECK(PlanState == ESP_PlanState::PS_Valid, "Try to cancel invalid plan!")
 }
 
 void USP_PlannerComponent::BeginPlay()

@@ -5,7 +5,7 @@
 
 class USP_ActionSetComponent;
 class USP_TargetComponent;
-class USP_InteractZoneComponent;
+class USP_POIZoneComponent;
 class USP_PlannerLODComponent;
 
 /**
@@ -27,7 +27,7 @@ protected:
 
 	/** POI Interact zone behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_InteractZoneComponent* InteractZone = nullptr;
+	USP_POIZoneComponent* POIZone = nullptr;
 
 	/** LOD behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")

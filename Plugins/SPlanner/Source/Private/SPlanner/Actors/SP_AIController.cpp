@@ -3,9 +3,9 @@
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 #include <SPlanner/Components/SP_ActionSetComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
-#include <SPlanner/Components/SP_InteractZoneComponent.h>
-#include <SPlanner/Components/SP_ReactZoneComponent.h>
-#include <SPlanner/Components/LODs/SP_PlannerLODComponent.h>
+#include <SPlanner/Components/Zones/SP_POIZoneComponent.h>
+#include <SPlanner/Components/Zones/SP_ReactZoneComponent.h>
+#include <SPlanner/Components/Zones/SP_PlannerLODComponent.h>
 
 FName ASP_AIController::PlannerComponentName(TEXT("Planner"));
 
@@ -21,7 +21,7 @@ void ASP_AIController::OnPossess(APawn* InPawn)
 
 	Planner->ActionSet = Cast<USP_ActionSetComponent>(InPawn->GetComponentByClass(USP_ActionSetComponent::StaticClass()));
 	Planner->Target = Cast<USP_TargetComponent>(InPawn->GetComponentByClass(USP_TargetComponent::StaticClass()));
-	Planner->InteractZone = Cast<USP_InteractZoneComponent>(InPawn->GetComponentByClass(USP_InteractZoneComponent::StaticClass()));
+	Planner->POIZone = Cast<USP_POIZoneComponent>(InPawn->GetComponentByClass(USP_POIZoneComponent::StaticClass()));
 	Planner->LOD = Cast<USP_PlannerLODComponent>(InPawn->GetComponentByClass(USP_PlannerLODComponent::StaticClass()));
 
 	// Setup pawn react zones.
@@ -37,6 +37,6 @@ void ASP_AIController::OnUnPossess()
 
 	Planner->ActionSet = nullptr;
 	Planner->Target = nullptr;
-	Planner->InteractZone = nullptr;
+	Planner->POIZone = nullptr;
 	Planner->LOD = nullptr;
 }

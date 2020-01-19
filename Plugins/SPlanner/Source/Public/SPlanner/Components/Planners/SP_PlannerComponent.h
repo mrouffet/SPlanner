@@ -82,10 +82,6 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
 	void OnPlanConstructionFailed();
 
-	/** Callback function called when a plan get cancelled (by setting new goal). */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
-	void OnPlanCancelled();
-
 	void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
@@ -133,4 +129,11 @@ public:
 	/** Setter of Goal. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
 	void SetGoal(USP_Goal* InGoal);
+
+	/**
+	*	Cancel current executed plan.
+	*	Callback function called when a plan get cancelled (by setting new goal).
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
+	void CancelPlan();
 };
