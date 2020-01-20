@@ -3,7 +3,7 @@
 #include "SP_PlanState.generated.h"
 
 /** The current state of the plan. */
-UENUM(BlueprintType, Blueprintable, Category = "SPlanner|Misc")
+UENUM(BlueprintType, Category = "SPlanner|Misc")
 enum class ESP_PlanState : uint8
 {
 	/** Can be executed. */
@@ -20,10 +20,13 @@ enum class ESP_PlanState : uint8
 
 	/** Finished with success planner. */
 	PS_Finished					UMETA(Display = "Finished"),
+
+	/** Planner inactive (out of LOD range). */
+	PS_Inactive					UMETA(Display = "Inactive"),
 };
 
 /** The current state of the task executed. */
-UENUM(BlueprintType, Blueprintable, Category = "SPlanner|Misc")
+UENUM(BlueprintType, Category = "SPlanner|Misc")
 enum class ESP_PlanExecutionState : uint8
 {
 	/** Active task, called each frame. */

@@ -64,14 +64,17 @@ protected:
 	void AskNewPlan() override;
 
 	/** Check cooldown and call AskNewPlan after newly available task. */
-	void OnPlanConstructionFailed_Implementation() override;
+	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;
 
 	/**
 	*	Cancel the current task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
 	*	Called on main thread.
 	*/
-	void CancelPlan_Implementation() override;
+	bool CancelPlan_Implementation() override;
+
+	bool OnActive_Implementation() override;
+	bool OnInactive_Implementation() override;
 
 	void InitializeComponent() override;
 	void UninitializeComponent() override;

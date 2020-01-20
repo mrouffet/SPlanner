@@ -26,6 +26,32 @@ USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectIniti
 	PlanState = ESP_PlanState::PS_Invalid;
 }
 
+void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
+{
+	if (bEnable)
+		OnActive();
+	else
+		OnInactive();
+}
+
+void USP_PlannerComponent::SetLOD(USP_PlannerLODComponent* NewLOD)
+{
+	if (LOD)
+	{
+		LOD->OnActive.RemoveDynamic(this, &USP_PlannerComponent::OnActiveLOD);
+		LOD->OnInactive.RemoveDynamic(this, &USP_PlannerComponent::OnInactiveLOD);
+	}
+
+	LOD = NewLOD;
+
+	// Can be nullptr to reset component.
+	if (LOD)
+	{
+		LOD->OnActive.AddDynamic(this, &USP_PlannerComponent::OnActiveLOD);
+		LOD->OnInactive.AddDynamic(this, &USP_PlannerComponent::OnInactiveLOD);
+	}
+}
+
 USP_Goal* USP_PlannerComponent::GetGoal() const
 {
 	return Goal;
@@ -57,9 +83,10 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 		AskNewPlan();
 }
 
-void USP_PlannerComponent::CancelPlan_Implementation()
+bool USP_PlannerComponent::CancelPlan_Implementation()
 {
-	SP_CHECK(PlanState == ESP_PlanState::PS_Valid, "Try to cancel invalid plan!")
+	// Must cancel a valid plan.
+	return PlanState == ESP_PlanState::PS_Valid;
 }
 
 void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
@@ -114,6 +141,7 @@ void USP_PlannerComponent::AskNewPlan()
 {
 	SP_CHECK(PlanState != ESP_PlanState::PS_Valid, "Plan still valid!")
 	SP_CHECK(PlanState != ESP_PlanState::PS_WaitForCompute, "Plan already waiting for being computed!")
+	SP_CHECK(PlanState != ESP_PlanState::PS_Inactive, "Plan LOD is inactive!")
 
 #if SP_DEBUG_EDITOR
 	// Reset debug keys.
@@ -132,10 +160,8 @@ void USP_PlannerComponent::AskNewPlan()
 
 	if (LOD)
 	{
-		if (LOD->IsInRange())
-			TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan();
-		else
-			return; // LOD not active
+		SP_CHECK(LOD->IsInRange(), "LOD inactive!")
+		TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan();
 	}
 
 	if (TimeBeforeConstructPlan <= 0.0f)
@@ -154,6 +180,10 @@ void USP_PlannerComponent::AskNewPlan()
 }
 void USP_PlannerComponent::ConstructPlan()
 {
+	// LOD became out of range during TimeBeforeConstructPlan.
+	if (PlanState == ESP_PlanState::PS_Inactive)
+		return;
+
 	SP_CHECK(PlanState == ESP_PlanState::PS_WaitForCompute, "PlanState must be waiting for computation at this point. This should never happen.")
 
 	PlanState = ESP_PlanState::PS_Computing;
@@ -212,23 +242,43 @@ void USP_PlannerComponent::ConstructPlan()
 		if (LOD->IsInRange())
 			MaxDepth = LOD->GetMaxPlannerDepth();
 		else
-			MaxDepth = -1; // LOD not active
+		{
+			OnPlanConstructionFailed(ESP_PlanError::PE_LODOutOfRange);
+			return;
+		}
 	}
 
+	if (LOD)
+	{
+#if SP_DEBUG
+		if (!LOD->IsInRange())
+		{
+			SP_LOG(Error, "LOD inactive!")
+			OnPlanConstructionFailed(ESP_PlanError::PE_LODOutOfRange);
+			return;
+		}
+#endif
+		MaxDepth = LOD->GetMaxPlannerDepth();
+	}
+
+#if SP_DEBUG
+	if (MaxDepth < 0)
+	{
+		SP_LOG(Error, "Bad MaxDepth: %d", MaxDepth)
+		OnPlanConstructionFailed(ESP_PlanError::PE_ConstructionBadArgument);
+		return;
+	}
+#endif
+
 	// Planner Computation.
-	if (MaxDepth > 0 && ConstructPlan_Internal(PlannerActions, NewPlan, MaxDepth))
+	if (ConstructPlan_Internal(PlannerActions, NewPlan, MaxDepth))
 	{
 		// Plan still being computed by this thread (not cancelled with AskNewPlan or SetNewGoal on main thread).
 		if(PlanState == ESP_PlanState::PS_Computing)
 			SetNewPlan(std::move(NewPlan));
 	}
-	else
-	{
-		PlanState = ESP_PlanState::PS_Invalid;
-		
-		// No plan found.
-		OnPlanConstructionFailed();
-	}
+	else // No plan found.
+		OnPlanConstructionFailed(ESP_PlanError::PE_ConstructionFailed);
 }
 bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& PlannerActions,
 	TArray<USP_ActionStep*>& OutPlan,
@@ -279,8 +329,44 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 	return false;
 }
 
-void USP_PlannerComponent::OnPlanConstructionFailed_Implementation()
+void USP_PlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)
 {
+	PlanState = ESP_PlanState::PS_Invalid;
+}
+
+bool USP_PlannerComponent::OnActive_Implementation()
+{
+	if (PlanState != ESP_PlanState::PS_Inactive)
+		return false;
+
+	// Set as finished to ask a new plan.
+	PlanState = ESP_PlanState::PS_Finished;
+
+	AskNewPlan();
+
+	return true;
+}
+bool USP_PlannerComponent::OnInactive_Implementation()
+{
+	if (PlanState == ESP_PlanState::PS_Inactive)
+		return false;
+
+	// Try cancel plan, otherwise stop cosntruct timer.
+	if(!CancelPlan())
+		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
+
+	PlanState = ESP_PlanState::PS_Inactive;
+
+	return true;
+}
+
+void USP_PlannerComponent::OnActiveLOD()
+{
+	SetEnableBehavior(true);
+}
+void USP_PlannerComponent::OnInactiveLOD()
+{
+	SetEnableBehavior(false);
 }
 
 void USP_PlannerComponent::BeginPlay()

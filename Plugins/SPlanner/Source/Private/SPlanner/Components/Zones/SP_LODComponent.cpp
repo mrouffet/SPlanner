@@ -1,7 +1,5 @@
 #include <SPlanner/Components/Zones/SP_LODComponent.h>
 
-#include <GameFramework/PlayerController.h>
-
 #include <SPlanner/Debug/SP_Debug.h>
 
 USP_LODComponent::USP_LODComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,4 +33,19 @@ float USP_LODComponent::GetClosestDistance() const
 	}
 
 	return FMath::Sqrt(closestSqrDist);
+}
+
+void USP_LODComponent::AddObject_Implementation(UPrimitiveComponent* Object)
+{
+	Super::AddObject_Implementation(Object);
+
+	if (Objects.Num() == 1)
+		OnActive.Broadcast();
+}
+void USP_LODComponent::RemoveObject_Implementation(UPrimitiveComponent* Object)
+{
+	Super::RemoveObject_Implementation(Object);
+
+	if (Objects.Num() == 0)
+		OnInactive.Broadcast();
 }

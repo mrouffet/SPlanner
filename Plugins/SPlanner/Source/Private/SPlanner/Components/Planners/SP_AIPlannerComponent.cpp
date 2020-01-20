@@ -249,9 +249,13 @@ void USP_AIPlannerComponent::AskNewPlan()
 	Super::AskNewPlan();
 }
 
-void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation()
+void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)
 {
-	Super::OnPlanConstructionFailed_Implementation();
+	Super::OnPlanConstructionFailed_Implementation(PlanError);
+
+	// Catch construction failed because of cooldowns.
+	if (PlanError != ESP_PlanError::PE_ConstructionFailed)
+		return;
 
 	float MinCooldown = FLT_MAX;
 
@@ -268,24 +272,42 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation()
 
 	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, this, &USP_AIPlannerComponent::AskNewPlan, MinCooldown, false);
 }
-void USP_AIPlannerComponent::CancelPlan_Implementation()
+bool USP_AIPlannerComponent::CancelPlan_Implementation()
 {
-	Super::CancelPlan_Implementation();
+	if (!Super::CancelPlan_Implementation() || CurrentPlanIndex == -1) // Plan not started.
+		return false;
 
-	// Plan not started.
-	if (CurrentPlanIndex == -1)
-		return;
-
-	SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!")
+	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
 
 	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
-	SP_CHECK_NULLPTR(CurrentTask)
+	SP_RCHECK_NULLPTR(CurrentTask, false)
 
 #if SP_DEBUG
-	SP_CHECK(CurrentTask->Cancel(this, TaskUserData.GetData()), "Cancel failed!")
+	SP_RCHECK(CurrentTask->Cancel(this, TaskUserData.GetData()), "Cancel failed!", false)
 #else
 	CurrentTask->Cancel(this, TaskUserData.GetData());
 #endif
+
+	return true;
+}
+
+bool USP_AIPlannerComponent::OnActive_Implementation()
+{
+	if (!Super::OnActive_Implementation())
+		return false;
+
+	SetComponentTickEnabled(true);
+
+	return true;
+}
+bool USP_AIPlannerComponent::OnInactive_Implementation()
+{
+	if(!Super::OnInactive_Implementation())
+		return false;
+
+	SetComponentTickEnabled(false);
+
+	return true;
 }
 
 void USP_AIPlannerComponent::InitializeComponent()

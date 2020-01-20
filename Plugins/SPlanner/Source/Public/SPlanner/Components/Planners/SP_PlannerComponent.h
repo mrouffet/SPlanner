@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include <SPlanner/Miscs/SP_PlanState.h>
+#include <SPlanner/Miscs/SP_PlanError.h>
 #include <SPlanner/Miscs/Flags/SP_PlannerFlags.h>
 
 #include <Components/ActorComponent.h>
@@ -52,6 +53,10 @@ protected:
 	*/
 	std::atomic<ESP_PlanState> PlanState;
 
+	/** LOD component used  for plan generation. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	USP_PlannerLODComponent* LOD = nullptr;
+
 	/**
 	*	Set new plan to execute and update PlanState.
 	*	Executed on external thread.
@@ -80,7 +85,37 @@ protected:
 
 	/** Callback function called when a plan's construction failed (no valid plan found). */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
-	void OnPlanConstructionFailed();
+	void OnPlanConstructionFailed(ESP_PlanError PlanError);
+
+	/**
+	*	Callback function to set active planner behavior.
+	*	Ask new plan.
+	*	Return success.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
+	bool OnActive();
+
+	/**
+	*	Callback function to set inactive planner behavior.
+	*	Cancel current plan and plan generation.
+	*	Return success.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
+	bool OnInactive();
+
+	/**
+	*	Callback function bind to LOD.OnActive.
+	*	call SetEnableBehavior(true).
+	*/
+	UFUNCTION(Category = "SPlanner|Planner")
+	void OnActiveLOD();
+
+	/**
+	*	Callback function bind to LOD.OnInactive.
+	*	call SetEnableBehavior(false).
+	*/
+	UFUNCTION(Category = "SPlanner|Planner")
+	void OnInactiveLOD();
 
 	void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -113,15 +148,25 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_ActionSetComponent* ActionSet = nullptr;
 
-	/** LOD component used  for plan generation. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_PlannerLODComponent* LOD = nullptr;
-
 	/** Callback event when goal is changed. */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_PlannerGoalDelegate OnGoalChange;
 
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
+
+	/**
+	*	Enable or disable behavior.
+	*	Call OnActive / OnInactive.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner")
+	void SetEnableBehavior(bool bEnable);
+
+	/**
+	*	Setter of LOD.
+	*	Bind OnActiveLOD / OnInactiveLOD events.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
+	void SetLOD(USP_PlannerLODComponent* NewLOD);
 
 	/** Getter of Goal. */
 	USP_Goal* GetGoal() const;
@@ -133,7 +178,8 @@ public:
 	/**
 	*	Cancel current executed plan.
 	*	Callback function called when a plan get cancelled (by setting new goal).
+	*	Return cancel succeed.
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
-	void CancelPlan();
+	bool CancelPlan();
 };

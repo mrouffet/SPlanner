@@ -22,7 +22,7 @@ void ASP_AIController::OnPossess(APawn* InPawn)
 	Planner->ActionSet = Cast<USP_ActionSetComponent>(InPawn->GetComponentByClass(USP_ActionSetComponent::StaticClass()));
 	Planner->Target = Cast<USP_TargetComponent>(InPawn->GetComponentByClass(USP_TargetComponent::StaticClass()));
 	Planner->POIZone = Cast<USP_POIZoneComponent>(InPawn->GetComponentByClass(USP_POIZoneComponent::StaticClass()));
-	Planner->LOD = Cast<USP_PlannerLODComponent>(InPawn->GetComponentByClass(USP_PlannerLODComponent::StaticClass()));
+	Planner->SetLOD(Cast<USP_PlannerLODComponent>(InPawn->GetComponentByClass(USP_PlannerLODComponent::StaticClass())));
 
 	// Setup pawn react zones.
 	TArray<USP_ReactZoneComponent*> ReactZones;
@@ -38,5 +38,12 @@ void ASP_AIController::OnUnPossess()
 	Planner->ActionSet = nullptr;
 	Planner->Target = nullptr;
 	Planner->POIZone = nullptr;
-	Planner->LOD = nullptr;
+	Planner->SetLOD(nullptr);
+}
+
+void ASP_AIController::SetEnableBehavior(bool bEnable)
+{
+	Planner->SetEnableBehavior(bEnable);
+
+	SetActorTickEnabled(bEnable);
 }

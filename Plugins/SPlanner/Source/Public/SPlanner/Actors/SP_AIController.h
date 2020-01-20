@@ -26,4 +26,8 @@ public:
 	static FName PlannerComponentName;
 
 	ASP_AIController(const FObjectInitializer& ObjectInitializer);
+
+	/** Enable or disable Planner behavior. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner")
+	void SetEnableBehavior(bool bEnable);
 };
