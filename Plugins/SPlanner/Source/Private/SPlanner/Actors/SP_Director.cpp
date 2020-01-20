@@ -14,11 +14,11 @@ ASP_Director::ASP_Director(const FObjectInitializer& ObjectInitializer) : Super(
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ASP_Director::BeginPlay()
+void ASP_Director::PreInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PreInitializeComponents();
 
-	SP_CHECK(!Instance, "Bad Instance: Already set! An other AIDirector actor may be already in scene.")
+	SP_CHECK(!Instance, "Bad Instance: Already set! An other Director actor may already be in scene.")
 
 	Instance = this;
 }
@@ -26,7 +26,7 @@ void ASP_Director::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	SP_CHECK(Instance == this, "Bad Instance: Try to reset an other instance! An other AIDirector actor may be already in scene.")
+	SP_CHECK(Instance == this, "Bad Instance: Try to reset an other instance! An other Director actor may already be in scene.")
 
 	Instance = nullptr;
 }

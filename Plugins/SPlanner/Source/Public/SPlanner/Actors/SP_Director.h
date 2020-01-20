@@ -44,7 +44,7 @@ protected:
 	UFUNCTION(Category = "SPlanner|Director")
 	virtual void OnRegistedPlannerGoalChange(USP_PlannerComponent* InPlanner, USP_Goal* OldGoal, USP_Goal* NewGoal);
 
-	void BeginPlay() override;
+	void PreInitializeComponents() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:

@@ -10,6 +10,7 @@
 ASP_Character::ASP_Character(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	AIControllerClass = ASP_AIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	ActionSet = CreateDefaultSubobject<USP_ActionSetComponent>(TEXT("ActionSet"));
 

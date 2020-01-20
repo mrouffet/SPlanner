@@ -1,8 +1,12 @@
 #include <SPlanner/Actors/SP_AIController.h>
 
-#include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
+#include <SPlanner/Actors/SP_Director.h>
+
 #include <SPlanner/Components/SP_ActionSetComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
+
+#include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
+
 #include <SPlanner/Components/Zones/SP_POIZoneComponent.h>
 #include <SPlanner/Components/Zones/SP_ReactZoneComponent.h>
 #include <SPlanner/Components/Zones/SP_PlannerLODComponent.h>
@@ -43,6 +47,18 @@ void ASP_AIController::OnUnPossess()
 
 void ASP_AIController::SetEnableBehavior(bool bEnable)
 {
+	// Already in good state.
+	if (IsActorTickEnabled() == bEnable)
+		return;
+
+	if (Planner->bAutoRegisterInDirector)
+	{
+		if(bEnable)
+			ASP_Director::Register(Planner);
+		else
+			ASP_Director::UnRegister(Planner);
+	}
+
 	Planner->SetEnableBehavior(bEnable);
 
 	SetActorTickEnabled(bEnable);
