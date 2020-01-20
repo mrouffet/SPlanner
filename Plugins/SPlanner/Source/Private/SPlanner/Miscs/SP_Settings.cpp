@@ -20,9 +20,13 @@ int USP_Settings::GetPlanLogKey()
 {
 	return GetDefault<USP_Settings>()->DebugLogKey + 1;
 }
+int USP_Settings::GetPlanGenerationLogKey()
+{
+	return GetDefault<USP_Settings>()->DebugLogKey + 2;
+}
 int USP_Settings::GetTaskExecuteLogKey()
 {
-	return GetDefault<USP_Settings>()->DebugLogKey + 2 + TaskExecuteKeyOffset;
+	return GetDefault<USP_Settings>()->DebugLogKey + 3 + TaskExecuteKeyOffset;
 }
 void USP_Settings::IncrementTaskExecuteLogKey()
 {

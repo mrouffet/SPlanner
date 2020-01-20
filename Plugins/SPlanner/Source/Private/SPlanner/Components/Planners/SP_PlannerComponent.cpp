@@ -164,6 +164,12 @@ void USP_PlannerComponent::AskNewPlan()
 		TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan();
 	}
 
+#if SP_DEBUG_EDITOR
+	// Log available planner actions.
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
+		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanGenerationLogKey(), FColor::Purple, USP_Settings::GetDebugScreenDisplayTime(), "Time before construct: %f", TimeBeforeConstructPlan)
+#endif
+
 	if (TimeBeforeConstructPlan <= 0.0f)
 	{
 		// Queue plan construction in thread.

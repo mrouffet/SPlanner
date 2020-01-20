@@ -64,6 +64,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static int GetPlanLogKey();
 
+	/** Static accessor of PlanLogKey. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	static int GetPlanGenerationLogKey();
+
 	/** Static accessor of TaskExecuteLogKey. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
 	static int GetTaskExecuteLogKey();
