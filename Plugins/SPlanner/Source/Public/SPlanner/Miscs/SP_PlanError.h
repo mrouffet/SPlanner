@@ -10,7 +10,7 @@ enum class ESP_PlanError : uint8
 	PE_Unknown								UMETA(Display = "Unknown"),
 
 	/** ConstructPlan() failed. */
-	PE_ConstructionBadArgument				UMETA(Display = "ConstructionBadArgument"),
+	PE_BadArgument							UMETA(Display = "BadArgument"),
 
 	/** ConstructPlan() failed. */
 	PE_ConstructionFailed					UMETA(Display = "ConstructionFailed"),

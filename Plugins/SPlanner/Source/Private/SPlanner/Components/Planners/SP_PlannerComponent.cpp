@@ -245,17 +245,6 @@ void USP_PlannerComponent::ConstructPlan()
 
 	if (LOD)
 	{
-		if (LOD->IsInRange())
-			MaxDepth = LOD->GetMaxPlannerDepth();
-		else
-		{
-			OnPlanConstructionFailed(ESP_PlanError::PE_LODOutOfRange);
-			return;
-		}
-	}
-
-	if (LOD)
-	{
 #if SP_DEBUG
 		if (!LOD->IsInRange())
 		{
@@ -268,10 +257,10 @@ void USP_PlannerComponent::ConstructPlan()
 	}
 
 #if SP_DEBUG
-	if (MaxDepth < 0)
+	if (MaxDepth <= 0)
 	{
 		SP_LOG(Error, "Bad MaxDepth: %d", MaxDepth)
-		OnPlanConstructionFailed(ESP_PlanError::PE_ConstructionBadArgument);
+		OnPlanConstructionFailed(ESP_PlanError::PE_BadArgument);
 		return;
 	}
 #endif

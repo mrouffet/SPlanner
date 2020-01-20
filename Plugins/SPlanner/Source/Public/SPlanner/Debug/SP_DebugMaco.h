@@ -32,7 +32,10 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 		{\
 			AActor* OwnerActor = nullptr;\
 			const_cast<std::remove_cv<std::remove_reference<decltype(*this)>::type>::type&>(*this).ProcessEvent(OwnerFunction, &OwnerActor);\
-			UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s.%s -- %s:%d in %s:\n\t" Str), *OwnerActor->GetName(), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
+			if(OwnerActor)\
+				UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s.%s -- %s:%d in %s:\n\t" Str), *OwnerActor->GetName(), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
+			else\
+				UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s -- %s:%d in %s:\n\t" Str), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
 		}\
 		else\
 			UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s -- %s:%d in %s:\n\t" Str), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
