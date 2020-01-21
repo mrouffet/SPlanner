@@ -142,7 +142,15 @@ public:
 	*	Require Director actor in scene while true.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	bool bAutoRegisterInDirector = false;
+	bool bAutoRegisterInDirector = true;
+
+	/**
+	*	Whether this planner should register itself in the Director in BeginPlay.
+	*	Require Director actor in scene while true.
+	*	Set to false for pooling use.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner", meta=(EditCondition="bAutoRegisterInDirector"))
+	bool bAutoRegisterInDirectorInBeginPlay = true;
 
 	/** Action set component used. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")

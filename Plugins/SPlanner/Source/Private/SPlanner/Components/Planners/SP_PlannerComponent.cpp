@@ -337,6 +337,10 @@ bool USP_PlannerComponent::OnActive_Implementation()
 	// Set as finished to ask a new plan.
 	PlanState = ESP_PlanState::PS_Finished;
 
+	// Add to active planners.
+	if (bAutoRegisterInDirector)
+		ASP_Director::Register(this);
+
 	AskNewPlan();
 
 	return true;
@@ -351,6 +355,10 @@ bool USP_PlannerComponent::OnInactive_Implementation()
 		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
 
 	PlanState = ESP_PlanState::PS_Inactive;
+
+	// Remove from active planners.
+	if(bAutoRegisterInDirector)
+		ASP_Director::UnRegister(this);
 
 	return true;
 }
@@ -377,7 +385,7 @@ void USP_PlannerComponent::BeginPlay()
 		AskNewPlan();
 
 	// Register in Director.
-	if (bAutoRegisterInDirector)
+	if (bAutoRegisterInDirector && bAutoRegisterInDirectorInBeginPlay)
 		ASP_Director::Register(this);
 }
 void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -1,7 +1,5 @@
 #include <SPlanner/Actors/SP_AIController.h>
 
-#include <SPlanner/Actors/SP_Director.h>
-
 #include <SPlanner/Components/SP_ActionSetComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 
@@ -16,7 +14,10 @@ FName ASP_AIController::PlannerComponentName(TEXT("Planner"));
 ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	Planner = CreateOptionalDefaultSubobject<USP_AIPlannerComponent>(PlannerComponentName);
+	
+	// Always register by default.
 	Planner->bAutoRegisterInDirector = true;
+	Planner->bAutoRegisterInDirectorInBeginPlay = true;
 }
 
 void ASP_AIController::OnPossess(APawn* InPawn)
@@ -50,14 +51,6 @@ void ASP_AIController::SetEnableBehavior(bool bEnable)
 	// Already in good state.
 	if (IsActorTickEnabled() == bEnable)
 		return;
-
-	if (Planner->bAutoRegisterInDirector)
-	{
-		if(bEnable)
-			ASP_Director::Register(Planner);
-		else
-			ASP_Director::UnRegister(Planner);
-	}
 
 	Planner->SetEnableBehavior(bEnable);
 
