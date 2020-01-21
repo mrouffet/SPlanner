@@ -65,7 +65,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 	if(!(Predicate))\
 	{\
 		SP_LOG(Error, Str, ##__VA_ARGS__)\
-		##PostLogInstruction;\
+		PostLogInstruction;\
 	}
 
 
@@ -97,16 +97,16 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 	SP_CHECK_FULL(Predicate, Str, return ReturnValue, ##__VA_ARGS__)
 
 /** Helper check for nullptr objects. */
-#define SP_RCHECK_NULLPTR(Object, ReturnType, ...) SP_RCHECK(Object, #Object " is nullptr!", ReturnType, ##__VA_ARGS__)
+#define SP_RCHECK_NULLPTR(Object, ReturnValue, ...) SP_RCHECK(Object, #Object " is nullptr!", ReturnValue, ##__VA_ARGS__)
 
 /** Helper check for GameState type.*/
-#define SP_RCHECK_GAMESTATE(GameStateType, ReturnType, ...) SP_RCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ReturnType, ##__VA_ARGS__)
+#define SP_RCHECK_GAMESTATE(GameStateType, ReturnValue, ...) SP_RCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ReturnValue, ##__VA_ARGS__)
 
 /** Helper check Authority */
-#define SP_RCHECK_AUTHORITY(ReturnType, ...) SP_RCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ReturnType, ##__VA_ARGS__)
+#define SP_RCHECK_AUTHORITY(ReturnValue, ...) SP_RCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ReturnValue, ##__VA_ARGS__)
 
 /** Helper check Owner*/
-#define SP_RCHECK_OWNER(ReturnType, ...) SP_RCHECK(GetOwner(), "Owner nullptr!", ReturnType, ##__VA_ARGS__)
+#define SP_RCHECK_OWNER(ReturnValue, ...) SP_RCHECK(GetOwner(), "Owner nullptr!", ReturnValue, ##__VA_ARGS__)
 
 
 /**
@@ -159,7 +159,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 	if(!(Predicate))\
 	{\
 		SP_SLOG(Error, Str, ##__VA_ARGS__)\
-		##PostLogInstruction;\
+		PostLogInstruction;\
 	}
 
 /**
@@ -191,16 +191,16 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 
 
 /** Helper check for nullptr objects. */
-#define SP_SRCHECK_NULLPTR(Object, ReturnType, ...) SP_SRCHECK(Object, #Object " is nullptr!", ReturnType, ##__VA_ARGS__)
+#define SP_SRCHECK_NULLPTR(Object, ReturnValue, ...) SP_SRCHECK(Object, #Object " is nullptr!", ReturnValue, ##__VA_ARGS__)
 
 /** Helper check for GameState type.*/
-#define SP_SRCHECK_GAMESTATE(GameStateType, ReturnType, ...) SP_SRCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ReturnType, ##__VA_ARGS__)
+#define SP_SRCHECK_GAMESTATE(GameStateType, ReturnValue, ...) SP_SRCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ReturnValue, ##__VA_ARGS__)
 
 /** Helper check Authority */
-#define SP_SRCHECK_AUTHORITY(ReturnType, ...) SP_SRCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ReturnType, ##__VA_ARGS__)
+#define SP_SRCHECK_AUTHORITY(ReturnValue, ...) SP_SRCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ReturnValue, ##__VA_ARGS__)
 
 /** Helper check Owner*/
-#define SP_SRCHECK_OWNER(ReturnType, ...) SP_SRCHECK(GetOwner(), "Owner nullptr!", ReturnType, ##__VA_ARGS__)
+#define SP_SRCHECK_OWNER(ReturnValue, ...) SP_SRCHECK(GetOwner(), "Owner nullptr!", ReturnValue, ##__VA_ARGS__)
 
 
 /**

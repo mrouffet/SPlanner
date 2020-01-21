@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SPlanner/Debug/SP_Debug.h>
+
 #include <SPlanner/Actions/SP_Action.h>
 #include <SPlanner/Actions/SP_PlannerActionSet.h>
 
