@@ -73,8 +73,8 @@ protected:
 	*/
 	bool CancelPlan_Implementation() override;
 
-	bool OnActive_Implementation() override;
-	bool OnInactive_Implementation() override;
+	bool OnActive_Internal_Implementation() override;
+	bool OnInactive_Internal_Implementation() override;
 
 	void InitializeComponent() override;
 	void UninitializeComponent() override;

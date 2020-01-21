@@ -291,18 +291,18 @@ bool USP_AIPlannerComponent::CancelPlan_Implementation()
 	return true;
 }
 
-bool USP_AIPlannerComponent::OnActive_Implementation()
+bool USP_AIPlannerComponent::OnActive_Internal_Implementation()
 {
-	if (!Super::OnActive_Implementation())
+	if (!Super::OnActive_Internal_Implementation())
 		return false;
 
 	SetComponentTickEnabled(true);
 
 	return true;
 }
-bool USP_AIPlannerComponent::OnInactive_Implementation()
+bool USP_AIPlannerComponent::OnInactive_Internal_Implementation()
 {
-	if(!Super::OnInactive_Implementation())
+	if(!Super::OnInactive_Internal_Implementation())
 		return false;
 
 	SetComponentTickEnabled(false);

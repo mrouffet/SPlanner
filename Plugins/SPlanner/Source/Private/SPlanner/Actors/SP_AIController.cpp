@@ -15,9 +15,9 @@ ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) 
 {
 	Planner = CreateOptionalDefaultSubobject<USP_AIPlannerComponent>(PlannerComponentName);
 	
-	// Always register by default.
+	// Start active by default.
+	Planner->bStartActive = true;
 	Planner->bAutoRegisterInDirector = true;
-	Planner->bAutoRegisterInDirectorInBeginPlay = true;
 }
 
 void ASP_AIController::OnPossess(APawn* InPawn)

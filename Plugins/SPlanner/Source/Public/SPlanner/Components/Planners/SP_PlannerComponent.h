@@ -17,6 +17,7 @@ struct FSP_PlannerActionSet;
 class USP_ActionSetComponent;
 class USP_PlannerLODComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_PlannerDelegate, USP_PlannerComponent*, Planner);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_PlannerGoalDelegate, USP_PlannerComponent*, Planner, USP_Goal*, OldGoal, USP_Goal*, NewGoal);
 
 /**
@@ -96,7 +97,7 @@ protected:
 	*	Return success.
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
-	bool OnActive();
+	bool OnActive_Internal();
 
 	/**
 	*	Callback function to set inactive planner behavior.
@@ -104,7 +105,7 @@ protected:
 	*	Return success.
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
-	bool OnInactive();
+	bool OnInactive_Internal();
 
 	/**
 	*	Callback function bind to LOD.OnActive.
@@ -141,29 +142,49 @@ public:
 	float DefaultTimeBeforeConstructPlan = -1.0f;
 
 	/**
+	*	Whether this planner should start as active or inactive.
+	*	Call OnActive / OnInactive callback in BeginPlay.
+	*	Set to false for pooling use.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bStartActive = true;
+
+	/**
 	*	Whether this planner should register itself in the Director.
 	*	Require Director actor in scene while true.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	bool bAutoRegisterInDirector = true;
 
-	/**
-	*	Whether this planner should register itself in the Director in BeginPlay.
-	*	Require Director actor in scene while true.
-	*	Set to false for pooling use.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner", meta=(EditCondition="bAutoRegisterInDirector"))
-	bool bAutoRegisterInDirectorInBeginPlay = true;
+	/** Whether this planner should reset its goal OnActive() callback. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bResetGoalOnInactive = false;
 
 	/** Action set component used. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_ActionSetComponent* ActionSet = nullptr;
+
+	/**
+	*	Callback event when planner become active.
+	*	Called by OnActive_Internal().
+	*/
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
+	FSP_PlannerDelegate OnActive;
+
+	/**
+	*	Callback event when planner become active.
+	*	Called by OnInactive_Internal().
+	*/
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
+	FSP_PlannerDelegate OnInactive;
 
 	/** Callback event when goal is changed. */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_PlannerGoalDelegate OnGoalChange;
 
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
+
+	ESP_PlanState GetPlanState() const;
 
 	/**
 	*	Enable or disable behavior.

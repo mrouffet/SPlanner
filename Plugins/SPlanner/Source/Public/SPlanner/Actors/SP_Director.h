@@ -25,6 +25,8 @@ protected:
 	/** All planner registered (currently in use) for each goal. */
 	TMap<USP_Goal*, TArray<USP_PlannerComponent*>> GoalPlannersMap;
 
+	/** Registered inactive planners. */
+	TArray<USP_PlannerComponent*> InactivePlanners;
 
 	/**
 	*	Callback function when planner get registered.
@@ -39,6 +41,14 @@ protected:
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Director")
 	void OnUnRegister_Internal(USP_PlannerComponent* InPlanner);
+
+	/** Callback function bound to registered Planner.OnActive. */
+	UFUNCTION(Category = "SPlanner|Director")
+	virtual void OnRegistedPlannerActive(USP_PlannerComponent* InPlanner);
+
+	/** Callback function bound to registered Planner.OnInactive. */
+	UFUNCTION(Category = "SPlanner|Director")
+	virtual void OnRegistedPlannerInactive(USP_PlannerComponent* InPlanner);
 
 	/** Callback function bound to registered Planner.OnGoalChange. */
 	UFUNCTION(Category = "SPlanner|Director")
@@ -63,18 +73,18 @@ public:
 	int GetPlannerNum() const;
 
 	/** Getter (query) of all planners registered. */
-	TArray<USP_PlannerComponent*> QueryAllPlanners() const;
+	TArray<USP_PlannerComponent*> QueryAllPlanners(bool bIncludeInactive = false) const;
 
 	/**
 	*	Blueprint getter (query) of all planners registered.
 	*	Need to be BlueprintCallable and non-const to force Unreal to cache resulted array.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
-	TArray<USP_PlannerComponent*> QueryAllPlanners();
+	TArray<USP_PlannerComponent*> QueryAllPlanners(bool bIncludeInactive = false);
 
 	/** Getter (query) of planners with goal in GoalPlannersMap. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
-	const TArray<USP_PlannerComponent*>& QueryAllPlannersWithGoal(USP_Goal* Goal);
+	const TArray<USP_PlannerComponent*>& QueryAllPlannersWithGoal(USP_Goal* Goal, bool bIncludeInactive = false);
 
 	/** Getter of Instance. */
 	UFUNCTION(BlueprintPure, DisplayName = "Get SP_Director", Category = "SPlanner|Director")

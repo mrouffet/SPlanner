@@ -23,15 +23,20 @@ USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectIniti
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// Must be init in cpp file (Standard).
-	PlanState = ESP_PlanState::PS_Invalid;
+	PlanState = ESP_PlanState::PS_Inactive;
+}
+
+ESP_PlanState USP_PlannerComponent::GetPlanState() const
+{
+	return PlanState;
 }
 
 void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
 {
 	if (bEnable)
-		OnActive();
+		OnActive_Internal();
 	else
-		OnInactive();
+		OnInactive_Internal();
 }
 
 void USP_PlannerComponent::SetLOD(USP_PlannerLODComponent* NewLOD)
@@ -61,26 +66,26 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 	if (Goal == InGoal)
 		return;
 
-	// Cancel previous plan.
-	if (PlanState == ESP_PlanState::PS_Valid)
-		CancelPlan();
-
-	// Out dated plan.
-	if (PlanState != ESP_PlanState::PS_WaitForCompute)
-	{
-		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
-
-		PlanState = ESP_PlanState::PS_Invalid;
-	}
-
 	USP_Goal* OldGoal = Goal;
 	Goal = InGoal;
 
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
 
-	// Do not ask again if already / still waiting for computation.
-	if (PlanState != ESP_PlanState::PS_WaitForCompute)
-		AskNewPlan(true); // Instant request new plan with goal.
+	// Inactive planner.
+	if (PlanState == ESP_PlanState::PS_Inactive)
+		return;
+	else if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
+		CancelPlan();
+	else if (PlanState != ESP_PlanState::PS_WaitForCompute) // Out dated plan: Do not ask again if already / still waiting for computation.
+	{
+		// ConstructPlanTimer may be used for waiting other instructions (see SP_AIPlannerComponent).
+		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
+
+		if(!Goal)
+			PlanState = ESP_PlanState::PS_Invalid;
+		else
+			AskNewPlan(true); // Instant request new plan with goal.
+	}
 }
 
 bool USP_PlannerComponent::CancelPlan_Implementation()
@@ -331,7 +336,7 @@ void USP_PlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError
 	PlanState = ESP_PlanState::PS_Invalid;
 }
 
-bool USP_PlannerComponent::OnActive_Implementation()
+bool USP_PlannerComponent::OnActive_Internal_Implementation()
 {
 	if (PlanState != ESP_PlanState::PS_Inactive)
 		return false;
@@ -339,15 +344,14 @@ bool USP_PlannerComponent::OnActive_Implementation()
 	// Set as finished to ask a new plan.
 	PlanState = ESP_PlanState::PS_Finished;
 
-	// Add to active planners.
-	if (bAutoRegisterInDirector)
-		ASP_Director::Register(this);
+	if (Goal) // Active goal already set.
+		AskNewPlan();
 
-	AskNewPlan();
+	OnActive.Broadcast(this);
 
 	return true;
 }
-bool USP_PlannerComponent::OnInactive_Implementation()
+bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 {
 	if (PlanState == ESP_PlanState::PS_Inactive)
 		return false;
@@ -358,9 +362,10 @@ bool USP_PlannerComponent::OnInactive_Implementation()
 
 	PlanState = ESP_PlanState::PS_Inactive;
 
-	// Remove from active planners.
-	if(bAutoRegisterInDirector)
-		ASP_Director::UnRegister(this);
+	if(bResetGoalOnInactive)
+		SetGoal(nullptr);
+
+	OnInactive.Broadcast(this);
 
 	return true;
 }
@@ -382,13 +387,25 @@ void USP_PlannerComponent::BeginPlay()
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
-	// Ask plan with default goal.
-	if (Goal)
-		AskNewPlan();
+	if (bStartActive)
+	{
+		// Register before set active.
+		if (bAutoRegisterInDirector)
+			ASP_Director::Register(this);
 
-	// Register in Director.
-	if (bAutoRegisterInDirector && bAutoRegisterInDirectorInBeginPlay)
-		ASP_Director::Register(this);
+		OnActive_Internal();
+	}
+	else
+	{
+		// Set previouly as inactive to success OnInactive().
+		PlanState = ESP_PlanState::PS_Finished;
+
+		OnInactive_Internal();
+
+		// Register after inactive (avoid double call).
+		if (bAutoRegisterInDirector)
+			ASP_Director::Register(this);
+	}
 }
 void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
