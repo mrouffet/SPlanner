@@ -61,7 +61,7 @@ protected:
 
 	FSP_PlannerActionSet CreatePlannerActionSet() override;
 
-	void AskNewPlan() override;
+	void AskNewPlan(bool bInstantRequest = false) override;
 
 	/** Check cooldown and call AskNewPlan after newly available task. */
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;

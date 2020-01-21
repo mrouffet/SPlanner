@@ -66,8 +66,11 @@ protected:
 	/** Create the planner action set to generate the plan with. */
 	virtual FSP_PlannerActionSet CreatePlannerActionSet();
 
-	/**	Ask a new plan generation on external thread. */
-	virtual void AskNewPlan();
+	/**
+	*	Ask a new plan generation on external thread.
+	*	bInstantRequest force to ask without waiting for TimeBeforeConstructPlan (used when new goal is set).
+	*/
+	virtual void AskNewPlan(bool bInstantRequest = false);
 
 	/** Construct the plan for the plannable. */
 	void ConstructPlan();

@@ -242,11 +242,11 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet()
 	return PlannerActions;
 }
 
-void USP_AIPlannerComponent::AskNewPlan()
+void USP_AIPlannerComponent::AskNewPlan(bool bInstantRequest)
 {
 	CurrentPlanIndex = -1;
 
-	Super::AskNewPlan();
+	Super::AskNewPlan(bInstantRequest);
 }
 
 void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)
@@ -270,7 +270,7 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 
 	SP_CHECK(!FMath::IsNearlyEqual(MinCooldown, FLT_MAX), "Plan construction failed while no task are in cooldown.")
 
-	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, this, &USP_AIPlannerComponent::AskNewPlan, MinCooldown, false);
+	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this]{	AskNewPlan(); }, MinCooldown, false);
 }
 bool USP_AIPlannerComponent::CancelPlan_Implementation()
 {

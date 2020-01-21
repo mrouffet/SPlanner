@@ -80,7 +80,7 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 
 	// Do not ask again if already / still waiting for computation.
 	if (PlanState != ESP_PlanState::PS_WaitForCompute)
-		AskNewPlan();
+		AskNewPlan(true); // Instant request new plan with goal.
 }
 
 bool USP_PlannerComponent::CancelPlan_Implementation()
@@ -137,7 +137,7 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet()
 	return CurrActionSet->Shuffle();
 }
 
-void USP_PlannerComponent::AskNewPlan()
+void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 {
 	SP_CHECK(PlanState != ESP_PlanState::PS_Valid, "Plan still valid!")
 	SP_CHECK(PlanState != ESP_PlanState::PS_WaitForCompute, "Plan already waiting for being computed!")
@@ -158,7 +158,9 @@ void USP_PlannerComponent::AskNewPlan()
 
 	float TimeBeforeConstructPlan = DefaultTimeBeforeConstructPlan;
 
-	if (LOD)
+	if (bInstantRequest)
+		TimeBeforeConstructPlan = -1.0f;
+	else if (LOD)
 	{
 		SP_CHECK(LOD->IsInRange(), "LOD inactive!")
 		TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan();
