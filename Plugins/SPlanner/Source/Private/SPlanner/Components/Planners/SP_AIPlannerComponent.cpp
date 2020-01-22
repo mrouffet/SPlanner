@@ -87,7 +87,7 @@ void USP_AIPlannerComponent::CheckCooldowns()
 bool USP_AIPlannerComponent::BeginNextTask()
 {
 	// index == Plan.Num() will be checked to ask new plan.
-	SP_RCHECK(CurrentPlanIndex + 1 >= 0 && CurrentPlanIndex + 1 <= Plan.Num(), "Index out of range!", false)
+	SP_RCHECK(CurrentPlanIndex + 1 >= 0 && CurrentPlanIndex + 1 <= Plan.Num(), "Index [%d] out of range [0, %d]!", false, (CurrentPlanIndex + 1), Plan.Num())
 
 	++CurrentPlanIndex;
 	
@@ -138,6 +138,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 			return;
 	}
 
+	SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
 	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
 	SP_CHECK_NULLPTR(CurrentTask)
 
@@ -168,7 +169,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 }
 bool USP_AIPlannerComponent::EndTask()
 {
-	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
+	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", false, CurrentPlanIndex, Plan.Num())
 
 	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
 	SP_RCHECK_NULLPTR(CurrentTask, false)
@@ -276,13 +277,13 @@ bool USP_AIPlannerComponent::CancelPlan_Implementation()
 	if (!Super::CancelPlan_Implementation() || CurrentPlanIndex == -1) // Plan not started.
 		return false;
 
-	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index out of range!", false)
+	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", false, CurrentPlanIndex, Plan.Num())
 
 	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
 #if SP_DEBUG
-	SP_RCHECK(CurrentTask->Cancel(this, TaskUserData.GetData()), "Cancel failed!", false)
+	SP_RCHECK(CurrentTask->Cancel(this, TaskUserData.GetData()), "%s.Cancel() failed!", false, *CurrentTask->GetName())
 #else
 	CurrentTask->Cancel(this, TaskUserData.GetData());
 #endif

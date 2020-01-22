@@ -75,8 +75,14 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 	if (PlanState == ESP_PlanState::PS_Inactive)
 		return;
 	else if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
+	{
 		CancelPlan();
-	else if (PlanState != ESP_PlanState::PS_WaitForCompute) // Out dated plan: Do not ask again if already / still waiting for computation.
+
+		PlanState = ESP_PlanState::PS_Finished;
+	}
+	
+	// Out dated plan: Do not ask again if already / still waiting for computation.
+	if (PlanState != ESP_PlanState::PS_WaitForCompute)
 	{
 		// ConstructPlanTimer may be used for waiting other instructions (see SP_AIPlannerComponent).
 		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
@@ -155,8 +161,6 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 #endif
 
 	Plan.Empty();
-
-	ESP_PlanState PrevState = PlanState;
 
 	// Wait for new plan computation.
 	PlanState = ESP_PlanState::PS_WaitForCompute;
