@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Curves/CurveFloat.h>
+
 #include <SPlanner/Actions/SP_ActionBase.h>
 #include "SP_Action.generated.h"
 
@@ -11,13 +13,24 @@ struct FSP_Action : public FSP_ActionBase
 {
 	GENERATED_BODY()
 
+protected:
 	/**
-	*	The weight of the action.
+	*	The default weight of the action.
 	*	Increase Weight to increase chances of adding the task to the plan.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float Weight = 1.0f;
+	float DefaultWeight = 1.0f;
 
+	/**
+	*	The weight of the action depending on the LOD level.
+	*	Increase Weight to increase chances of adding the task to the plan.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	FRuntimeFloatCurve WeightLODCurve;
+
+public:
 	FSP_Action() = default;
-	FSP_Action(USP_ActionStep* InStep, float InWeight);
+
+	/** Getter of Weight using WeightCurve with valid LODLevel, otherwise DefaultWeight. */
+	float GetWeight(float LODLevel = -1.0f) const;
 };

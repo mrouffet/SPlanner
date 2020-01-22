@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SPlanner/Debug/SP_Debug.h>
-
 #include <SPlanner/Actions/SP_Action.h>
 #include <SPlanner/Actions/SP_PlannerActionSet.h>
 
@@ -57,13 +55,13 @@ public:
 	/** Getter of EndActions. */
 	const TArray<FSP_Action>& GetEndActions() const;
 
-	FSP_PlannerActionSet Shuffle() const;
+	FSP_PlannerActionSet Shuffle(float LODLevel = -1.0f) const;
 
 	template <typename PredicateClass>
-	FSP_PlannerActionSet Shuffle(const PredicateClass& Predicate) const
+	FSP_PlannerActionSet Shuffle(float LODLevel, const PredicateClass& Predicate) const
 	{
 		SP_RCHECK(EndActions.Num(), "No EndActions: Can't generate a valid plan!", FSP_PlannerActionSet())
 
-		return FSP_PlannerActionSet(BeginActions, CoreActions, ForcedCoreActions, EndActions, Predicate);
+		return FSP_PlannerActionSet::Make(this, LODLevel, Predicate);
 	}
 };

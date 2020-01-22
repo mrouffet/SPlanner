@@ -15,7 +15,7 @@ bool USP_LODComponent::IsInRange() const
 	return Objects.Num();
 }
 
-float USP_LODComponent::GetClosestDistance() const
+float USP_LODComponent::GetLevel() const
 {
 	if (!Objects.Num())
 		return -1.0f;

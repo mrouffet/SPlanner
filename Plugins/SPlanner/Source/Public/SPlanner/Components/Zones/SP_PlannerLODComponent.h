@@ -31,11 +31,17 @@ protected:
 public:
 	USP_PlannerLODComponent(const FObjectInitializer& ObjectInitializer);
 
-	/** Getter of MaxPlannerDepth using MaxPlannerDepthCurve */
+	/**
+	*	Getter of MaxPlannerDepth using MaxPlannerDepthCurve and LODLevel.
+	*	Eval LODLevel using GetLevel() if LODLevel < 0.0f.
+	*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|LOD")
-	int GetMaxPlannerDepth() const;
+	int GetMaxPlannerDepth(float LODLevel = -1.0f) const;
 
-	/** Getter of MaxPlannerDepth using MaxPlannerDepthCurve */
+	/**
+	*	Getter of  TimeBeforeConstructPlan using  TimeBeforeConstructPlanCurve and LODLevel.
+	*	Eval LODLevel using GetLevel() if LODLevel < 0.0f.
+	*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|LOD")
-	float GetTimeBeforeConstructPlan() const;
+	float GetTimeBeforeConstructPlan(float LODLevel = -1.0f) const;
 };

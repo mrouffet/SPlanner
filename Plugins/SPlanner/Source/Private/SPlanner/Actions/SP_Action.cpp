@@ -1,7 +1,9 @@
 #include <SPlanner/Actions/SP_Action.h>
 
-FSP_Action::FSP_Action(USP_ActionStep* InStep, float InWeight) :
-	FSP_ActionBase(InStep),
-	Weight{ InWeight }
+float FSP_Action::GetWeight(float LODLevel) const
 {
+	if (LODLevel < 0.0f || WeightLODCurve.GetRichCurveConst()->IsEmpty())
+		return DefaultWeight;
+
+	return WeightLODCurve.GetRichCurveConst()->Eval(LODLevel);
 }

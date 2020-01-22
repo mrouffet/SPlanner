@@ -31,6 +31,9 @@ public:
 	/** Whether Objects with Tags are in range. */
 	bool IsInRange() const;
 
-	/** Get the closest distance between this and the closest object in Objects. */
-	float GetClosestDistance() const;
+	/**
+	*	Get the level of LOD.
+	*	Min distance between this and the closest object in Objects.
+	*/
+	float GetLevel() const;
 };

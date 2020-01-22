@@ -18,11 +18,17 @@ USP_PlannerLODComponent::USP_PlannerLODComponent(const FObjectInitializer& Objec
 	TimeBeforeConstructPlanCurve_Internal->AddKey(5000.0f, 10.0f);
 }
 
-int USP_PlannerLODComponent::GetMaxPlannerDepth() const
+int USP_PlannerLODComponent::GetMaxPlannerDepth(float LODLevel) const
 {
-	return static_cast<int>(MaxPlannerDepthCurve.GetRichCurveConst()->Eval(GetClosestDistance()));
+	if (LODLevel < 0.0f)
+		LODLevel = GetLevel();
+
+	return static_cast<int>(MaxPlannerDepthCurve.GetRichCurveConst()->Eval(LODLevel));
 }
-float USP_PlannerLODComponent::GetTimeBeforeConstructPlan() const
+float USP_PlannerLODComponent::GetTimeBeforeConstructPlan(float LODLevel) const
 {
-	return TimeBeforeConstructPlanCurve.GetRichCurveConst()->Eval(GetClosestDistance());
+	if (LODLevel < 0.0f)
+		LODLevel = GetLevel();
+
+	return TimeBeforeConstructPlanCurve.GetRichCurveConst()->Eval(LODLevel);
 }

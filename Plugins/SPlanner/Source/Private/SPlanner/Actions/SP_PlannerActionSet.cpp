@@ -8,8 +8,7 @@ struct DefaultPredicate
 	}
 };
 
-FSP_PlannerActionSet::FSP_PlannerActionSet(const TArray<FSP_Action>& InBeginActions, const TArray<FSP_Action>& InCoreActions,
-	const TArray<FSP_Action>& InForcedCoreActions, const TArray<FSP_Action>& InEndActions) :
-	FSP_PlannerActionSet(InBeginActions, InCoreActions, InForcedCoreActions, InEndActions, DefaultPredicate())
+FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_ActionSet* ActionSet, float LODLevel)
 {
+	return Make(ActionSet, LODLevel, DefaultPredicate());
 }

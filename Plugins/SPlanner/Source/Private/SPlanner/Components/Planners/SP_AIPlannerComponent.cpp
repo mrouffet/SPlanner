@@ -177,7 +177,7 @@ bool USP_AIPlannerComponent::EndTask()
 	return CurrentTask->End(this, TaskUserData.GetData()) == ESP_PlanExecutionState::PES_Succeed;
 }
 
-FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet()
+FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel) const
 {
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
 	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
@@ -195,7 +195,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet()
 		}
 	};
 
-	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(CooldownPredicate());
+	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate());
 
 	// Add all available actions from POI.
 	if (POIZone)
@@ -209,13 +209,13 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet()
 
 			for (int i = 0; i < POIActions.Num(); ++i)
 			{
-				SP_CCHECK(POIActions[i].Task, "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
+				SP_CCHECK(POIActions[i].GetTask(), "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
 
 				// Use INDEX_NONE to convert int32 to bool.
-				bool bAchieveGoal = POIActions[i].AchievedGoals.Find(Goal) != INDEX_NONE;
+				bool bAchieveGoal = POIActions[i].GetAchievedGoals().Find(Goal) != INDEX_NONE;
 
-				if (!IsInCooldown(POIActions[i].Task) && (bAchieveGoal || POIActions[i].ServedGoals.Find(Goal) != INDEX_NONE))
-					PlannerActions.Actions.Add(FSP_PlannerAction(POIActions[i].Task, POIActions[i].Weight * FMath::FRand(), bAchieveGoal));
+				if (!IsInCooldown(POIActions[i].GetTask()) && (bAchieveGoal || POIActions[i].GetServedGoals().Find(Goal) != INDEX_NONE))
+					PlannerActions.Actions.Add(FSP_PlannerAction(POIActions[i].GetTask(), POIActions[i].GetWeight(LODLevel) * FMath::FRand(), bAchieveGoal));
 			}
 		}
 	}

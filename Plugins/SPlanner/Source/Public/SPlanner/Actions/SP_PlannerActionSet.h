@@ -1,14 +1,18 @@
 #pragma once
 
+#include <SPlanner/Debug/SP_Debug.h>
+
 #include <SPlanner/Actions/SP_PlannerAction.h>
 
 #include "SP_PlannerActionSet.generated.h"
+
+class USP_ActionSet;
 
 // Sort using weight.
 struct ActionSortFunctor
 {
 	// Decreasing weight sort.
-	bool operator()(const FSP_Action& lhs, const FSP_Action& rhs) const
+	bool operator()(const FSP_PlannerAction& lhs, const FSP_PlannerAction& rhs) const
 	{
 		return lhs.Weight > rhs.Weight;
 	}
@@ -47,45 +51,75 @@ struct FSP_PlannerActionSet
 	*	Shuffle every actions using random and weights.
 	*/
 	template <typename PredicateClass>
-	FSP_PlannerActionSet(const TArray<FSP_Action>& InBeginActions, const TArray<FSP_Action>& InCoreActions,
-		const TArray<FSP_Action>& InForcedCoreActions, const TArray<FSP_Action>& InEndActions, const PredicateClass& IsAvailablePredicate)
+	static FSP_PlannerActionSet Make(const USP_ActionSet* ActionSet, float LODLevel, const PredicateClass& IsAvailablePredicate)
 	{
+		SP_SRCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
+
+		FSP_PlannerActionSet Result;
 		ActionSortFunctor SortFunctor;
 
-		// Begin Action shuffle.
-		for (int i = 0; i < InBeginActions.Num(); ++i)
-		{
-			if(IsAvailablePredicate(InBeginActions[i]))
-				BeginActions.Add(FSP_PlannerAction(InBeginActions[i].Step, InBeginActions[i].Weight * FMath::FRand()));
-		}
 
-		BeginActions.Sort(SortFunctor);
+		// Begin Action shuffle.
+		{
+			const TArray<FSP_Action>& BeginActions = ActionSet->GetBeginActions();
+
+			for (int i = 0; i < BeginActions.Num(); ++i)
+			{
+				SP_SCCHECK(BeginActions[i].Step, "%s.BeginActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
+
+				if (IsAvailablePredicate(BeginActions[i]))
+					Result.BeginActions.Add(FSP_PlannerAction(BeginActions[i].Step, BeginActions[i].GetWeight(LODLevel) * FMath::FRand()));
+			}
+
+			Result.BeginActions.Sort(SortFunctor);
+		}
 
 
 		// Forced action shuffle
-		for (int i = 0; i < InForcedCoreActions.Num(); ++i)
 		{
-			if (IsAvailablePredicate(InForcedCoreActions[i]))
-				ForcedActions.Add(FSP_PlannerAction(InForcedCoreActions[i].Step, InForcedCoreActions[i].Weight * FMath::FRand()));
+			const TArray<FSP_Action>& ForcedActions = ActionSet->GetForcedCoreActions();
+
+			for (int i = 0; i < ForcedActions.Num(); ++i)
+			{
+				SP_SCCHECK(ForcedActions[i].Step, "%s.ForcedActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
+
+				if (IsAvailablePredicate(ForcedActions[i]))
+					Result.ForcedActions.Add(FSP_PlannerAction(ForcedActions[i].Step, ForcedActions[i].GetWeight(LODLevel) * FMath::FRand()));
+			}
+
+			Result.ForcedActions.Sort(SortFunctor);
 		}
-
-		ForcedActions.Sort(SortFunctor);
-
 
 		// Core and end Action shuffle.
-		for (int i = 0; i < InCoreActions.Num(); ++i)
 		{
-			if (IsAvailablePredicate(InCoreActions[i]))
-				Actions.Add(FSP_PlannerAction(InCoreActions[i].Step, InCoreActions[i].Weight * FMath::FRand()));
+			{
+				const TArray<FSP_Action>& CoreActions = ActionSet->GetCoreActions();
+
+				for (int i = 0; i < CoreActions.Num(); ++i)
+				{
+					SP_SCCHECK(CoreActions[i].Step, "%s.CoreActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
+				
+					if (IsAvailablePredicate(CoreActions[i]))
+						Result.Actions.Add(FSP_PlannerAction(CoreActions[i].Step, CoreActions[i].GetWeight(LODLevel) * FMath::FRand()));
+				}
+			}
+
+			{
+				const TArray<FSP_Action>& EndActions = ActionSet->GetEndActions();
+
+				for (int i = 0; i < EndActions.Num(); ++i)
+				{
+					SP_SCCHECK(EndActions[i].Step, "%s.EndActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
+
+					if (IsAvailablePredicate(EndActions[i]))
+						Result.Actions.Add(FSP_PlannerAction(EndActions[i].Step, EndActions[i].GetWeight(LODLevel) * FMath::FRand(), true));
+				}
+			}
+
+			Result.Actions.Sort(SortFunctor);
 		}
 
-		for (int i = 0; i < InEndActions.Num(); ++i)
-		{
-			if (IsAvailablePredicate(InEndActions[i]))
-				Actions.Add(FSP_PlannerAction(InEndActions[i].Step, InEndActions[i].Weight * FMath::FRand(), true));
-		}
-
-		Actions.Sort(SortFunctor);
+		return Result;
 	}
 
 	/**
@@ -93,6 +127,5 @@ struct FSP_PlannerActionSet
 	*	Shuffle every actions using random and weights.
 	*	Use default predicate (always true).
 	*/
-	FSP_PlannerActionSet(const TArray<FSP_Action>& InBeginActions, const TArray<FSP_Action>& InCoreActions,
-		const TArray<FSP_Action>& InForcedCoreActions, const TArray<FSP_Action>& InEndActions);
+	static FSP_PlannerActionSet Make(const USP_ActionSet* ActionSet, float LODLevel);
 };

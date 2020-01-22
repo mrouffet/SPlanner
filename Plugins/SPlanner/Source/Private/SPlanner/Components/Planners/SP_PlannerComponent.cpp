@@ -131,7 +131,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 		PlanState = ESP_PlanState::PS_Invalid;
 }
 
-FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet()
+FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel) const
 {
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
 	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
@@ -139,7 +139,7 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet()
 	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(Goal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
-	return CurrActionSet->Shuffle();
+	return CurrActionSet->Shuffle(LODLevel);
 }
 
 void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
@@ -201,7 +201,23 @@ void USP_PlannerComponent::ConstructPlan()
 
 	PlanState = ESP_PlanState::PS_Computing;
 
-	const FSP_PlannerActionSet PlannerActions = CreatePlannerActionSet();
+	// Get current LOD level.
+	float LODLevel = -1.0f;
+
+	if (LOD)
+	{
+#if SP_DEBUG
+		if (!LOD->IsInRange())
+		{
+			SP_LOG(Error, "LOD inactive!")
+			OnPlanConstructionFailed(ESP_PlanError::PE_LODOutOfRange);
+			return;
+		}
+#endif
+		LODLevel = LOD->GetLevel();
+	}
+
+	const FSP_PlannerActionSet PlannerActions = CreatePlannerActionSet(LODLevel);
 
 #if SP_DEBUG_EDITOR
 	// Log available planner actions.
@@ -248,20 +264,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 	TArray<USP_ActionStep*> NewPlan;
 
-	int8 MaxDepth = DefaultMaxPlannerDepth;
-
-	if (LOD)
-	{
-#if SP_DEBUG
-		if (!LOD->IsInRange())
-		{
-			SP_LOG(Error, "LOD inactive!")
-			OnPlanConstructionFailed(ESP_PlanError::PE_LODOutOfRange);
-			return;
-		}
-#endif
-		MaxDepth = LOD->GetMaxPlannerDepth();
-	}
+	int8 MaxDepth = LODLevel > 0.0f ? LOD->GetMaxPlannerDepth(LODLevel) : DefaultMaxPlannerDepth;
 
 #if SP_DEBUG
 	if (MaxDepth <= 0)
