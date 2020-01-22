@@ -12,7 +12,7 @@ class SPLANNER_API USP_ChooseTargetPOITask : public USP_ChooseTargetTask
 	GENERATED_BODY()
 	
 public:
-	FSP_PlannerFlags PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
+	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 
 	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
 };

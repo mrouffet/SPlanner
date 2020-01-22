@@ -2,8 +2,6 @@
 
 #include <SPlanner/Actions/SP_ActionMacro.h>
 
-#include <SPlanner/Miscs/Flags/SP_PlannerFlags.h>
-
 #include <Engine/DataAsset.h>
 #include "SP_ActionStep.generated.h"
 
@@ -24,14 +22,14 @@ public:
 	*	Must return true to be added to the plan during generation.
 	*	Called on external thread.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action")
-	virtual bool PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const;
+	UFUNCTION(Category = "SPlanner|Action")
+	virtual bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const;
 
 	/**
 	*	The post-condition of the step.
 	*	Return new planner flags to check for next pre-conditions during plan generation.
 	*	Called on external thread.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action")
-	virtual FSP_PlannerFlags PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const;
+	UFUNCTION(Category = "SPlanner|Action")
+	virtual uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const;
 };

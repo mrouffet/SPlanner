@@ -4,7 +4,6 @@
 
 #include <SPlanner/Miscs/SP_PlanState.h>
 #include <SPlanner/Miscs/SP_PlanError.h>
-#include <SPlanner/Miscs/Flags/SP_PlannerFlags.h>
 
 #include <Components/ActorComponent.h>
 #include "SP_PlannerComponent.generated.h"
@@ -85,7 +84,7 @@ protected:
 		TArray<USP_ActionStep*>& OutPlan,
 		uint8 MaxDepth,
 		uint8 CurrDepth = 0u,
-		FSP_PlannerFlags PlannerFlags = FSP_PlannerFlags()) const;
+		uint64 PlannerFlags = 0u) const;
 
 	/** Callback function called when a plan's construction failed (no valid plan found). */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")

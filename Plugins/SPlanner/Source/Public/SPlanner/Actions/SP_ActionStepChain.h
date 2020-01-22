@@ -18,8 +18,8 @@ protected:
 
 public:
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
-	bool PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 
 	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
-	FSP_PlannerFlags PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
+	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 };

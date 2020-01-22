@@ -59,8 +59,8 @@ protected:
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 public:
-	bool PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
-	FSP_PlannerFlags PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 
 	ESP_PlanExecutionState Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
 	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;

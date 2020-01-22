@@ -4,16 +4,18 @@
 #include <DrawDebugHelpers.h>
 #endif
 
+#include <SPlanner/Miscs/Flags/SP_AIPlannerFlags.h>
+
 #include <SPlanner/Components/SP_POIComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 
-FSP_PlannerFlags USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_POI);
-	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Actor);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetPOI);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetActor);
 
 	return PlannerFlags;
 }

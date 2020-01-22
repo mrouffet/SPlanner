@@ -3,10 +3,12 @@
 #include <GameFramework/PlayerState.h>
 #include <GameFramework/GameStateBase.h>
 
+#include <SPlanner/Miscs/Flags/SP_AIPlannerFlags.h>
+
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 
-bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
 
@@ -17,15 +19,15 @@ bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent* Plann
 	SP_RCHECK_NULLPTR(AIPlanner->Target, false)
 
 	// Not already re-targeted.
-	return !SP_IS_FLAG_SET(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Dirty);
+	return !SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
 }
-FSP_PlannerFlags USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Dirty);
-	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Actor);
-	SP_ADD_FLAG(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Player);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetActor);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetPlayer);
 
 	return PlannerFlags;
 }

@@ -4,6 +4,8 @@
 #include <GameFramework/Character.h>
 #include <Components/CapsuleComponent.h>
 
+#include <SPlanner/Miscs/Flags/SP_AIPlannerFlags.h>
+
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 #include <SPlanner/Components/SP_POIComponent.h>
@@ -70,7 +72,7 @@ void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPat
 	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
-bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
 
@@ -80,21 +82,21 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, FSP_Plann
 	SP_RCHECK_NULLPTR(AIPlanner->Target, false)
 
 	// New target will be set.
-	if(SP_IS_FLAG_SET(PlannerFlags.TargetFlags, ESP_TargetFlags::TF_Dirty))
+	if(SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
 		return true;
 
 	// Check valid target and has not already moved.
-	if (!AIPlanner->Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyPosition))
+	if (!AIPlanner->Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
 		return false;
 
 	return !HasReachedPosition(AIPlanner);
 }
-FSP_PlannerFlags USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 	
-	SP_ADD_FLAG(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyPosition);
-	SP_ADD_FLAG(PlannerFlags.TransformFlags, ESP_TransformFlags::TF_DirtyRotation);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty);
+	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_RotationDirty);
 
 	return PlannerFlags;
 }

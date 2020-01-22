@@ -289,7 +289,7 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 	TArray<USP_ActionStep*>& OutPlan,
 	uint8 MaxDepth,
 	uint8 CurrDepth,
-	FSP_PlannerFlags PlannerFlags) const
+	uint64 PlannerFlags) const
 {
 	if (CurrDepth > MaxDepth)
 		return false;

@@ -5,7 +5,7 @@ uint32 USP_TaskChain::GetUserDataSize() const
 	return sizeof(FSP_TaskInfos);
 }
 
-bool USP_TaskChain::PreCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+bool USP_TaskChain::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
 
@@ -23,7 +23,7 @@ bool USP_TaskChain::PreCondition(const USP_PlannerComponent* Planner, FSP_Planne
 
 	return true;
 }
-FSP_PlannerFlags USP_TaskChain::PostCondition(const USP_PlannerComponent* Planner, FSP_PlannerFlags PlannerFlags) const
+uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
