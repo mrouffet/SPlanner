@@ -11,7 +11,7 @@
 
 ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	AActor* TargetOwner = Planner->Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)

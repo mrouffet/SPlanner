@@ -9,14 +9,29 @@
 
 
 /**
-*	Helper macro to call parent implementation.
-*	Should always be called in children Execute_Implementation override.
+*	Helper macro to call Begin() parent implementation.
+*	Should always be called in children Begin() override.
 */
-#define SP_TASK_SUPER(Implementation, ...)\
-	ESP_PlanExecutionState SuperState = Super::Implementation(__VA_ARGS__);\
+#define SP_TASK_BEGIN_SUPER(...)\
+	if (!Super::Begin(__VA_ARGS__))\
+		return false;
+
+/**
+*	Helper macro to call Tick() parent implementation.
+*	Should always be called in children Tick() override.
+*/
+#define SP_TASK_TICK_SUPER(...)\
+	ESP_PlanExecutionState SuperState = Super::Tick(__VA_ARGS__);\
 	if (SuperState != ESP_PlanExecutionState::PES_Succeed)\
 		return SuperState;
 
+/**
+*	Helper macro to call End() parent implementation.
+*	Should always be called in children End() override.
+*/
+#define SP_TASK_END_SUPER(...)\
+	if (!Super::End(__VA_ARGS__))\
+		return false;
 
 
 #if SP_DEBUG_EDITOR

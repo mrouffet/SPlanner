@@ -56,7 +56,7 @@ public:
 	*	The begin implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual ESP_PlanExecutionState Begin(USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData);
 
 	/**
 	*	The tick implementation of the task.
@@ -68,7 +68,7 @@ public:
 	*	The end implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual ESP_PlanExecutionState End(USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual bool End(USP_AIPlannerComponent* Planner, uint8* UserData);
 
 	/**
 	*	The cancel implementation of the task.

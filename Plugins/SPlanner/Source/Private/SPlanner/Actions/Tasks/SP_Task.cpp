@@ -14,15 +14,15 @@ uint32 USP_Task::GetUserDataSize() const
 	return 0u;
 }
 
-ESP_PlanExecutionState USP_Task::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_Task::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK_NULLPTR(Planner, false)
 
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 		OnBegin(Planner);
 #endif
 
-	return ESP_PlanExecutionState::PES_Succeed;
+	return true;
 }
 ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
@@ -34,15 +34,15 @@ ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
-ESP_PlanExecutionState USP_Task::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_Task::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK_NULLPTR(Planner, false)
 
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 		OnEnd(Planner);
 #endif
 
-	return ESP_PlanExecutionState::PES_Succeed;
+	return true;
 }
 
 bool USP_Task::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)

@@ -34,7 +34,7 @@ uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent* Pl
 
 ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	// Valid Target component.
 	SP_RCHECK_NULLPTR(Planner->Target, ESP_PlanExecutionState::PES_Failed)

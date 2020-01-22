@@ -40,14 +40,14 @@ uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent* Planner, uint64 
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Begin, Planner, UserData)
+	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = new (UserData) FSP_TaskInfos();
 
-	SP_RCHECK(Tasks.Num(), "Empty tasks!", ESP_PlanExecutionState::PES_Failed)
-	SP_RCHECK_NULLPTR(Tasks[0], ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK(Tasks.Num(), "Empty tasks!", false)
+	SP_RCHECK_NULLPTR(Tasks[0], false)
 
 	if(Tasks[0]->GetUserDataSize())
 		Infos->UserData.Reserve(Tasks[0]->GetUserDataSize());
@@ -56,7 +56,7 @@ ESP_PlanExecutionState USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uin
 }
 ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
@@ -69,41 +69,41 @@ ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComp
 	if (TickResult != ESP_PlanExecutionState::PES_Succeed)
 		return TickResult; // Failed or rurnning.
 
-	// End task.
-	ESP_PlanExecutionState EndResult = Tasks[Infos->Index]->End(Planner, Infos->UserData.GetData());
 
-	if (EndResult != ESP_PlanExecutionState::PES_Succeed)
+	// End task.
+	if (!Tasks[Infos->Index]->End(Planner, Infos->UserData.GetData()))
 		return ESP_PlanExecutionState::PES_Failed;
 
 	// All task ended with success.
 	if (++Infos->Index == Tasks.Num())
 		return ESP_PlanExecutionState::PES_Succeed;
 
+
 	// Begin next task.
 	SP_RCHECK_NULLPTR(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed)
 
+	// Reserve data size.
 	if (Tasks[Infos->Index]->GetUserDataSize())
 		Infos->UserData.Reserve(Tasks[Infos->Index]->GetUserDataSize());
 
-	ESP_PlanExecutionState BeginResult = Tasks[Infos->Index]->Begin(Planner, Infos->UserData.GetData());
-
-	if(BeginResult != ESP_PlanExecutionState::PES_Succeed)
+	// Begin task.
+	if(!Tasks[Infos->Index]->Begin(Planner, Infos->UserData.GetData()))
 		return ESP_PlanExecutionState::PES_Failed;
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-ESP_PlanExecutionState USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(End, Planner, UserData)
+	SP_TASK_END_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
-	ESP_PlanExecutionState Result = ESP_PlanExecutionState::PES_Succeed;
+	bool Result = true;
 
 	// Task has failed.
 	if (Infos->Index < Tasks.Num())
 	{
-		SP_RCHECK_NULLPTR(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed)
+		SP_RCHECK_NULLPTR(Tasks[Infos->Index], false)
 		Result = Tasks[Infos->Index]->End(Planner, Infos->UserData.GetData()); // end failed task.
 	}
 

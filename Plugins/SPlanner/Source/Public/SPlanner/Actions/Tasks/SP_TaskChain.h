@@ -33,9 +33,9 @@ public:
 	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 
-	ESP_PlanExecutionState Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
 	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	ESP_PlanExecutionState End(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool End(USP_AIPlannerComponent* Planner, uint8* UserData) override;
 	
 	bool Cancel(USP_AIPlannerComponent* Planner, uint8* UserData) override;
 };

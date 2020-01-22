@@ -41,7 +41,7 @@ protected:
 	/**
 	*	Begin the next task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
-	*	Return Result == ESP_PlanExecutionState::PES_Succeed.
+	*	Return Task.Begin().
 	*/
 	bool BeginNextTask();
 
@@ -55,7 +55,7 @@ protected:
 	/**
 	*	End the current task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
-	*	Return Result == ESP_PlanExecutionState::PES_Succeed.
+	*	Return Task.End().
 	*/
 	bool EndTask();
 

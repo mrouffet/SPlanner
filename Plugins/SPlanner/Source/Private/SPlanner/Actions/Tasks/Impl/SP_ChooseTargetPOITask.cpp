@@ -22,7 +22,7 @@ uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planne
 
 ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	AActor* TargetOwner = Planner->Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)

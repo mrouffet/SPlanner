@@ -3,6 +3,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Miscs/SP_Settings.h>
+#include <SPlanner/Miscs/SP_PlanState.h>
 
 #include <SPlanner/Goal/SP_Goal.h>
 
@@ -113,7 +114,7 @@ bool USP_AIPlannerComponent::BeginNextTask()
 		TaskUserData.Reserve(UserDataSize);
 
 	// Can't begin task, Plan got invalid: ask a new one.
-	if (CurrentTask->Begin(this, TaskUserData.GetData()) != ESP_PlanExecutionState::PES_Succeed)
+	if (!CurrentTask->Begin(this, TaskUserData.GetData()))
 	{
 		if (CurrentTask->GetUseCooldownOnFailed())
 			SetCooldown(CurrentTask);
@@ -147,9 +148,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 		return;
 
 	// Always end task (Tick succeed or failed).
-	bool EndTaskResult = EndTask();
-
-	if (!EndTaskResult || TickResult == ESP_PlanExecutionState::PES_Failed)
+	if (!EndTask() || TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
 		if (CurrentTask->GetUseCooldownOnFailed())
 			SetCooldown(CurrentTask);
@@ -174,7 +173,7 @@ bool USP_AIPlannerComponent::EndTask()
 	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
-	return CurrentTask->End(this, TaskUserData.GetData()) == ESP_PlanExecutionState::PES_Succeed;
+	return CurrentTask->End(this, TaskUserData.GetData());
 }
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel) const

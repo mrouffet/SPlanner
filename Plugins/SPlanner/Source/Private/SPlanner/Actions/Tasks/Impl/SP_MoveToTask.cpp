@@ -101,22 +101,22 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, uint64
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Begin, Planner, UserData)
+	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
 
 	if (HasReachedPosition(Planner))
 	{
 		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
-		return ESP_PlanExecutionState::PES_Succeed;
+		return true;
 	}
 
 
 	// Use AIController pathfinding MoveTo.
 	AAIController* const Controller = Cast<AAIController>(Planner->GetOwner());
-	SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK_NULLPTR(Controller, false)
 
 
 	// Create MoveRequest.
@@ -129,7 +129,7 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, ui
 	else
 	{
 		SP_LOG(Error, "Bad Target!")
-		return ESP_PlanExecutionState::PES_Failed;
+		return false;
 	}
 
 	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
@@ -146,12 +146,12 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, ui
 	if (Request.Code == EPathFollowingRequestResult::Failed)
 	{
 		SP_LOG_TASK_EXECUTE(Controller, "Move request failed!")
-		return ESP_PlanExecutionState::PES_Failed;
+		return false;
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
 		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
-		return ESP_PlanExecutionState::PES_Succeed;
+		return true;
 	}
 
 	SP_LOG_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
@@ -164,11 +164,11 @@ ESP_PlanExecutionState USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, ui
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
 
-	return ESP_PlanExecutionState::PES_Succeed;
+	return true;
 }
 ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(Tick, DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
@@ -196,13 +196,13 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-ESP_PlanExecutionState USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_SUPER(End, Planner, UserData)
+	SP_TASK_END_SUPER(Planner, UserData)
 
 	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
 
-	return ESP_PlanExecutionState::PES_Succeed;
+	return true;
 }
 
 bool USP_MoveToTask::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
