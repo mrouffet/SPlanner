@@ -5,7 +5,7 @@
 USP_LODComponent::USP_LODComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Default active radius.
-	SphereRadius = 5000.0f;
+	SphereRadius = 10000.0f;
 
 	Tags.Add("SP_Player");
 }
