@@ -1,13 +1,13 @@
 #pragma once
 
-#include <SPlanner/Actions/Tasks/SP_Task.h>
+#include <SPlanner/Actions/AITasks/SP_AITask.h>
 #include "SP_ChooseTargetTask.generated.h"
 
 /**
  *	Base implementation of ChooseTarget task.
  */
-UCLASS(Abstract, ClassGroup = "SPlanner|PlanStep|Task|Target")
-class SPLANNER_API USP_ChooseTargetTask : public USP_Task
+UCLASS(Abstract, ClassGroup = "SPlanner|PlanStep|AITask|Target")
+class SPLANNER_API USP_ChooseTargetTask : public USP_AITask
 {
 	GENERATED_BODY()
 	

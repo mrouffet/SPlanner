@@ -1,12 +1,12 @@
 #pragma once
 
-#include <SPlanner/Actions/Tasks/Impl/SP_ChooseTargetTask.h>
+#include <SPlanner/Actions/AITasks/Impl/SP_ChooseTargetTask.h>
 #include "SP_ChooseTargetPOITask.generated.h"
 
 /**
  *	Choose target implementation with POI spec.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|Task|Target")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|Target")
 class SPLANNER_API USP_ChooseTargetPOITask : public USP_ChooseTargetTask
 {
 	GENERATED_BODY()

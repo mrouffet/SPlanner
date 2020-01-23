@@ -2,18 +2,18 @@
 
 #include <SPlanner/Miscs/SP_PlanState.h>
 
-#include <SPlanner/Actions/Tasks/SP_TaskMacro.h>
+#include <SPlanner/Actions/AITasks/SP_AITaskMacro.h>
 
 #include <SPlanner/Actions/SP_ActionStep.h>
-#include "SP_Task.generated.h"
+#include "SP_AITask.generated.h"
 
 class USP_AIPlannerComponent;
 
 /**
- *	Planner task base.
+ *	AI Planner task base.
  */
-UCLASS(Abstract, Blueprintable, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_Task : public USP_ActionStep
+UCLASS(Abstract, Blueprintable, ClassGroup = "SPlanner|Action|AITask")
+class SPLANNER_API USP_AITask : public USP_ActionStep
 {
 	GENERATED_BODY()
 
@@ -27,19 +27,19 @@ protected:
 	float Cooldown = 0.0f;
 
 	/** Blueprint event called by Begin(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
 	void OnBegin(USP_AIPlannerComponent* Planner);
 
 	/** Blueprint event called by Tick(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
 	void OnTick(float DeltaSeconds, USP_AIPlannerComponent* Planner);
 
 	/** Blueprint event called by End(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
 	void OnEnd(USP_AIPlannerComponent* Planner);
 
 	/** Blueprint event called by End(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
 	void OnCancel(USP_AIPlannerComponent* Planner);
 
 public:

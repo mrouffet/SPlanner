@@ -1,12 +1,12 @@
 #pragma once
 
-#include <SPlanner/Actions/Tasks/Impl/SP_ChooseTargetTask.h>
+#include <SPlanner/Actions/AITasks/Impl/SP_ChooseTargetTask.h>
 #include "SP_ChooseTargetPositionTask.generated.h"
 
 /**
  *	Choose target implementation with position spec.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|Task|Target")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|Target")
 class SPLANNER_API USP_ChooseTargetPositionTask : public USP_ChooseTargetTask
 {
 	GENERATED_BODY()

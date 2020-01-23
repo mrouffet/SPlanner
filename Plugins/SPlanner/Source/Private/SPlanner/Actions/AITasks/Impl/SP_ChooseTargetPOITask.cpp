@@ -1,4 +1,4 @@
-#include <SPlanner/Actions/Tasks/Impl/SP_ChooseTargetPOITask.h>
+#include <SPlanner/Actions/AITasks/Impl/SP_ChooseTargetPOITask.h>
 
 #if SP_DEBUG
 	#include <DrawDebugHelpers.h>
@@ -24,7 +24,7 @@ uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planne
 
 ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	AActor* TargetOwner = Planner->Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
@@ -62,7 +62,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 
 #if SP_DEBUG_EDITOR
 
-	SP_IF_TASK_EXECUTE(Planner->GetOwner())
+	SP_IF_AI_TASK_EXECUTE(Planner->GetOwner())
 	{
 		DrawDebugSphere(TargetOwner->GetWorld(),
 			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
@@ -73,7 +73,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), DebugColor, false, DebugDrawTime);
 	}
 
-	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPOI->GetOwner()->GetName())
+	SP_LOG_AI_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPOI->GetOwner()->GetName())
 
 #endif
 

@@ -4,7 +4,7 @@
 
 #include "SP_POIAction.generated.h"
 
-class USP_Task;
+class USP_AITask;
 class USP_Goal;
 
 /**
@@ -19,7 +19,7 @@ struct FSP_POIAction
 protected:
 	/** The handled Task. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_Task* Task = nullptr;
+	USP_AITask* Task = nullptr;
 
 	/**
 	*	The default weight of the action.
@@ -45,7 +45,7 @@ protected:
 
 public:
 	/** Getter of Task. */
-	USP_Task* GetTask() const;
+	USP_AITask* GetTask() const;
 
 	/** Getter of Weight using WeightCurve with valid LODLevel, otherwise DefaultWeight. */
 	float GetWeight(float LODLevel = -1.0f) const;

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <SPlanner/Actions/Tasks/SP_Task.h>
-#include "SP_TaskChain.generated.h"
+#include <SPlanner/Actions/AITasks/SP_AITask.h>
+#include "SP_AITaskChain.generated.h"
 
 /**
  *	Chain of Tasks.
  *	Only the cooldown of TaskChain is used by planner.
  *	Cooldown of every tasks in Tasks are not used.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_TaskChain : public USP_Task
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|AITask")
+class SPLANNER_API USP_AITaskChain : public USP_AITask
 {
 	GENERATED_BODY()
 
@@ -22,7 +22,7 @@ class SPLANNER_API USP_TaskChain : public USP_Task
 protected:
 	/** The handled tasks. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_Task*> Tasks;
+	TArray<USP_AITask*> Tasks;
 
 public:
 	uint32 GetUserDataSize() const override;

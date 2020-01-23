@@ -1,13 +1,13 @@
 #pragma once
 
-#include <SPlanner/Actions/Tasks/SP_Task.h>
+#include <SPlanner/Actions/AITasks/SP_AITask.h>
 #include "SP_IdleTask.generated.h"
 
 /**
  *	Idle task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|Task")
-class SPLANNER_API USP_IdleTask : public USP_Task
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask")
+class SPLANNER_API USP_IdleTask : public USP_AITask
 {
 	GENERATED_BODY()
 	

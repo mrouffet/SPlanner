@@ -3,7 +3,7 @@
 #include <SPlanner/Components/Planners/SP_PlannerComponent.h>
 #include "SP_AIPlannerComponent.generated.h"
 
-class USP_Task;
+class USP_AITask;
 
 class USP_TargetComponent;
 class USP_POIZoneComponent;
@@ -26,7 +26,7 @@ protected:
 
 	/** Cooldown of all tasks of this planner. */
 	UPROPERTY(Transient)
-	TMap<const USP_Task*, float> Cooldowns;
+	TMap<const USP_AITask*, float> Cooldowns;
 
 	/** Allocated memory for user data during task execution. */
 	TArray<uint8> TaskUserData;
@@ -95,13 +95,13 @@ public:
 
 	/** Getter of cooldown for one behavior. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
-	float GetCooldown(const USP_Task* Task) const;
+	float GetCooldown(const USP_AITask* Task) const;
 
 	/** Getter of cooldown for one behavior. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
-	void SetCooldown(const USP_Task* Task);
+	void SetCooldown(const USP_AITask* Task);
 
 	/** Helper function for cooldown check */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
-	bool IsInCooldown(const USP_Task* Task) const;
+	bool IsInCooldown(const USP_AITask* Task) const;
 };

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <SPlanner/Actions/Tasks/SP_Task.h>
+#include <SPlanner/Actions/AITasks/SP_AITask.h>
 #include "SP_TargetNearestPlayerTask.generated.h"
 
 /**
  *	Target nearest player task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|Task|Target")
-class SPLANNER_API USP_TargetNearestPlayerTask : public USP_Task
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|Target")
+class SPLANNER_API USP_TargetNearestPlayerTask : public USP_AITask
 {
 	GENERATED_BODY()
 

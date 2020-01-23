@@ -1,4 +1,4 @@
-#include <SPlanner/Actions/Tasks/Impl/SP_ChooseTargetPositionTask.h>
+#include <SPlanner/Actions/AITasks/Impl/SP_ChooseTargetPositionTask.h>
 
 #if SP_DEBUG
 	#include <DrawDebugHelpers.h>
@@ -11,7 +11,7 @@
 
 ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	AActor* TargetOwner = Planner->Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
@@ -24,7 +24,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 	Planner->Target->SetPosition(TargetPosition);
 
 #if SP_DEBUG_EDITOR
-	SP_IF_TASK_EXECUTE(Planner->GetOwner())
+	SP_IF_AI_TASK_EXECUTE(Planner->GetOwner())
 	{
 		DrawDebugSphere(TargetOwner->GetWorld(),
 			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
@@ -35,7 +35,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPosition, DebugColor, false, DebugDrawTime);
 	}
 
-	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPosition.ToString())
+	SP_LOG_AI_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPosition.ToString())
 #endif
 
 	if (bAutoLookAt)

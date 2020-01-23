@@ -1,4 +1,4 @@
-#include <SPlanner/Actions/Tasks/Impl/SP_MoveToTask.h>
+#include <SPlanner/Actions/AITasks/Impl/SP_MoveToTask.h>
 
 #include <AIController.h>
 #include <GameFramework/Character.h>
@@ -103,7 +103,7 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, uint64
 
 bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_BEGIN_SUPER(Planner, UserData)
+	SP_AI_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
 
@@ -145,7 +145,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
 	{
-		SP_LOG_TASK_EXECUTE(Controller, "Move request failed!")
+		SP_LOG_AI_TASK_EXECUTE(Controller, "Move request failed!")
 		return false;
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -154,7 +154,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 		return true;
 	}
 
-	SP_LOG_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
+	SP_LOG_AI_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
 	Infos->Controller = Controller;
@@ -168,13 +168,13 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 }
 ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Failed)
 	{
-		SP_LOG_TASK_TICK(Planner->GetOwner(), "Failed")
+		SP_LOG_AI_TASK_TICK(Planner->GetOwner(), "Failed")
 		return ESP_PlanExecutionState::PES_Failed;
 	}
 	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
@@ -189,7 +189,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		if (Character->GetVelocity().SizeSquared() != 0.0f)
 			return ESP_PlanExecutionState::PES_Running;
 
-		SP_LOG_TASK_TICK(Controller, "Succeed")
+		SP_LOG_AI_TASK_TICK(Controller, "Succeed")
 
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
@@ -198,7 +198,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 }
 bool USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_END_SUPER(Planner, UserData)
+	SP_AI_TASK_END_SUPER(Planner, UserData)
 
 	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
 

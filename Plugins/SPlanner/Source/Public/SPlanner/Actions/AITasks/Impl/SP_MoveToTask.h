@@ -2,14 +2,14 @@
 
 #include <AIController.h>
 
-#include <SPlanner/Actions/Tasks/SP_Task.h>
+#include <SPlanner/Actions/AITasks/SP_AITask.h>
 #include "SP_MoveToTask.generated.h"
 
 /**
  *	MoveTo implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|Task|MoveTo")
-class SPLANNER_API USP_MoveToTask : public USP_Task
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|MoveTo")
+class SPLANNER_API USP_MoveToTask : public USP_AITask
 {
 	GENERATED_BODY()
 	
@@ -37,7 +37,7 @@ protected:
 	float AcceptanceRadius = 10.0f;
 
 	/** Check if owner actor has reached its target. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|PlanStep|Task|MoveTo")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|PlanStep|AITask|MoveTo")
 	bool HasReachedPosition(const USP_AIPlannerComponent* Planner) const;
 
 	/**
@@ -55,7 +55,7 @@ protected:
 	uint32 GetUserDataSize() const override;
 
 	/** Callback when a movement is completed by the AI Controller. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|PlanStep|Task|MoveTo")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|PlanStep|AITask|MoveTo")
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 public:

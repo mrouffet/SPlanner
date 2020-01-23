@@ -9,7 +9,7 @@
 
 #include <SPlanner/Actions/SP_ActionSet.h>
 #include <SPlanner/Actions/SP_POIActionSet.h>
-#include <SPlanner/Actions/Tasks/SP_Task.h>
+#include <SPlanner/Actions/AITasks/SP_AITask.h>
 
 #include <SPlanner/Components/SP_POIComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
@@ -24,7 +24,7 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 	bWantsInitializeComponent = true;
 }
 
-float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
+float USP_AIPlannerComponent::GetCooldown(const USP_AITask* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, -1.0f)
 
@@ -32,7 +32,7 @@ float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
 
 	return CooldownPtr ? GetWorld()->GetTimeSeconds() - *CooldownPtr : FLT_MAX;
 }
-void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
+void USP_AIPlannerComponent::SetCooldown(const USP_AITask* Task)
 {
 	SP_CHECK_NULLPTR(Task)
 
@@ -47,7 +47,7 @@ void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 	else
 		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Task->GetCooldown());
 }
-bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
+bool USP_AIPlannerComponent::IsInCooldown(const USP_AITask* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, false)
 
@@ -106,7 +106,7 @@ bool USP_AIPlannerComponent::BeginNextTask()
 		return false;
 	}
 
-	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
+	USP_AITask* CurrentTask = Cast<USP_AITask>(Plan[CurrentPlanIndex]);
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
 	// Reserve user data.
@@ -139,7 +139,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	}
 
 	SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
-	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
+	USP_AITask* CurrentTask = Cast<USP_AITask>(Plan[CurrentPlanIndex]);
 	SP_CHECK_NULLPTR(CurrentTask)
 
 	ESP_PlanExecutionState TickResult = CurrentTask->Tick(DeltaTime, this, TaskUserData.GetData());
@@ -182,7 +182,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 
 		bool operator()(const FSP_Action& Action) const
 		{
-			return !Planner->IsInCooldown(Cast<USP_Task>(Action.Step));
+			return !Planner->IsInCooldown(Cast<USP_AITask>(Action.Step));
 		}
 	};
 
@@ -270,7 +270,7 @@ bool USP_AIPlannerComponent::CancelPlan()
 
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", false, CurrentPlanIndex, Plan.Num())
 
-	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
+	USP_AITask* CurrentTask = Cast<USP_AITask>(Plan[CurrentPlanIndex]);
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
 #if SP_DEBUG

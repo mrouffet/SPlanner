@@ -1,4 +1,4 @@
-#include <SPlanner/Actions/Tasks/Impl/SP_MoveToPOITask.h>
+#include <SPlanner/Actions/AITasks/Impl/SP_MoveToPOITask.h>
 
 #include <SPlanner/Miscs/Flags/SP_AIPlannerFlags.h>
 

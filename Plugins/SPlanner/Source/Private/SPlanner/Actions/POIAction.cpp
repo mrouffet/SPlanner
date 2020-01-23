@@ -1,6 +1,6 @@
 #include <SPlanner/Actions/SP_POIAction.h>
 
-USP_Task* FSP_POIAction::GetTask() const
+USP_AITask* FSP_POIAction::GetTask() const
 {
 	return Task;
 }
