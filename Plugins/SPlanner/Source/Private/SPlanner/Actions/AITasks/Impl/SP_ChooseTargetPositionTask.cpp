@@ -19,7 +19,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 
 	// Random position with character's Z (only use XY).
 	FVector TargetPosition = TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset) +
-		FVector(FMath::RandRange(-1.0f, 1.0f) * Dimensions.X, +FMath::RandRange(-1.0f, 1.0f) * Dimensions.Y, 0.0f);
+		FVector(FMath::RandRange(-1.0f, 1.0f) * Dimensions.X, FMath::RandRange(-1.0f, 1.0f) * Dimensions.Y, 0.0f);
 
 	Planner->Target->SetPosition(TargetPosition);
 

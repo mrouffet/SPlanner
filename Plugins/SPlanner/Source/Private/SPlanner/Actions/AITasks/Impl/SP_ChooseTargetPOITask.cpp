@@ -78,7 +78,13 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 #endif
 
 	if (bAutoLookAt)
-		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation()));
+	{
+		// Only Yaw rotation.
+		FVector TargetPosition = TargetPOI->GetOwner()->GetActorLocation();
+		TargetPosition.Z = TargetOwner->GetActorLocation().Z;
+
+		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), TargetPosition));
+	}
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
