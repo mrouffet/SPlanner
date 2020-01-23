@@ -182,6 +182,8 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 	// Wait for new plan computation.
 	PlanState = ESP_PlanState::PS_WaitForCompute;
 
+	OnAskPlan.Broadcast(this);
+
 	float TimeBeforeConstructPlan = DefaultTimeBeforeConstructPlan;
 
 	if (bInstantRequest)

@@ -192,13 +192,17 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_PlannerDelegate OnInactive;
 
-	/** Callback event when goal is changed. */
+	/** Callback event when a new plan is asked. */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
-	FSP_PlannerGoalDelegate OnGoalChange;
+	FSP_PlannerDelegate OnAskPlan;
 
 	/** Callback event when plan get cancelled. */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_PlannerDelegate OnPlanCancel;
+
+	/** Callback event when goal is changed. */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
+	FSP_PlannerGoalDelegate OnGoalChange;
 
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
 

@@ -22,6 +22,11 @@ ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) 
 	Planner->bAutoRegisterInDirector = true;
 }
 
+USP_AIPlannerComponent* ASP_AIController::GetPlanner() const
+{
+	return Planner;
+}
+
 void ASP_AIController::SetEnableBehavior(bool bEnable)
 {
 	// Already in good state.
@@ -33,6 +38,11 @@ void ASP_AIController::SetEnableBehavior(bool bEnable)
 	SetActorTickEnabled(bEnable);
 }
 
+void ASP_AIController::OnAskPlan_Implementation(USP_PlannerComponent* InPlanner)
+{
+	SP_CHECK(Planner == InPlanner, "Bad planner binding")
+}
+
 void ASP_AIController::OnPlanCancel_Implementation(USP_PlannerComponent* InPlanner)
 {
 	SP_CHECK(Planner == InPlanner, "Bad planner binding")
@@ -42,6 +52,7 @@ void ASP_AIController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	Planner->OnAskPlan.AddDynamic(this, &ASP_AIController::OnAskPlan);
 	Planner->OnPlanCancel.AddDynamic(this, &ASP_AIController::OnPlanCancel);
 }
 
@@ -49,6 +60,7 @@ void ASP_AIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
+	Planner->OnAskPlan.RemoveDynamic(this, &ASP_AIController::OnAskPlan);
 	Planner->OnPlanCancel.RemoveDynamic(this, &ASP_AIController::OnPlanCancel);
 }
 
