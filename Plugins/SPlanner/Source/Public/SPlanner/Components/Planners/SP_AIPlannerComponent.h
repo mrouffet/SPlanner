@@ -52,13 +52,6 @@ protected:
 	*/
 	void ExecuteTask(float DeltaTime);
 
-	/**
-	*	End the current task of the Plan.
-	*	Use CurrentPlanIndex and Plan.
-	*	Return Task.End().
-	*/
-	bool EndTask();
-
 	FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel) const override;
 
 	void AskNewPlan(bool bInstantRequest = false) override;
@@ -80,6 +73,7 @@ protected:
 	void UninitializeComponent() override;
 
 	void BeginPlay() override;
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	/** Should reset target on goal change. */
@@ -110,6 +104,4 @@ public:
 	/** Helper function for cooldown check */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	bool IsInCooldown(const USP_Task* Task) const;
-
-	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

@@ -20,7 +20,7 @@
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTickInEditor = false;
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	// Must be init in cpp file (Standard).
 	PlanState = ESP_PlanState::PS_Inactive;
@@ -63,11 +63,15 @@ USP_Goal* USP_PlannerComponent::GetGoal() const
 }
 void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 {
-	if (Goal == InGoal)
+	NextGoal = InGoal;
+}
+void USP_PlannerComponent::UpdateGoal()
+{
+	if (Goal == NextGoal)
 		return;
 
 	USP_Goal* OldGoal = Goal;
-	Goal = InGoal;
+	Goal = NextGoal;
 
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
 
@@ -80,14 +84,14 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
 
 		PlanState = ESP_PlanState::PS_Finished;
 	}
-	
+
 	// Out dated plan: Do not ask again if already / still waiting for computation.
 	if (PlanState != ESP_PlanState::PS_WaitForCompute)
 	{
 		// ConstructPlanTimer may be used for waiting other instructions (see SP_AIPlannerComponent).
 		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
 
-		if(!Goal)
+		if (!Goal)
 			PlanState = ESP_PlanState::PS_Invalid;
 		else
 			AskNewPlan(true); // Instant request new plan with goal.
@@ -425,4 +429,11 @@ void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	// Unregister from Director.
 	if (bAutoRegisterInDirector)
 		ASP_Director::TryUnRegister(this); // Try unregister: Director can be destroyed first during scene travel or quit game.
+}
+void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// Update new goal.
+	UpdateGoal();
 }

@@ -1,8 +1,10 @@
 #include <SPlanner/Actions/Tasks/Impl/SP_ChooseTargetPOITask.h>
 
 #if SP_DEBUG
-#include <DrawDebugHelpers.h>
+	#include <DrawDebugHelpers.h>
 #endif
+
+#include <Kismet/KismetMathLibrary.h>
 
 #include <SPlanner/Miscs/Flags/SP_AIPlannerFlags.h>
 
@@ -55,10 +57,10 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 	if(POIs.Num() == 0)
 		return ESP_PlanExecutionState::PES_Failed;
 
-#if SP_DEBUG_EDITOR
-
 	USP_POIComponent* TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
 	Planner->Target->SetPOI(TargetPOI);
+
+#if SP_DEBUG_EDITOR
 
 	SP_IF_TASK_EXECUTE(Planner->GetOwner())
 	{
@@ -73,11 +75,10 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 
 	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPOI->GetOwner()->GetName())
 
-#else
-
-	Planner->Target->SetPOI(POIs[FMath::RandRange(0, POIs.Num() - 1)]);
-
 #endif
+
+	if (bAutoLookAt)
+		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation()));
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }

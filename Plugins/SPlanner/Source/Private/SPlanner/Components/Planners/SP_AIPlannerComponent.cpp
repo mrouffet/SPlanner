@@ -149,7 +149,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 		return;
 
 	// Always end task (Tick succeed or failed).
-	if (!EndTask() || TickResult == ESP_PlanExecutionState::PES_Failed)
+	if (!CurrentTask->End(this, TaskUserData.GetData()) || TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
 		if (CurrentTask->GetUseCooldownOnFailed())
 			SetCooldown(CurrentTask);
@@ -166,15 +166,6 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 
 		BeginNextTask();
 	}
-}
-bool USP_AIPlannerComponent::EndTask()
-{
-	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", false, CurrentPlanIndex, Plan.Num())
-
-	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
-	SP_RCHECK_NULLPTR(CurrentTask, false)
-
-	return CurrentTask->End(this, TaskUserData.GetData());
 }
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel) const

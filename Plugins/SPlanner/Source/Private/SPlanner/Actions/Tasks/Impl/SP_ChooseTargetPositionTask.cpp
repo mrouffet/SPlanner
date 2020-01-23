@@ -1,7 +1,7 @@
 #include <SPlanner/Actions/Tasks/Impl/SP_ChooseTargetPositionTask.h>
 
 #if SP_DEBUG
-#include <DrawDebugHelpers.h>
+	#include <DrawDebugHelpers.h>
 #endif
 
 #include <Kismet/KismetMathLibrary.h>
@@ -22,7 +22,6 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 		FVector(FMath::RandRange(-1.0f, 1.0f) * Dimensions.X, +FMath::RandRange(-1.0f, 1.0f) * Dimensions.Y, 0.0f);
 
 	Planner->Target->SetPosition(TargetPosition);
-		
 
 #if SP_DEBUG_EDITOR
 	SP_IF_TASK_EXECUTE(Planner->GetOwner())
@@ -38,7 +37,6 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 
 	SP_LOG_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPosition.ToString())
 #endif
-
 
 	if (bAutoLookAt)
 		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), TargetPosition));
