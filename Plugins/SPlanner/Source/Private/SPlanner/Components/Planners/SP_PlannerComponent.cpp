@@ -398,6 +398,8 @@ void USP_PlannerComponent::BeginPlay()
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
+	NextGoal = Goal;
+
 	if (bStartActive)
 	{
 		// Register before set active.
