@@ -98,6 +98,14 @@ void USP_PlannerComponent::UpdateGoal()
 	}
 }
 
+const TArray<USP_ActionStep*>& USP_PlannerComponent::GetPlan() const
+{
+	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, "Invalid plan: performing unsafe operation!", Plan)
+
+	return Plan;
+}
+
 bool USP_PlannerComponent::CancelPlan()
 {
 	// Must cancel a valid plan.

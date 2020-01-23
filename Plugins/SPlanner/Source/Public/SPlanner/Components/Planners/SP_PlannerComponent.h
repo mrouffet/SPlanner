@@ -225,6 +225,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
 	void SetGoal(USP_Goal* InGoal);
 
+	/** Getter of Plan. */
+	const TArray<USP_ActionStep*>& GetPlan() const;
+
 	/**
 	*	Cancel current executed plan.
 	*	Callback function called when a plan get cancelled (by setting new goal).

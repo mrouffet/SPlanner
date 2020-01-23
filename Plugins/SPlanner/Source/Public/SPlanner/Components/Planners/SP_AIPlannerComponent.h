@@ -93,6 +93,19 @@ public:
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
 
+	/** Getter of executed ActionSteps in Plan. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	TArray<USP_ActionStep*> GetExecutedActionSteps() const;
+
+	/** Getter of current executed ActionStep. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	USP_ActionStep* GetCurrentActionStep() const;
+
+	/** Getter of following ActionSteps in Plan*/
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	TArray<USP_ActionStep*> GetNextActionSteps() const;
+
+
 	/** Getter of cooldown for one behavior. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	float GetCooldown(const USP_AITask* Task) const;

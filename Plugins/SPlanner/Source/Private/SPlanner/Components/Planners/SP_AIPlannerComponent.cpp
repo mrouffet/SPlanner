@@ -24,6 +24,46 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 	bWantsInitializeComponent = true;
 }
 
+TArray<USP_ActionStep*> USP_AIPlannerComponent::GetExecutedActionSteps() const
+{
+	TArray<USP_ActionStep*> Result;
+
+	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, "Invalid plan: performing unsafe operation!", Result)
+
+	SP_RCHECK(CurrentPlanIndex < Plan.Num(), "Index out of range!", Result)
+	
+	// Plan started.
+	if (CurrentPlanIndex != -1)
+		Result.Append(Plan.GetData(), CurrentPlanIndex);
+
+	return Result;
+}
+USP_ActionStep* USP_AIPlannerComponent::GetCurrentActionStep() const
+{
+	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, "Invalid plan: performing unsafe operation!", nullptr)
+
+	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", nullptr, CurrentPlanIndex, Plan.Num())
+
+	return Plan[CurrentPlanIndex];
+}
+TArray<USP_ActionStep*> USP_AIPlannerComponent::GetNextActionSteps() const
+{
+	TArray<USP_ActionStep*> Result;
+
+	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, "Invalid plan: performing unsafe operation!", Result)
+
+	SP_RCHECK(CurrentPlanIndex < Plan.Num(), "Index out of range!", Result)
+
+	// Plan started.
+	if (CurrentPlanIndex != -1)
+		Result.Append(Plan.GetData() + CurrentPlanIndex + 1, Plan.Num() - CurrentPlanIndex - 1);
+
+	return Result;
+}
+
 float USP_AIPlannerComponent::GetCooldown(const USP_AITask* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, -1.0f)
@@ -106,7 +146,7 @@ bool USP_AIPlannerComponent::BeginNextTask()
 		return false;
 	}
 
-	USP_AITask* CurrentTask = Cast<USP_AITask>(Plan[CurrentPlanIndex]);
+	USP_AITask* CurrentTask = Cast<USP_AITask>(GetCurrentActionStep());
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
 	// Reserve user data.
@@ -138,8 +178,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 			return;
 	}
 
-	SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
-	USP_AITask* CurrentTask = Cast<USP_AITask>(Plan[CurrentPlanIndex]);
+	USP_AITask* CurrentTask = Cast<USP_AITask>(GetCurrentActionStep());
 	SP_CHECK_NULLPTR(CurrentTask)
 
 	ESP_PlanExecutionState TickResult = CurrentTask->Tick(DeltaTime, this, TaskUserData.GetData());
