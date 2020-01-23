@@ -93,15 +93,23 @@ public:
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
 
-	/** Getter of executed ActionSteps in Plan. */
+	/** Getter of the previous executed ActionStep in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
-	TArray<USP_ActionStep*> GetExecutedActionSteps() const;
+	USP_ActionStep* GetPrevActionStep() const;
+
+	/** Getter of previous executed ActionSteps in Plan. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	TArray<USP_ActionStep*> GetPrevActionSteps() const;
 
 	/** Getter of current executed ActionStep. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	USP_ActionStep* GetCurrentActionStep() const;
 
-	/** Getter of following ActionSteps in Plan*/
+	/** Getter of the next ActionStep to execute in Plan. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	USP_ActionStep* GetNextActionStep() const;
+
+	/** Getter of next ActionSteps to execute in Plan*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	TArray<USP_ActionStep*> GetNextActionSteps() const;
 

@@ -24,7 +24,20 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 	bWantsInitializeComponent = true;
 }
 
-TArray<USP_ActionStep*> USP_AIPlannerComponent::GetExecutedActionSteps() const
+USP_ActionStep* USP_AIPlannerComponent::GetPrevActionStep() const
+{
+	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
+
+	SP_RCHECK(CurrentPlanIndex < Plan.Num(), nullptr, "Index out of range!")
+
+	// No previous action.
+	if(CurrentPlanIndex <= 0)
+		return nullptr;
+
+	return Plan[CurrentPlanIndex - 1];
+}
+TArray<USP_ActionStep*> USP_AIPlannerComponent::GetPrevActionSteps() const
 {
 	TArray<USP_ActionStep*> Result;
 
@@ -47,6 +60,19 @@ USP_ActionStep* USP_AIPlannerComponent::GetCurrentActionStep() const
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), nullptr, "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
 
 	return Plan[CurrentPlanIndex];
+}
+USP_ActionStep* USP_AIPlannerComponent::GetNextActionStep() const
+{
+	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
+
+	SP_RCHECK(CurrentPlanIndex < Plan.Num(), nullptr, "Index out of range!")
+
+	// No other action left.
+	if(CurrentPlanIndex + 1 <= Plan.Num())
+		return nullptr;
+
+	return Plan[CurrentPlanIndex + 1];
 }
 TArray<USP_ActionStep*> USP_AIPlannerComponent::GetNextActionSteps() const
 {
