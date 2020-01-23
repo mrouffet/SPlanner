@@ -22,7 +22,7 @@ ESP_TargetState USP_TargetComponent::GetState() const
 
 const FVector& USP_TargetComponent::GetPosition() const
 {
-	SP_RCHECK(State == ESP_TargetState::TS_Position, "Bad target!", Position)
+	SP_RCHECK(State == ESP_TargetState::TS_Position, Position, "Bad target!")
 
 	return Position;
 }
@@ -49,7 +49,7 @@ FVector USP_TargetComponent::GetAnyPosition() const
 }
 AActor* USP_TargetComponent::GetActor() const
 {
-	SP_RCHECK(State == ESP_TargetState::TS_Actor, "Bad target!", nullptr)
+	SP_RCHECK(State == ESP_TargetState::TS_Actor, nullptr, "Bad target!")
 
 	return Actor;
 }
@@ -73,13 +73,13 @@ AActor* USP_TargetComponent::GetAnyActor() const
 }
 APawn* USP_TargetComponent::GetPlayer() const
 {
-	SP_RCHECK(State == ESP_TargetState::TS_Player, "Bad target!", nullptr)
+	SP_RCHECK(State == ESP_TargetState::TS_Player, nullptr, "Bad target!")
 
 	return Player;
 }
 USP_POIComponent* USP_TargetComponent::GetPOI() const
 {
-	SP_RCHECK(State == ESP_TargetState::TS_POI, "Bad target!", nullptr)
+	SP_RCHECK(State == ESP_TargetState::TS_POI, nullptr, "Bad target!")
 
 	return POI;
 }

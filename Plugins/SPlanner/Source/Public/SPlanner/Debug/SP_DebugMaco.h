@@ -61,7 +61,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Assertion like check.
 *	Simple implementation of check.
 */
-#define SP_CHECK_FULL(Predicate, Str, PostLogInstruction, ...)\
+#define SP_CHECK_FULL(Predicate, PostLogInstruction, Str, ...)\
 	if(!(Predicate))\
 	{\
 		SP_LOG(Error, Str, ##__VA_ARGS__)\
@@ -74,7 +74,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Simple implementation of check.
 */
 #define SP_CHECK(Predicate, Str, ...)\
-	SP_CHECK_FULL(Predicate, Str, return, ##__VA_ARGS__)
+	SP_CHECK_FULL(Predicate, return, Str, ##__VA_ARGS__)
 
 /** Helper check for nullptr objects. */
 #define SP_CHECK_NULLPTR(Object, ...) SP_CHECK(Object, #Object " is nullptr!", ##__VA_ARGS__)
@@ -93,20 +93,20 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Assertion like check.
 *	Implementation of check with return type.
 */
-#define SP_RCHECK(Predicate, Str, ReturnValue, ...)\
-	SP_CHECK_FULL(Predicate, Str, return ReturnValue, ##__VA_ARGS__)
+#define SP_RCHECK(Predicate, ReturnValue, Str, ...)\
+	SP_CHECK_FULL(Predicate, return ReturnValue, Str, ##__VA_ARGS__)
 
 /** Helper check for nullptr objects. */
-#define SP_RCHECK_NULLPTR(Object, ReturnValue, ...) SP_RCHECK(Object, #Object " is nullptr!", ReturnValue, ##__VA_ARGS__)
+#define SP_RCHECK_NULLPTR(Object, ReturnValue, ...) SP_RCHECK(Object, ReturnValue, #Object " is nullptr!", ##__VA_ARGS__)
 
 /** Helper check for GameState type.*/
-#define SP_RCHECK_GAMESTATE(GameStateType, ReturnValue, ...) SP_RCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ReturnValue, ##__VA_ARGS__)
+#define SP_RCHECK_GAMESTATE(GameStateType, ReturnValue, ...) SP_RCHECK(GetWorld()->GetGameState<GameStateType>(), ReturnValue, "Bad GameState type[" #GameStateType "]!", ##__VA_ARGS__)
 
 /** Helper check Authority */
-#define SP_RCHECK_AUTHORITY(ReturnValue, ...) SP_RCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ReturnValue, ##__VA_ARGS__)
+#define SP_RCHECK_AUTHORITY(ReturnValue, ...) SP_RCHECK(HasAuthority(), ReturnValue, "%s doen't have authority!", *GetName(), ##__VA_ARGS__)
 
 /** Helper check Owner*/
-#define SP_RCHECK_OWNER(ReturnValue, ...) SP_RCHECK(GetOwner(), "Owner nullptr!", ReturnValue, ##__VA_ARGS__)
+#define SP_RCHECK_OWNER(ReturnValue, ...) SP_RCHECK(GetOwner(), ReturnValue, "Owner nullptr!", ##__VA_ARGS__)
 
 
 /**
@@ -114,7 +114,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Implementation of check with continue.
 */
 #define SP_CCHECK(Predicate, Str, ...)\
-	SP_CHECK_FULL(Predicate, Str, continue, ##__VA_ARGS__)
+	SP_CHECK_FULL(Predicate, continue, Str, ##__VA_ARGS__)
 
 /** Helper check for nullptr objects. */
 #define SP_CCHECK_NULLPTR(Object, ...) SP_CCHECK(Object, #Object " is nullptr!", ##__VA_ARGS__)
@@ -155,7 +155,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Assertion like check.
 *	Simple implementation of check.
 */
-#define SP_SCHECK_FULL(Predicate, Str, PostLogInstruction, ...)\
+#define SP_SCHECK_FULL(Predicate, PostLogInstruction, Str, ...)\
 	if(!(Predicate))\
 	{\
 		SP_SLOG(Error, Str, ##__VA_ARGS__)\
@@ -167,7 +167,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Simple implementation of check.
 */
 #define SP_SCHECK(Predicate, Str, ...)\
-	SP_SCHECK_FULL(Predicate, Str, return, ##__VA_ARGS__)
+	SP_SCHECK_FULL(Predicate, return, Str, ##__VA_ARGS__)
 
 /** Helper check for nullptr objects. */
 #define SP_SCHECK_NULLPTR(Object, ...) SP_SCHECK(Object, #Object " is nullptr!", ##__VA_ARGS__)
@@ -186,21 +186,21 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Assertion like check.
 *	Implementation of check with return type.
 */
-#define SP_SRCHECK(Predicate, Str, ReturnValue, ...)\
-	SP_SCHECK_FULL(Predicate, Str, return ReturnValue, ##__VA_ARGS__)
+#define SP_SRCHECK(Predicate, ReturnValue, Str, ...)\
+	SP_SCHECK_FULL(Predicate, return ReturnValue, Str, ##__VA_ARGS__)
 
 
 /** Helper check for nullptr objects. */
-#define SP_SRCHECK_NULLPTR(Object, ReturnValue, ...) SP_SRCHECK(Object, #Object " is nullptr!", ReturnValue, ##__VA_ARGS__)
+#define SP_SRCHECK_NULLPTR(Object, ReturnValue, ...) SP_SRCHECK(Object, ReturnValue, #Object " is nullptr!", ##__VA_ARGS__)
 
 /** Helper check for GameState type.*/
-#define SP_SRCHECK_GAMESTATE(GameStateType, ReturnValue, ...) SP_SRCHECK(GetWorld()->GetGameState<GameStateType>(), "Bad GameState type[" #GameStateType "]!", ReturnValue, ##__VA_ARGS__)
+#define SP_SRCHECK_GAMESTATE(GameStateType, ReturnValue, ...) SP_SRCHECK(GetWorld()->GetGameState<GameStateType>(), ReturnValue, "Bad GameState type[" #GameStateType "]!", ##__VA_ARGS__)
 
 /** Helper check Authority */
-#define SP_SRCHECK_AUTHORITY(ReturnValue, ...) SP_SRCHECK(HasAuthority(), "%s doen't have authority!", *GetName(), ReturnValue, ##__VA_ARGS__)
+#define SP_SRCHECK_AUTHORITY(ReturnValue, ...) SP_SRCHECK(HasAuthority(), ReturnValue, "%s doen't have authority!", *GetName(), ##__VA_ARGS__)
 
 /** Helper check Owner*/
-#define SP_SRCHECK_OWNER(ReturnValue, ...) SP_SRCHECK(GetOwner(), "Owner nullptr!", ReturnValue, ##__VA_ARGS__)
+#define SP_SRCHECK_OWNER(ReturnValue, ...) SP_SRCHECK(GetOwner(), ReturnValue, "Owner nullptr!", ##__VA_ARGS__)
 
 
 /**
@@ -208,7 +208,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 *	Implementation of check with continue.
 */
 #define SP_SCCHECK(Predicate, Str, ...)\
-	SP_SCHECK_FULL(Predicate, Str, continue, ##__VA_ARGS__)
+	SP_SCHECK_FULL(Predicate, continue, Str, ##__VA_ARGS__)
 
 
 /** Helper check for nullptr objects. */

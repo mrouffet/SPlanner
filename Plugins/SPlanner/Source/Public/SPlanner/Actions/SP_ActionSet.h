@@ -60,7 +60,7 @@ public:
 	template <typename PredicateClass>
 	FSP_PlannerActionSet Shuffle(float LODLevel, const PredicateClass& Predicate) const
 	{
-		SP_RCHECK(EndActions.Num(), "No EndActions: Can't generate a valid plan!", FSP_PlannerActionSet())
+		SP_RCHECK(EndActions.Num(), FSP_PlannerActionSet(), "No EndActions: Can't generate a valid plan!")
 
 		return FSP_PlannerActionSet::Make(this, LODLevel, Predicate);
 	}

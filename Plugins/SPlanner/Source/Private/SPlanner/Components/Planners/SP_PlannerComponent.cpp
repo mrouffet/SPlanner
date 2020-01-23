@@ -101,7 +101,7 @@ void USP_PlannerComponent::UpdateGoal()
 const TArray<USP_ActionStep*>& USP_PlannerComponent::GetPlan() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
-	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, "Invalid plan: performing unsafe operation!", Plan)
+	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, Plan, "Invalid plan: performing unsafe operation!")
 
 	return Plan;
 }

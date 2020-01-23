@@ -77,7 +77,7 @@ const TArray<USP_PlannerComponent*>& ASP_Director::QueryAllPlannersWithGoal(USP_
 
 ASP_Director* ASP_Director::GetInstance()
 {
-	SP_SRCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.", nullptr)
+	SP_SRCHECK(Instance, nullptr, "Instance nullptr! AIDirector actor must be put in scene.")
 
 	return Instance;
 }

@@ -6,7 +6,7 @@ bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent* Planner, uint
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
 
-	SP_RCHECK(Steps.Num(), "Empty steps!", false)
+	SP_RCHECK(Steps.Num(), false, "Empty steps!")
 
 	for (int i = 0; i < Steps.Num(); ++i)
 	{
@@ -24,7 +24,7 @@ uint64 USP_ActionStepChain::PostCondition(const USP_PlannerComponent* Planner, u
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	SP_RCHECK(Steps.Num(), "Empty steps!", PlannerFlags)
+	SP_RCHECK(Steps.Num(), PlannerFlags, "Empty steps!")
 
 	for (int i = 0; i < Steps.Num(); ++i)
 	{

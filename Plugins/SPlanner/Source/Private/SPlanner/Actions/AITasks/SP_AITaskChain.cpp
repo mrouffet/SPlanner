@@ -9,7 +9,7 @@ bool USP_AITaskChain::PreCondition(const USP_PlannerComponent* Planner, uint64 P
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
 
-	SP_RCHECK(Tasks.Num(), "Empty tasks!", false)
+	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
@@ -27,7 +27,7 @@ uint64 USP_AITaskChain::PostCondition(const USP_PlannerComponent* Planner, uint6
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
-	SP_RCHECK(Tasks.Num(), "Empty tasks!", PlannerFlags)
+	SP_RCHECK(Tasks.Num(), PlannerFlags, "Empty tasks!")
 
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
@@ -46,7 +46,7 @@ bool USP_AITaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	FSP_TaskInfos* Infos = new (UserData) FSP_TaskInfos();
 
-	SP_RCHECK(Tasks.Num(), "Empty tasks!", false)
+	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 	SP_RCHECK_NULLPTR(Tasks[0], false)
 
 	if(Tasks[0]->GetUserDataSize())
@@ -60,7 +60,7 @@ ESP_PlanExecutionState USP_AITaskChain::Tick(float DeltaSeconds, USP_AIPlannerCo
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
-	SP_RCHECK(Infos->Index < Tasks.Num(), "Index out of range!", ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK(Infos->Index < Tasks.Num(), ESP_PlanExecutionState::PES_Failed, "Index out of range!")
 	SP_RCHECK_NULLPTR(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed)
 
 	// Tick current task.
