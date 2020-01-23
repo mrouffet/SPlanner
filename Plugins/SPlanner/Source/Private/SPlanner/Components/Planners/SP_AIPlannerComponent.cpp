@@ -263,9 +263,9 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 
 	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this]{	AskNewPlan(); }, MinCooldown, false);
 }
-bool USP_AIPlannerComponent::CancelPlan_Implementation()
+bool USP_AIPlannerComponent::CancelPlan()
 {
-	if (!Super::CancelPlan_Implementation() || CurrentPlanIndex == -1) // Plan not started.
+	if (!Super::CancelPlan() || CurrentPlanIndex == -1) // Plan not started.
 		return false;
 
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", false, CurrentPlanIndex, Plan.Num())

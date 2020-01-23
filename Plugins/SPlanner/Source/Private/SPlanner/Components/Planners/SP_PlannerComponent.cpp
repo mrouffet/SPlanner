@@ -98,10 +98,15 @@ void USP_PlannerComponent::UpdateGoal()
 	}
 }
 
-bool USP_PlannerComponent::CancelPlan_Implementation()
+bool USP_PlannerComponent::CancelPlan()
 {
 	// Must cancel a valid plan.
-	return PlanState == ESP_PlanState::PS_Valid;
+	if (PlanState != ESP_PlanState::PS_Valid)
+		return false;
+
+	OnPlanCancel.Broadcast(this);
+
+	return true;
 }
 
 void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)

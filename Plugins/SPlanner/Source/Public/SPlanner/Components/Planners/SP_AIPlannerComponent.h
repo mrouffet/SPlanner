@@ -64,7 +64,7 @@ protected:
 	*	Use CurrentPlanIndex and Plan.
 	*	Called on main thread.
 	*/
-	bool CancelPlan_Implementation() override;
+	bool CancelPlan() override;
 
 	bool OnActive_Internal_Implementation() override;
 	bool OnInactive_Internal_Implementation() override;

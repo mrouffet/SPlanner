@@ -18,6 +18,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_AIPlannerComponent* Planner = nullptr;
 
+	/** Callback function called when plan get cancelled. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Controller")
+	void OnPlanCancel(USP_PlannerComponent* InPlanner);
+
+	void PostInitializeComponents() override;
+
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	void OnPossess(APawn* InPawn) override;
 	void OnUnPossess() override;
 
@@ -28,6 +36,6 @@ public:
 	ASP_AIController(const FObjectInitializer& ObjectInitializer);
 
 	/** Enable or disable Planner behavior. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
 	void SetEnableBehavior(bool bEnable);
 };

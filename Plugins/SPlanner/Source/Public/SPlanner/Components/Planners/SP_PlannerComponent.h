@@ -196,6 +196,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_PlannerGoalDelegate OnGoalChange;
 
+	/** Callback event when plan get cancelled. */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
+	FSP_PlannerDelegate OnPlanCancel;
+
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
 
 	ESP_PlanState GetPlanState() const;
@@ -226,6 +230,6 @@ public:
 	*	Callback function called when a plan get cancelled (by setting new goal).
 	*	Return cancel succeed.
 	*/
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
-	bool CancelPlan();
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
+	virtual bool CancelPlan();
 };
