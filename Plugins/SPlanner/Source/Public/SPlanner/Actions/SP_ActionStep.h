@@ -22,7 +22,6 @@ public:
 	*	Must return true to be added to the plan during generation.
 	*	Called on external thread.
 	*/
-	UFUNCTION(Category = "SPlanner|Action")
 	virtual bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const;
 
 	/**
@@ -30,6 +29,5 @@ public:
 	*	Return new planner flags to check for next pre-conditions during plan generation.
 	*	Called on external thread.
 	*/
-	UFUNCTION(Category = "SPlanner|Action")
 	virtual uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const;
 };

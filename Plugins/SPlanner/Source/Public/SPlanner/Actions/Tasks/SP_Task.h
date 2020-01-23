@@ -52,6 +52,8 @@ public:
 	/** Getter of user data size to reserve. */
 	virtual uint32 GetUserDataSize() const;
 
+	bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+
 	/**
 	*	The begin implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).

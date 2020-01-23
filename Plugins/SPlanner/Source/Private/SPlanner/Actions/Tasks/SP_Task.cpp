@@ -14,6 +14,15 @@ uint32 USP_Task::GetUserDataSize() const
 	return 0u;
 }
 
+bool USP_Task::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+{
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
+
+	SP_RCHECK_NULLPTR(Cast<USP_AIPlannerComponent>(Planner), false)
+
+	return true;
+}
+
 bool USP_Task::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
