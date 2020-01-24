@@ -2,8 +2,7 @@
 
 #include <TimerManager.h>
 
-#include <SPlanner/Debug/SP_Debug.h>
-
+#include <SPlanner/Miscs/SP_Config.h>
 #include <SPlanner/Miscs/SP_Settings.h>
 #include <SPlanner/Miscs/SP_PlanConstructTask.h>
 
@@ -204,13 +203,25 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 
 	if (TimeBeforeConstructPlan <= 0.0f)
 	{
+#if SP_MULTITHREAD
 		// Queue plan construction in thread.
 		(new FAutoDeleteAsyncTask<FSP_PlanConstructTask>(this))->StartBackgroundTask();
+#else
+		ConstructPlan();
+#endif
 	}
 	else
 	{
 		GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer,
-			[this](){ (new FAutoDeleteAsyncTask<FSP_PlanConstructTask>(this))->StartBackgroundTask(); },
+			[this]()
+			{
+#if SP_MULTITHREAD
+				// Queue plan construction in thread.
+				(new FAutoDeleteAsyncTask<FSP_PlanConstructTask>(this))->StartBackgroundTask();
+#else
+				ConstructPlan();
+#endif
+			},
 			TimeBeforeConstructPlan,
 			false
 		);

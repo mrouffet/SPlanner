@@ -1,18 +1,6 @@
 #pragma once
 
-#if !UE_BUILD_SHIPPING
-
-	#define SP_DEBUG 1
-
-	#define SP_DEBUG_EDITOR WITH_EDITOR
-
-#else
-
-	#define SP_DEBUG 0
-
-	#define SP_DEBUG_EDITOR 0
-
-#endif
+#include <SPlanner/Miscs/SP_Config.h>
 
 #if SP_DEBUG
 
