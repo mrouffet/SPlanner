@@ -2,6 +2,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Actions/SP_PlannerActionSet.h>
+
 const TArray<FSP_Action>& USP_ActionSet::GetBeginActions() const
 {
 	return BeginActions;

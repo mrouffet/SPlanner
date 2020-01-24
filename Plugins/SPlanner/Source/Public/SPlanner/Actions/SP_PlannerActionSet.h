@@ -2,11 +2,10 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Actions/SP_ActionSet.h>
 #include <SPlanner/Actions/SP_PlannerAction.h>
 
 #include "SP_PlannerActionSet.generated.h"
-
-class USP_ActionSet;
 
 // Sort using weight.
 struct ActionSortFunctor

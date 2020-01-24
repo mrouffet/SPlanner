@@ -7,8 +7,8 @@
 
 #include <SPlanner/Goal/SP_Goal.h>
 
-#include <SPlanner/Actions/SP_ActionSet.h>
 #include <SPlanner/Actions/SP_POIActionSet.h>
+#include <SPlanner/Actions/SP_PlannerActionSet.h>
 #include <SPlanner/Actions/AITasks/SP_AITask.h>
 
 #include <SPlanner/Components/SP_POIComponent.h>

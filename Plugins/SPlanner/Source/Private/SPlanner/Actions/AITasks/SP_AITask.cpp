@@ -1,5 +1,7 @@
 #include <SPlanner/Actions/AITasks/SP_AITask.h>
 
+#include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
+
 bool USP_AITask::GetUseCooldownOnFailed() const
 {
 	return bUseCooldownOnFailed;

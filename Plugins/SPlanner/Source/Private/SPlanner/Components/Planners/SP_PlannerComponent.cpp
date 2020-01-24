@@ -9,8 +9,8 @@
 
 #include <SPlanner/Goal/SP_Goal.h>
 
-#include <SPlanner/Actions/SP_ActionSet.h>
 #include <SPlanner/Actions/SP_ActionStep.h>
+#include <SPlanner/Actions/SP_PlannerActionSet.h>
 
 #include <SPlanner/Actors/SP_Director.h>
 

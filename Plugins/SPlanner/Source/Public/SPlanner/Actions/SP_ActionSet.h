@@ -1,10 +1,11 @@
 #pragma once
 
 #include <SPlanner/Actions/SP_Action.h>
-#include <SPlanner/Actions/SP_PlannerActionSet.h>
 
 #include <Engine/DataAsset.h>
 #include "SP_ActionSet.generated.h"
+
+struct FSP_PlannerActionSet;
 
 /**
  *	Set of Planner Action.
