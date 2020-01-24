@@ -18,7 +18,17 @@ void ASP_Director::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	SP_CHECK(!Instance, "Bad Instance: Already set! An other Director actor may already be in scene.")
+#if SP_DEBUG
+	if (Instance)
+	{
+#if SP_DEBUG_EDITOR
+		// Editor call PreInitializeComponents() to preview an actor.
+		SP_LOG(Error, "Bad Instance: Already set! If Director blueprint's has been previously edited ignore this error (won't trigger next play). Otherwise an other Director actor may already be in scene")
+#else
+		SP_LOG(Error, "Bad Instance: Already set! An other Director actor may already be in scene")
+#endif
+	}
+#endif
 
 	Instance = this;
 }
