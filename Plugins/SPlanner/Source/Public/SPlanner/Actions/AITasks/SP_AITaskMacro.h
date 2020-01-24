@@ -33,6 +33,14 @@
 	if (!Super::End(__VA_ARGS__))\
 		return false;
 
+/**
+*	Helper macro to call Cancel() parent implementation.
+*	Should always be called in children Cancel() override.
+*/
+#define SP_AI_TASK_CANCEL_SUPER(...)\
+	if (!Super::Cancel(__VA_ARGS__))\
+		return false;
+
 
 #if SP_DEBUG_EDITOR
 

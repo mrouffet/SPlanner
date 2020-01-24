@@ -114,8 +114,7 @@ bool USP_AITaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 bool USP_AITaskChain::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	if (!Super::Cancel(Planner, UserData))
-		return false;
+	SP_AI_TASK_CANCEL_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
