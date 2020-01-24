@@ -61,9 +61,11 @@ USP_Goal* USP_PlannerComponent::GetGoal() const
 {
 	return Goal;
 }
-void USP_PlannerComponent::SetGoal(USP_Goal* InGoal)
+void USP_PlannerComponent::SetGoal(USP_Goal* InGoal, bool bForce)
 {
-	NextGoal = InGoal;
+	// Check current goal can transit to (SetGoal can be called multiple time in one frame).
+	if(bForce || !Goal || Goal->CanTransitTo(InGoal))
+		NextGoal = InGoal;
 }
 void USP_PlannerComponent::UpdateGoal()
 {

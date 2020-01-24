@@ -225,9 +225,13 @@ public:
 	/** Getter of Goal. */
 	USP_Goal* GetGoal() const;
 
-	/** Setter of Goal. */
+	/**
+	*	Setter of Goal.
+	*	Goal get cached and will be update in next Tick().
+	*	use bForce to force goal set (ie no goal transition check).
+	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
-	void SetGoal(USP_Goal* InGoal);
+	void SetGoal(USP_Goal* InGoal, bool bForce = false);
 
 	/** Getter of Plan. */
 	const TArray<USP_ActionStep*>& GetPlan() const;
