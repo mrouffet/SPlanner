@@ -20,6 +20,13 @@ struct FSP_PlannerAction : public FSP_ActionBase
 	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
 	bool bAchievePlan = false;
 
+	/**
+	*	Has been already added to the plan.
+	*	This is the only value that can be changed during plan generation.
+	*/
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
+	mutable bool bIsInPlan = false;
+
 	FSP_PlannerAction() = default;
 	FSP_PlannerAction(USP_ActionStep* InStep, float InWeight, bool bInAchievePlan = false);
 };

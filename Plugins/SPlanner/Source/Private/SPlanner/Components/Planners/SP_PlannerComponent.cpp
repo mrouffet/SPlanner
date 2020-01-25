@@ -298,8 +298,6 @@ void USP_PlannerComponent::ConstructPlan()
 	}
 #endif
 
-	TArray<USP_ActionStep*> NewPlan;
-
 	int8 MaxDepth = LODLevel > 0.0f ? LOD->GetMaxPlannerDepth(LODLevel) : DefaultMaxPlannerDepth;
 
 #if SP_DEBUG
@@ -310,6 +308,10 @@ void USP_PlannerComponent::ConstructPlan()
 		return;
 	}
 #endif
+
+	// Output plan.
+	TArray<USP_ActionStep*> NewPlan;
+	NewPlan.Reserve(MaxDepth);
 
 	// Planner Computation.
 	if (ConstructPlan_Internal(PlannerActions, NewPlan, MaxDepth))
@@ -330,33 +332,24 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 	if (CurrDepth > MaxDepth)
 		return false;
 
-	int Index = CurrDepth;
-	const TArray<FSP_PlannerAction>* Actions = &PlannerActions.Actions;
-
-	// Use BeginActions if any.
-	if (PlannerActions.BeginActions.Num())
-	{
-		if (CurrDepth == 0)
-			Actions = &PlannerActions.BeginActions;
-		else
-			--Index; // Remove Begin depth incrementation.
-	}
+	const TArray<FSP_PlannerAction>& Actions = PlannerActions.GetActionsFromDepth(CurrDepth);
 
 #if SP_DEBUG
 	// TODO: Use Forced Actions.
-	if(PlannerActions.ForcedActions.Num())
+	if (PlannerActions.ForcedActions.Num())
 		SP_LOG(Warning, "Forced actions not implemented yet! ActionSet: %s", *ActionSet->GetActionSet(Goal)->GetName())
 #endif
 
-	for (int i = Index; i < Actions->Num(); ++i)
+	for(int i = 0; i < Actions.Num(); ++i)
 	{
-		const FSP_PlannerAction& Action = (*Actions)[i];
-		SP_CCHECK_NULLPTR(Action.Step)
+		const FSP_PlannerAction& Action = Actions[i];
 
-		if (!Action.Step->PreCondition(this, PlannerFlags))
+		// Already added to the generated plan or invalid pre-condition.
+		if (Action.bIsInPlan || !Action.Step->PreCondition(this, PlannerFlags))
 			continue;
 
 		// Add steps to current plan.
+		Action.bIsInPlan = true;
 		OutPlan.Add(Action.Step);
 
 		// Check if action achieve plan or plan with this task achieve plan.
@@ -364,7 +357,8 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 			return true;
 
 		// Plan generation failed, remove this task from plan.
-		OutPlan.RemoveAt(static_cast<int32>(Index)); // Remove last.
+		Action.bIsInPlan = false;
+		OutPlan.RemoveAt(OutPlan.Num() - 1); // Remove last.
 	}
 
 	return false;

@@ -100,6 +100,7 @@ protected:
 		uint8 CurrDepth = 0u,
 		uint64 PlannerFlags = 0u) const;
 
+
 	/** Callback function called when a plan's construction failed (no valid plan found). */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
 	void OnPlanConstructionFailed(ESP_PlanError PlanError);

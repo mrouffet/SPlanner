@@ -45,6 +45,9 @@ struct FSP_PlannerActionSet
 
 	FSP_PlannerActionSet() = default;
 
+	/** Getter of Action array depending on Depth. */
+	const TArray<FSP_PlannerAction>& GetActionsFromDepth(uint8 Depth) const;
+
 	/**
 	*	Create PlannerActionSet from action set.
 	*	Shuffle every actions using random and weights.
