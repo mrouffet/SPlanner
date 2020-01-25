@@ -26,21 +26,33 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	float Cooldown = 0.0f;
 
-	/** Blueprint event called by Begin(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
-	void OnBegin(USP_AIPlannerComponent* Planner);
+	/**
+	*	Blueprint event called by Begin().
+	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*/
+	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskBegin", Category = "SPlanner|Action|AITask")
+	bool K2_OnTaskBegin(USP_AIPlannerComponent* Planner);
 
-	/** Blueprint event called by Tick(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
-	void OnTick(float DeltaSeconds, USP_AIPlannerComponent* Planner);
+	/**
+	*	Blueprint event called by Tick().
+	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*/
+	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskTick", Category = "SPlanner|Action|AITask")
+	ESP_PlanExecutionState K2_OnTaskTick(float DeltaSeconds, USP_AIPlannerComponent* Planner);
 
-	/** Blueprint event called by End(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
-	void OnEnd(USP_AIPlannerComponent* Planner);
+	/**
+	*	Blueprint event called by End().
+	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*/
+	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskEnd", Category = "SPlanner|Action|AITask")
+	bool K2_OnTaskEnd(USP_AIPlannerComponent* Planner);
 
-	/** Blueprint event called by End(). */
-	UFUNCTION(BlueprintImplementableEvent, Category = "SPlanner|Action|AITask")
-	void OnCancel(USP_AIPlannerComponent* Planner);
+	/**
+	*	Blueprint event called by End().
+	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*/
+	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskCancel", Category = "SPlanner|Action|AITask")
+	bool K2_OnTaskCancel(USP_AIPlannerComponent* Planner);
 
 public:
 	/** Gette of bUseCooldownOnFailed. */

@@ -13,6 +13,8 @@
 
 	#define SP_WARNING_PLAN_GEN_FAILED 1
 
+	#define SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE 1
+
 #else
 
 	#define SP_DEBUG 0
@@ -24,4 +26,6 @@
 
 	// Require SP_DEBUG for Log macros.
 	#define SP_WARNING_PLAN_GEN_FAILED SP_DEBUG
+
+	#define SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE 1
 #endif

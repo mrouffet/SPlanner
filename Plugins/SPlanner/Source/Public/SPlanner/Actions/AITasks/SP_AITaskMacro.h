@@ -5,8 +5,6 @@
 #include <SPlanner/Miscs/SP_Settings.h>
 #include <SPlanner/Miscs/Flags/SP_FlagHelper.h>
 
-#define SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE 1
-
 
 /**
 *	Helper macro to call Begin() parent implementation.
