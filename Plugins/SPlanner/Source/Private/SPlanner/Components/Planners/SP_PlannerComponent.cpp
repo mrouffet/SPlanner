@@ -367,7 +367,7 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 void USP_PlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)
 {
 #if SP_WARNING_PLAN_GEN_FAILED
-	SP_LOG(Warning, "Plan Generation Failed: %s", *FindObject<UEnum>(ANY_PACKAGE, TEXT("ESP_PlanError"), true)->GetEnumName(static_cast<int32>(PlanError)))
+	SP_LOG(Warning, "Plan Generation Failed: %s", *FindObject<UEnum>(ANY_PACKAGE, TEXT("ESP_PlanError"), true)->GetNameStringByIndex(static_cast<int32>(PlanError)))
 #endif
 
 	PlanState = ESP_PlanState::PS_Invalid;

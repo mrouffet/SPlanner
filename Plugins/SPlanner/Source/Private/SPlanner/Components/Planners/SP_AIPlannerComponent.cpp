@@ -69,7 +69,7 @@ USP_ActionStep* USP_AIPlannerComponent::GetNextActionStep() const
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), nullptr, "Index out of range!")
 
 	// No other action left.
-	if(CurrentPlanIndex + 1 <= Plan.Num())
+	if(CurrentPlanIndex + 1 >= Plan.Num())
 		return nullptr;
 
 	return Plan[CurrentPlanIndex + 1];
