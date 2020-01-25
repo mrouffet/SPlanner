@@ -70,7 +70,7 @@ struct FSP_PlannerActionSet
 				SP_SCCHECK(BeginActions[i].Step, "%s.BeginActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
 
 				if (IsAvailablePredicate(BeginActions[i]))
-					Result.BeginActions.Add(FSP_PlannerAction(BeginActions[i].Step, BeginActions[i].GetWeight(LODLevel) * FMath::FRand()));
+					Result.BeginActions.Add(FSP_PlannerAction(BeginActions[i].Step, BeginActions[i].Weight.Get(LODLevel) * FMath::FRand()));
 			}
 
 			Result.BeginActions.Sort(SortFunctor);
@@ -86,7 +86,7 @@ struct FSP_PlannerActionSet
 				SP_SCCHECK(ForcedActions[i].Step, "%s.ForcedActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
 
 				if (IsAvailablePredicate(ForcedActions[i]))
-					Result.ForcedActions.Add(FSP_PlannerAction(ForcedActions[i].Step, ForcedActions[i].GetWeight(LODLevel) * FMath::FRand()));
+					Result.ForcedActions.Add(FSP_PlannerAction(ForcedActions[i].Step, ForcedActions[i].Weight.Get(LODLevel) * FMath::FRand()));
 			}
 
 			Result.ForcedActions.Sort(SortFunctor);
@@ -102,7 +102,7 @@ struct FSP_PlannerActionSet
 					SP_SCCHECK(CoreActions[i].Step, "%s.CoreActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
 				
 					if (IsAvailablePredicate(CoreActions[i]))
-						Result.Actions.Add(FSP_PlannerAction(CoreActions[i].Step, CoreActions[i].GetWeight(LODLevel) * FMath::FRand()));
+						Result.Actions.Add(FSP_PlannerAction(CoreActions[i].Step, CoreActions[i].Weight.Get(LODLevel) * FMath::FRand()));
 				}
 			}
 
@@ -114,7 +114,7 @@ struct FSP_PlannerActionSet
 					SP_SCCHECK(EndActions[i].Step, "%s.EndActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
 
 					if (IsAvailablePredicate(EndActions[i]))
-						Result.Actions.Add(FSP_PlannerAction(EndActions[i].Step, EndActions[i].GetWeight(LODLevel) * FMath::FRand(), true));
+						Result.Actions.Add(FSP_PlannerAction(EndActions[i].Step, EndActions[i].Weight.Get(LODLevel) * FMath::FRand(), true));
 				}
 			}
 

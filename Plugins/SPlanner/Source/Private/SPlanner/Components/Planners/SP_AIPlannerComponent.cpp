@@ -273,7 +273,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 				bool bAchieveGoal = POIActions[i].GetAchievedGoals().Find(Goal) != INDEX_NONE;
 
 				if (!IsInCooldown(POIActions[i].GetTask()) && (bAchieveGoal || POIActions[i].GetServedGoals().Find(Goal) != INDEX_NONE))
-					PlannerActions.Actions.Add(FSP_PlannerAction(POIActions[i].GetTask(), POIActions[i].GetWeight(LODLevel) * FMath::FRand(), bAchieveGoal));
+					PlannerActions.Actions.Add(FSP_PlannerAction(POIActions[i].GetTask(), POIActions[i].Weight.Get(LODLevel) * FMath::FRand(), bAchieveGoal));
 			}
 		}
 	}
