@@ -16,9 +16,9 @@ uint32 USP_AITask::GetUserDataSize() const
 	return 0u;
 }
 
-bool USP_AITask::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+bool USP_AITask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
 	SP_RCHECK_NULLPTR(Cast<USP_AIPlannerComponent>(Planner), false)
 

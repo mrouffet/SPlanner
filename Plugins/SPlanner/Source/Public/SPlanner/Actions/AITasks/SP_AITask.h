@@ -19,11 +19,11 @@ class SPLANNER_API USP_AITask : public USP_ActionStep
 
 protected:
 	/** Should use cooldown even if the task has failed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AITask")
 	bool bUseCooldownOnFailed = true;
 
 	/** The cooldown of this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AITask")
 	float Cooldown = 0.0f;
 
 	/**
@@ -64,7 +64,7 @@ public:
 	/** Getter of user data size to reserve. */
 	virtual uint32 GetUserDataSize() const;
 
-	bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 
 	/**
 	*	The begin implementation of the task.

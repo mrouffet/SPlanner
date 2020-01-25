@@ -72,9 +72,9 @@ void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPat
 	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
-bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
 	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
 

@@ -2,9 +2,9 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
 	SP_RCHECK(Steps.Num(), false, "Empty steps!")
 
@@ -12,7 +12,7 @@ bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent* Planner, uint
 	{
 		SP_RCHECK_NULLPTR(Steps[i], false)
 
-		if (!Steps[i]->PreCondition(Planner, PlannerFlags))
+		if (!Steps[i]->PreCondition(Planner, GeneratedPlan, PlannerFlags))
 			return false;
 
 		PlannerFlags = Steps[i]->PostCondition(Planner, PlannerFlags);

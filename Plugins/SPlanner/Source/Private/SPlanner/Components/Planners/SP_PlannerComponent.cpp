@@ -345,7 +345,7 @@ bool USP_PlannerComponent::ConstructPlan_Internal(const FSP_PlannerActionSet& Pl
 		const FSP_PlannerAction& Action = Actions[i];
 
 		// Already added to the generated plan or invalid pre-condition.
-		if (Action.bIsInPlan || !Action.Step->PreCondition(this, PlannerFlags))
+		if (Action.bIsInPlan || !Action.Step->PreCondition(this, OutPlan, PlannerFlags))
 			continue;
 
 		// Add steps to current plan.

@@ -16,13 +16,25 @@ class SPLANNER_API USP_ActionStep : public UDataAsset
 {
 	GENERATED_BODY()
 	
+protected:
+	/**
+	*	Previous required steps of the currently generated plan to add this steps.
+	*	Let empty for no requirement.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	TArray<USP_ActionStep*> PreviousRequieredSteps;
+
+	/** Whether the previous required steps must use the specific order. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bUseRequiredStepOrder = true;
+
 public:
 	/**
 	*	The pre-condition of the step.
 	*	Must return true to be added to the plan during generation.
 	*	Called on external thread.
 	*/
-	virtual bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const;
+	virtual bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const;
 
 	/**
 	*	The post-condition of the step.

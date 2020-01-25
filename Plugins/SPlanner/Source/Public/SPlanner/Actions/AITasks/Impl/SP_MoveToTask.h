@@ -59,7 +59,7 @@ protected:
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 public:
-	bool PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 
 	bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;

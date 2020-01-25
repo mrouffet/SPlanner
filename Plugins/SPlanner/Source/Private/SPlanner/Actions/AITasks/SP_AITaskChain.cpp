@@ -5,9 +5,9 @@ uint32 USP_AITaskChain::GetUserDataSize() const
 	return sizeof(FSP_TaskInfos);
 }
 
-bool USP_AITaskChain::PreCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+bool USP_AITaskChain::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
 	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 
@@ -15,7 +15,7 @@ bool USP_AITaskChain::PreCondition(const USP_PlannerComponent* Planner, uint64 P
 	{
 		SP_RCHECK_NULLPTR(Tasks[i], false)
 
-		if (!Tasks[i]->PreCondition(Planner, PlannerFlags))
+		if (!Tasks[i]->PreCondition(Planner, GeneratedPlan, PlannerFlags))
 			return false;
 
 		PlannerFlags = Tasks[i]->PostCondition(Planner, PlannerFlags);
