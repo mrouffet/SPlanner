@@ -243,15 +243,17 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 
 	struct CooldownPredicate
 	{
-		USP_AIPlannerComponent* Planner = nullptr;
+		const USP_AIPlannerComponent* Planner = nullptr;
 
 		bool operator()(const FSP_Action& Action) const
 		{
+			SP_SRCHECK_NULLPTR(Planner, false)
+
 			return !Planner->IsInCooldown(Cast<USP_AITask>(Action.Step));
 		}
 	};
 
-	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate());
+	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate{ this });
 
 	// Add all available actions from POI.
 	if (POIZone)
