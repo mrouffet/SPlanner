@@ -5,6 +5,8 @@
 
 class USP_POIComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_TargetEvent, USP_TargetComponent*, Target);
+
 /**
 *	Enum state of TargetComponent.
 */
@@ -42,13 +44,35 @@ protected:
 	ESP_TargetState State = ESP_TargetState::TS_None;
 
 public:
+	/** Callback thrown when target is changed. */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
+	FSP_TargetEvent OnTargetChange;
+
 	USP_TargetComponent(const FObjectInitializer& ObjectInitializer);
 	
 	// DO NOT USE. Unreal internal use only.
 	USP_TargetComponent(FVTableHelper& Helper);
 
+
 	/** Getter of State. */
 	ESP_TargetState GetState() const;
+
+	/** Whether target is a position. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
+	bool IsPosition() const;
+
+	/** Whether target is an actor (or a player). */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
+	bool IsActor() const;
+
+	/** Whether target is a player. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
+	bool IsPlayer() const;
+
+	/** Whether target is a position. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
+	bool IsPOI() const;
+
 
 	/** Getter of Position */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
@@ -74,6 +98,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
 	USP_POIComponent* GetPOI() const;
 
+
 	/** Setter of TargetPosition */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Target")
 	void SetPosition(const FVector& InPosition);
@@ -89,6 +114,7 @@ public:
 	/** Setter of POI */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Target")
 	void SetPOI(USP_POIComponent* InPOI);
+
 
 	/** Return whether the target is valid. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Target")
