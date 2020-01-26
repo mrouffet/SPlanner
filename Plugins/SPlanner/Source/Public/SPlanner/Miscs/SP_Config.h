@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SPlanner/Debug/SP_DebugMaco.h>
-
 #if !UE_BUILD_SHIPPING
 
 	#define SP_DEBUG 1
