@@ -6,7 +6,7 @@
 #include <SPlanner/Miscs/SP_Settings.h>
 #include <SPlanner/Miscs/SP_PlanConstructTask.h>
 
-#include <SPlanner/Goal/SP_Goal.h>
+#include <SPlanner/Goals/SP_Goal.h>
 
 #include <SPlanner/Actions/SP_ActionStep.h>
 #include <SPlanner/Actions/SP_PlannerActionSet.h>
@@ -38,6 +38,10 @@ void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
 		OnInactive_Internal();
 }
 
+USP_PlannerLODComponent* USP_PlannerComponent::GetLOD() const
+{
+	return LOD;
+}
 void USP_PlannerComponent::SetLOD(USP_PlannerLODComponent* NewLOD)
 {
 	if (LOD)
@@ -160,7 +164,10 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
 	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
 
-	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(Goal);
+	const USP_Goal* const ExecutionGoal = Goal->GetExecutionGoal(this);
+	SP_RCHECK_NULLPTR(ExecutionGoal, FSP_PlannerActionSet())
+
+	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(ExecutionGoal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
 	return CurrActionSet->Shuffle(LODLevel);

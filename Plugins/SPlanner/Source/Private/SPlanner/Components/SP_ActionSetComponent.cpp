@@ -2,14 +2,14 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Goal/SP_Goal.h>
+#include <SPlanner/Goals/SP_Goal.h>
 
 USP_ActionSetComponent::USP_ActionSetComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-USP_ActionSet* USP_ActionSetComponent::GetActionSet(USP_Goal* Goal)
+USP_ActionSet* USP_ActionSetComponent::GetActionSet(const USP_Goal* Goal)
 {
 	USP_ActionSet* const* const ActionSetPtr = ActionsSets.Find(Goal);
 

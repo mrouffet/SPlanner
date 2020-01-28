@@ -23,5 +23,5 @@ public:
 	USP_ActionSetComponent(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|ActionSet")
-	USP_ActionSet* GetActionSet(USP_Goal* Goal);
+	USP_ActionSet* GetActionSet(const USP_Goal* Goal);
 };

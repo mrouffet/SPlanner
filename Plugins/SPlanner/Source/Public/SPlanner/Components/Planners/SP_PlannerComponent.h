@@ -216,6 +216,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner")
 	void SetEnableBehavior(bool bEnable);
 
+	/** Getter of LOD. */
+	USP_PlannerLODComponent* GetLOD() const;
+
 	/**
 	*	Setter of LOD.
 	*	Bind OnActiveLOD / OnInactiveLOD events.

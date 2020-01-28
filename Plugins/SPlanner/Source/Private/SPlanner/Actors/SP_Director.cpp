@@ -2,7 +2,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Goal/SP_Goal.h>
+#include <SPlanner/Goals/SP_Goal.h>
 
 #include <SPlanner/Components/Planners/SP_PlannerComponent.h>
 #include <SPlanner/Components/SP_ActionSetComponent.h>

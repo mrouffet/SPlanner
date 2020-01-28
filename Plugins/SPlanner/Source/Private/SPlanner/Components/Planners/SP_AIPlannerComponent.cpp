@@ -5,7 +5,7 @@
 #include <SPlanner/Miscs/SP_Settings.h>
 #include <SPlanner/Miscs/SP_PlanState.h>
 
-#include <SPlanner/Goal/SP_Goal.h>
+#include <SPlanner/Goals/SP_Goal.h>
 
 #include <SPlanner/Actions/SP_POIActionSet.h>
 #include <SPlanner/Actions/SP_PlannerActionSet.h>
