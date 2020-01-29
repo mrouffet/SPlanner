@@ -5,7 +5,7 @@
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 #include <SPlanner/Components/SP_TargetComponent.h>
 
-bool UMoveToPOITask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_MoveToPOITask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 

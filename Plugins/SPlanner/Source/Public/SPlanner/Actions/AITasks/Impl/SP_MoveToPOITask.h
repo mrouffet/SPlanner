@@ -7,7 +7,7 @@
  *	MoveTo POI only spec implementation.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|MoveTo")
-class SPLANNER_API UMoveToPOITask : public USP_MoveToTask
+class SPLANNER_API USP_MoveToPOITask : public USP_MoveToTask
 {
 	GENERATED_BODY()
 
