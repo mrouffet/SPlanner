@@ -244,4 +244,8 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
 	virtual bool CancelPlan();
+
+#if WITH_EDITOR
+	bool IsSelectedInEditor() const override;
+#endif
 };

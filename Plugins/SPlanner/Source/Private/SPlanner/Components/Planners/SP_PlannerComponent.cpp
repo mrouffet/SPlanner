@@ -124,24 +124,29 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 	if (PlanState == ESP_PlanState::PS_Valid)
 		SP_LOG(Warning, "Set new plan while still valid!")
 
+#if SP_DEBUG_EDITOR || SP_LOG_PLAN
+	// Log plan.
+	FString PlanDebugStr = "Goal: " + Goal->GetName() + " --- Plan: ";
+
+	if (InPlan.Num() != 0)
+	{
+		for (int i = 0; i < InPlan.Num(); i++)
+			PlanDebugStr += InPlan[i]->GetName() + ", ";
+
+		PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
+	}
+	else
+		PlanDebugStr += "null";
+
 #if SP_DEBUG_EDITOR
-		// Log plan.
-		if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
-		{
-			FString PlanDebugStr = "Goal: " + Goal->GetName() + " --- Plan: ";
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanLogKey(), FColor::Orange, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
+#endif
 
-			if (InPlan.Num() != 0)
-			{
-				for (int i = 0; i < InPlan.Num(); i++)
-					PlanDebugStr += InPlan[i]->GetName() + ", ";
+#if SP_LOG_PLAN
+	UE_LOG(LogSP_Debug, Display, "%s: %s", *GetOwner()->GetName(), *PlanDebugStr)
+#endif
 
-				PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
-			}
-			else
-				PlanDebugStr += "null";
-
-			SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanLogKey(), FColor::Orange, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
-		}
 #endif
 
 #endif
@@ -196,8 +201,7 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 	}
 
 #if SP_DEBUG_EDITOR
-	// Log available planner actions.
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
 		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanGenerationLogKey(), FColor::Purple, USP_Settings::GetDebugScreenDisplayTime(), "Time before construct: %f", TimeBeforeConstructPlan)
 #endif
 
@@ -257,7 +261,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 #if SP_DEBUG_EDITOR
 	// Log available planner actions.
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && GetOwner()->IsSelected())
+	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
 	{
 		FString PlanDebugStr = "Action list: ";
 
@@ -465,3 +469,18 @@ void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 	// Update new goal.
 	UpdateGoal();
 }
+
+#if WITH_EDITOR
+bool USP_PlannerComponent::IsSelectedInEditor() const
+{
+	// This component selected.
+	if (Super::IsSelectedInEditor())
+		return true;
+
+	// Owner Actor selected.
+	if (GetOwner())
+		return GetOwner()->IsSelectedInEditor();
+
+	return false;
+}
+#endif

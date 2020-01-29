@@ -159,7 +159,7 @@ bool USP_AIPlannerComponent::BeginNextTask()
 	
 #if SP_DEBUG_EDITOR
 	// Update debug keys.
-	if(GetOwner()->IsSelectedInEditor())
+	if(IsSelectedInEditor())
 		USP_Settings::IncrementTaskExecuteLogKey();
 #endif
 
@@ -412,3 +412,23 @@ void USP_AIPlannerComponent::TickComponent(float DeltaTime, enum ELevelTick Tick
 
 	ExecuteTask(DeltaTime);
 }
+
+#if WITH_EDITOR
+bool USP_AIPlannerComponent::IsSelectedInEditor() const
+{
+	// This selected (usually Controller).
+	if (Super::IsSelectedInEditor())
+		return true;
+
+	// ActionSet owner selected (usually Character).
+	if (ActionSet)
+	{
+		AActor* ActionSetOwner = ActionSet->GetOwner();
+
+		if (ActionSetOwner)
+			return ActionSetOwner->IsSelectedInEditor();
+	}
+
+	return false;
+}
+#endif

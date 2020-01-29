@@ -145,7 +145,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
 	{
-		SP_LOG_AI_TASK_EXECUTE(Controller, "Move request failed!")
+		SP_LOG_AI_TASK_EXECUTE(Planner, "Move request failed!")
 		return false;
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -154,7 +154,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 		return true;
 	}
 
-	SP_LOG_AI_TASK_EXECUTE(Controller, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
+	SP_LOG_AI_TASK_EXECUTE(Planner, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
 	Infos->Controller = Controller;
@@ -174,7 +174,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Failed)
 	{
-		SP_LOG_AI_TASK_TICK(Planner->GetOwner(), "Failed")
+		SP_LOG_AI_TASK_TICK(Planner, "Failed")
 		return ESP_PlanExecutionState::PES_Failed;
 	}
 	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
@@ -189,7 +189,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		if (Character->GetVelocity().SizeSquared() != 0.0f)
 			return ESP_PlanExecutionState::PES_Running;
 
-		SP_LOG_AI_TASK_TICK(Controller, "Succeed")
+		SP_LOG_AI_TASK_TICK(Planner, "Succeed")
 
 		return ESP_PlanExecutionState::PES_Succeed;
 	}

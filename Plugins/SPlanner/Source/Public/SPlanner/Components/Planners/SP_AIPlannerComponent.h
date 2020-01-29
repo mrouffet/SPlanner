@@ -125,4 +125,8 @@ public:
 	/** Helper function for cooldown check */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	bool IsInCooldown(const USP_AITask* Task) const;
+
+#if WITH_EDITOR
+	bool IsSelectedInEditor() const override;
+#endif
 };

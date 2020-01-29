@@ -13,7 +13,7 @@ bool USP_IdleTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	FSP_TaskInfos* Infos = new(UserData) FSP_TaskInfos{ FMath::RandRange(MinTime, MaxTime) };
 
-	SP_LOG_AI_TASK_EXECUTE(Planner->GetOwner(), "%f", Infos->WaitTime)
+	SP_LOG_AI_TASK_EXECUTE(Planner, "%f", Infos->WaitTime)
 
 	return true;
 }

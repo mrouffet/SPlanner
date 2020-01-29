@@ -62,7 +62,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 
 #if SP_DEBUG_EDITOR
 
-	SP_IF_AI_TASK_EXECUTE(Planner->GetOwner())
+	SP_IF_AI_TASK_EXECUTE(Planner)
 	{
 		DrawDebugSphere(TargetOwner->GetWorld(),
 			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
@@ -73,7 +73,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), DebugColor, false, DebugDrawTime);
 	}
 
-	SP_LOG_AI_TASK_EXECUTE(Planner->GetOwner(), "%s", *TargetPOI->GetOwner()->GetName())
+	SP_LOG_AI_TASK_EXECUTE(Planner, "%s", *TargetPOI->GetOwner()->GetName())
 
 #endif
 
