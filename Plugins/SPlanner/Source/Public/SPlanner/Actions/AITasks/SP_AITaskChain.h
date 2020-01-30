@@ -21,7 +21,7 @@ class SPLANNER_API USP_AITaskChain : public USP_AITask
 
 protected:
 	/** The handled tasks. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AITask|Chain")
 	TArray<USP_AITask*> Tasks;
 
 public:

@@ -6,7 +6,7 @@
 /**
  *	Target nearest player task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|Target")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|AITask|Target")
 class SPLANNER_API USP_TargetNearestPlayerTask : public USP_AITask
 {
 	GENERATED_BODY()

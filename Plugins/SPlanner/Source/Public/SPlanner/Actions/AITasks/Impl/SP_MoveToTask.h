@@ -8,7 +8,7 @@
 /**
  *	MoveTo implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask|MoveTo")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|AITask|MoveTo")
 class SPLANNER_API USP_MoveToTask : public USP_AITask
 {
 	GENERATED_BODY()
@@ -33,11 +33,11 @@ class SPLANNER_API USP_MoveToTask : public USP_AITask
 
 protected:
 	/** The radius to accept the move to as completed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|MoveTo")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AITask|MoveTo")
 	float AcceptanceRadius = 10.0f;
 
 	/** Check if owner actor has reached its target. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|PlanStep|AITask|MoveTo")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|AITask|MoveTo")
 	bool HasReachedPosition(const USP_AIPlannerComponent* Planner) const;
 
 	/**
@@ -55,7 +55,7 @@ protected:
 	uint32 GetUserDataSize() const override;
 
 	/** Callback when a movement is completed by the AI Controller. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|PlanStep|AITask|MoveTo")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|AITask|MoveTo")
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 public:

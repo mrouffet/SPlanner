@@ -6,7 +6,7 @@
 /**
  *	Idle task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|PlanStep|AITask")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|AITask")
 class SPLANNER_API USP_IdleTask : public USP_AITask
 {
 	GENERATED_BODY()
@@ -19,11 +19,11 @@ class SPLANNER_API USP_IdleTask : public USP_AITask
 
 protected:
 	/** The minimum idle time. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Idle")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AITask|Idle")
 	float MinTime = 0.5f;
 
 	/** The maximum idle time. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Idle")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AITask|Idle")
 	float MaxTime = 3.0f;
 
 public:
