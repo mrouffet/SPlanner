@@ -12,6 +12,14 @@
 #include <SPlanner/Components/SP_TargetComponent.h>
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 
+bool USP_ChooseTargetPOITask::Predicate(USP_AIPlannerComponent* Planner, USP_POIComponent* TargetPOI) const
+{
+	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(TargetPOI, false)
+
+	return true;
+}
+
 uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
@@ -50,14 +58,50 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 	for (int i = 0; i < HitInfos.Num(); ++i)
 	{
 		if (USP_POIComponent* POI = Cast<USP_POIComponent>(HitInfos[i].Component))
-			POIs.Add(POI);
+		{
+			UClass* POIActorClass = POI->GetOwner()->GetClass();
+
+			SP_CCHECK(AllowedPOIActorTypes.Find(POIActorClass) != INDEX_NONE &&
+				IgnoredPOIActorTypes.Find(POIActorClass) != INDEX_NONE,
+				"POI Actor type [%s] is both allowed and ignored!", *POIActorClass->GetName())
+
+			// Allowed or not ignored if no allowed.
+			if (IgnoredPOIActorTypes.Num() && IgnoredPOIActorTypes.Find(POIActorClass) != INDEX_NONE ||
+				AllowedPOIActorTypes.Num() && AllowedPOIActorTypes.Find(POIActorClass) == INDEX_NONE)
+				continue;
+
+			// Match overridden predicate.
+			if(Predicate(Planner, POI))
+				POIs.Add(POI);
+		}
 	}
 
 	// No POI found.
 	if(POIs.Num() == 0)
 		return ESP_PlanExecutionState::PES_Failed;
 
-	USP_POIComponent* TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
+	USP_POIComponent* TargetPOI = nullptr;
+
+
+	if (bTargetNearest)
+	{
+		float ClosestSqrDist = FLT_MAX;
+		FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
+
+		for (int i = 0; i < POIs.Num(); ++i)
+		{
+			float SqrDist = FVector::DistSquared(PlannerLocation, POIs[i]->GetComponentLocation());
+
+			if (SqrDist < ClosestSqrDist)
+			{
+				SqrDist = ClosestSqrDist;
+				TargetPOI = POIs[i];
+			}
+		}
+	}
+	else // Choose random one.
+		TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
+	
 	Planner->Target->SetPOI(TargetPOI);
 
 #if SP_DEBUG_EDITOR
