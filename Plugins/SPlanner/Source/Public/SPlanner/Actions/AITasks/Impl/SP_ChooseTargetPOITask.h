@@ -36,8 +36,8 @@ protected:
 	*	Predicate to validate to choose a POI.
 	*	Can be overridden in children, otherwise return true.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|AITask|Target")
-	virtual bool Predicate(USP_AIPlannerComponent* Planner, USP_POIComponent* TargetPOI) const;
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|AITask|Target")
+	bool Predicate(const USP_AIPlannerComponent* Planner, const USP_POIComponent* TargetPOI) const;
 
 public:
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;

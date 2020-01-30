@@ -12,7 +12,7 @@
 #include <SPlanner/Components/SP_TargetComponent.h>
 #include <SPlanner/Components/Planners/SP_AIPlannerComponent.h>
 
-bool USP_ChooseTargetPOITask::Predicate(USP_AIPlannerComponent* Planner, USP_POIComponent* TargetPOI) const
+bool USP_ChooseTargetPOITask::Predicate_Implementation(const USP_AIPlannerComponent* Planner, const USP_POIComponent* TargetPOI) const
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(TargetPOI, false)
@@ -34,7 +34,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 {
 	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
-	AActor* TargetOwner = Planner->Target->GetOwner();
+	AActor* const TargetOwner = Planner->Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
 
 	FCollisionQueryParams QParams;
@@ -57,7 +57,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 
 	for (int i = 0; i < HitInfos.Num(); ++i)
 	{
-		if (USP_POIComponent* POI = Cast<USP_POIComponent>(HitInfos[i].Component))
+		if (USP_POIComponent* const POI = Cast<USP_POIComponent>(HitInfos[i].Component))
 		{
 			UClass* POIActorClass = POI->GetOwner()->GetClass();
 
@@ -81,7 +81,6 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 		return ESP_PlanExecutionState::PES_Failed;
 
 	USP_POIComponent* TargetPOI = nullptr;
-
 
 	if (bTargetNearest)
 	{
