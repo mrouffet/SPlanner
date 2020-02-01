@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SPlanner/Miscs/SP_Config.h>
+#include <SPlanner/SP_Config.h>
 
 #if SP_DEBUG
 
@@ -16,7 +16,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 /** Log console with object name, file name, line, and function name. */
 #define SP_LOG(Verbosity, Str, ...)\
 	{\
-		if(UFunction* OwnerFunction = this->GetClass()->FindFunctionByName("GetOwner")) /* Is Component. */\
+		if(UFunction* OwnerFunction = this->GetClass()->FindFunctionByName("GetOwner"))\
 		{\
 			AActor* OwnerActor = nullptr;\
 			const_cast<std::remove_cv<std::remove_reference<decltype(*this)>::type>::type&>(*this).ProcessEvent(OwnerFunction, &OwnerActor);\

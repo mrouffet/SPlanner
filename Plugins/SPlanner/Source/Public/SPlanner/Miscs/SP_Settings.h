@@ -4,6 +4,7 @@
 #include "SP_Settings.generated.h"
 
 #if WITH_EDITORONLY_DATA
+
 /**
 *	Debug plan enum flags.
 */
@@ -21,6 +22,7 @@ enum class ESP_DebugFlag : uint8
 };
 
 ENUM_CLASS_FLAGS(ESP_DebugFlag);
+
 #endif
 
 /**

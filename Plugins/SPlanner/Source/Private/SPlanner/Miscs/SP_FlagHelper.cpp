@@ -1,4 +1,4 @@
-#include <SPlanner/Miscs/Flags/SP_FlagHelper.h>
+#include <SPlanner/Miscs/SP_FlagHelper.h>
 
 bool USP_FlagHelper::IsFlagSet(int BitMask, uint8 Flag)
 {

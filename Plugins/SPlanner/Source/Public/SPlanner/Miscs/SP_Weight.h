@@ -2,7 +2,7 @@
 
 #include <Animation/AnimCurveTypes.h>
 
-#include <SPlanner/Assets/SP_FloatAsset.h>
+#include <SPlanner/Miscs/Assets/SP_FloatAsset.h>
 
 #include "SP_Weight.generated.h"
 
@@ -11,7 +11,7 @@
 *	Increase Weight to increase chances of adding the action to the plan.
 */
 USTRUCT(BlueprintType, Category = "SPlanner|Misc")
-struct FSP_Weight
+struct SPLANNER_API FSP_Weight
 {
 	GENERATED_BODY()
 
