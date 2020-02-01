@@ -19,6 +19,31 @@ bool USP_ChooseTargetPOITask::Predicate_Implementation(const USP_AIPlannerCompon
 
 	return true;
 }
+USP_POIComponent* USP_ChooseTargetPOITask::ChoosePOI_Implementation(const USP_AIPlannerComponent* Planner, const TArray<USP_POIComponent*>& POIs)
+{
+	SP_RCHECK_NULLPTR(Planner, nullptr)
+
+	// Choose random one.
+	if(!bTargetNearest)
+		return POIs[FMath::RandRange(0, POIs.Num() - 1)];
+
+	float ClosestSqrDist = FLT_MAX;
+	USP_POIComponent* TargetPOI = nullptr;
+	FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
+
+	for (int i = 0; i < POIs.Num(); ++i)
+	{
+		float SqrDist = FVector::DistSquared(PlannerLocation, POIs[i]->GetComponentLocation());
+
+		if (SqrDist < ClosestSqrDist)
+		{
+			SqrDist = ClosestSqrDist;
+			TargetPOI = POIs[i];
+		}
+	}
+
+	return TargetPOI;
+}
 
 uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
@@ -80,26 +105,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 	if(POIs.Num() == 0)
 		return ESP_PlanExecutionState::PES_Failed;
 
-	USP_POIComponent* TargetPOI = nullptr;
-
-	if (bTargetNearest)
-	{
-		float ClosestSqrDist = FLT_MAX;
-		FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
-
-		for (int i = 0; i < POIs.Num(); ++i)
-		{
-			float SqrDist = FVector::DistSquared(PlannerLocation, POIs[i]->GetComponentLocation());
-
-			if (SqrDist < ClosestSqrDist)
-			{
-				SqrDist = ClosestSqrDist;
-				TargetPOI = POIs[i];
-			}
-		}
-	}
-	else // Choose random one.
-		TargetPOI = POIs[FMath::RandRange(0, POIs.Num() - 1)];
+	USP_POIComponent* TargetPOI = ChoosePOI(Planner, POIs);
 	
 	Planner->Target->SetPOI(TargetPOI);
 

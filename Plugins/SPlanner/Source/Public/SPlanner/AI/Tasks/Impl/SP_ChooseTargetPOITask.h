@@ -39,6 +39,13 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
 	bool Predicate(const USP_AIPlannerComponent* Planner, const USP_POIComponent* TargetPOI) const;
 
+	/**
+	*	Choose POI from list.
+	*	Can be overridden in children.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
+	USP_POIComponent* ChoosePOI(const USP_AIPlannerComponent* Planner, const TArray<USP_POIComponent*>& POIs);
+
 public:
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
 
