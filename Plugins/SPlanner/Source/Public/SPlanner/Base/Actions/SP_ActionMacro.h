@@ -4,8 +4,8 @@
 *	Helper macro to call parent pre-condition implementation.
 *	Should always be called in children PreCondition_Implementation override.
 */
-#define SP_ACTION_STEP_SUPER_PRECONDITION(Planner, PlannerFlags, ...)\
-	if (!Super::PreCondition(Planner, PlannerFlags, ##__VA_ARGS__))\
+#define SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags, ...)\
+	if (!Super::PreCondition(Planner, GeneratedPlan, PlannerFlags, ##__VA_ARGS__))\
 		return false;
 
 

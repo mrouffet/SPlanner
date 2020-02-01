@@ -9,7 +9,7 @@ uint32 USP_IdleTask::GetUserDataSize() const
 
 bool USP_IdleTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_BEGIN_SUPER(Planner, UserData)
+	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = new(UserData) FSP_TaskInfos{ FMath::RandRange(MinTime, MaxTime) };
 
@@ -19,7 +19,7 @@ bool USP_IdleTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 }
 ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
@@ -32,7 +32,7 @@ ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_AIPlannerCompo
 }
 bool USP_IdleTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_END_SUPER(Planner, UserData)
+	SP_TASK_END_SUPER(Planner, UserData)
 
 	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
 

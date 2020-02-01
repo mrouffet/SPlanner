@@ -103,7 +103,7 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, uint64
 
 bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_BEGIN_SUPER(Planner, UserData)
+	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
 
@@ -168,7 +168,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 }
 ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
@@ -198,7 +198,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 }
 bool USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_END_SUPER(Planner, UserData)
+	SP_TASK_END_SUPER(Planner, UserData)
 
 	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
 
@@ -207,7 +207,7 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 bool USP_MoveToTask::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_CANCEL_SUPER(Planner, UserData)
+	SP_TASK_CANCEL_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 

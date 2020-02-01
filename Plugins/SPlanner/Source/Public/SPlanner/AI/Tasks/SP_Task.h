@@ -28,28 +28,28 @@ protected:
 
 	/**
 	*	Blueprint event called by Begin().
-	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskBegin", Category = "SPlanner|Action|Task")
 	bool K2_OnTaskBegin(USP_AIPlannerComponent* Planner);
 
 	/**
 	*	Blueprint event called by Tick().
-	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskTick", Category = "SPlanner|Action|Task")
 	ESP_PlanExecutionState K2_OnTaskTick(float DeltaSeconds, USP_AIPlannerComponent* Planner);
 
 	/**
 	*	Blueprint event called by End().
-	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskEnd", Category = "SPlanner|Action|Task")
 	bool K2_OnTaskEnd(USP_AIPlannerComponent* Planner);
 
 	/**
 	*	Blueprint event called by End().
-	*	Require SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskCancel", Category = "SPlanner|Action|Task")
 	bool K2_OnTaskCancel(USP_AIPlannerComponent* Planner);

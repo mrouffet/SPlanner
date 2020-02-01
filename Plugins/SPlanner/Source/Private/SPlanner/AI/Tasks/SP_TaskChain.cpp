@@ -42,7 +42,7 @@ uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent* Planner, uint64 
 
 bool USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_BEGIN_SUPER(Planner, UserData)
+	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = new (UserData) FSP_TaskInfos();
 
@@ -56,7 +56,7 @@ bool USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 }
 ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
@@ -94,7 +94,7 @@ ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComp
 }
 bool USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_END_SUPER(Planner, UserData)
+	SP_TASK_END_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
@@ -114,7 +114,7 @@ bool USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 bool USP_TaskChain::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_AI_TASK_CANCEL_SUPER(Planner, UserData)
+	SP_TASK_CANCEL_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 

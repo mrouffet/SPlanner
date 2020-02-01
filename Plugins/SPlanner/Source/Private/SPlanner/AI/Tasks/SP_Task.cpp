@@ -29,7 +29,7 @@ bool USP_Task::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-#if SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE
+#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskBegin(Planner);
 #endif
 
@@ -39,7 +39,7 @@ ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent
 {
 	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
 
-#if SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE
+#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskTick(DeltaSeconds, Planner);
 #endif
 
@@ -49,7 +49,7 @@ bool USP_Task::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-#if SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE
+#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskEnd(Planner);
 #endif
 
@@ -60,7 +60,7 @@ bool USP_Task::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-#if SP_AI_TASK_BLUEPRINT_IMPLEMENTABLE
+#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskCancel(Planner);
 #endif
 
