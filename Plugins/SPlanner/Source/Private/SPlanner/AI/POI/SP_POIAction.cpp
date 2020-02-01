@@ -2,6 +2,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/AI/Tasks/SP_Task.h>
+
 USP_Task* FSP_POIAction::GetTask() const
 {
 	SP_SRCHECK_NULLPTR(Cast<USP_Task>(Step), nullptr)
