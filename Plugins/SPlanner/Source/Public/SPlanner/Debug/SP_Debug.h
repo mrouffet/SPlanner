@@ -1,7 +1,8 @@
 #pragma once
 
-#include <SPlanner/Debug/SP_DebugVerbosity.h>
 #include <SPlanner/Debug/SP_DebugMaco.h>
+#include <SPlanner/Debug/SP_DebugVerbosity.h>
+#include <SPlanner/Debug/SP_DebugBenchmark.h>
 
 #include <UObject/Object.h>
 #include "SP_Debug.generated.h"

@@ -152,6 +152,8 @@ void USP_AIPlannerComponent::CheckCooldowns()
 
 bool USP_AIPlannerComponent::BeginNextTask()
 {
+	SP_BENCHMARK_SCOPE(AIPC_BeginNextTask)
+
 	// index == Plan.Num() will be checked to ask new plan.
 	SP_RCHECK(CurrentPlanIndex + 1 >= 0 && CurrentPlanIndex + 1 <= Plan.Num(), false, "Index [%d] out of range [0, %d]!", (CurrentPlanIndex + 1), Plan.Num())
 
@@ -196,6 +198,8 @@ bool USP_AIPlannerComponent::BeginNextTask()
 }
 void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 {
+	SP_BENCHMARK_SCOPE(AIPC_ExecuteTask)
+
 	// Execute first task begin on main thread.
 	if (CurrentPlanIndex == -1)
 	{
@@ -214,7 +218,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 		return;
 
 	// Always end task (Tick succeed or failed).
-	if (!CurrentTask->End(this, TaskUserData.GetData()) || TickResult == ESP_PlanExecutionState::PES_Failed)
+	if (!EndTask(CurrentTask) || TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
 		if (CurrentTask->GetUseCooldownOnFailed())
 			SetCooldown(CurrentTask);
@@ -232,9 +236,19 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 		BeginNextTask();
 	}
 }
+bool USP_AIPlannerComponent::EndTask(USP_Task* Task)
+{
+	SP_BENCHMARK_SCOPE(AIPC_EndTask)
+
+	SP_RCHECK_NULLPTR(Task, false)
+
+	return Task->End(this, TaskUserData.GetData());
+}
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel) const
 {
+	SP_BENCHMARK_SCOPE(AIPC_CreatePlannerActionSet)
+
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
 	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
 

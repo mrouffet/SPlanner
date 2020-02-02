@@ -52,6 +52,12 @@ protected:
 	*/
 	void ExecuteTask(float DeltaTime);
 
+	/**
+	*	End the task of the Plan.
+	*	return Task.End().
+	*/
+	bool EndTask(USP_Task* Task);
+
 	FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel) const override;
 
 	void AskNewPlan(bool bInstantRequest = false) override;

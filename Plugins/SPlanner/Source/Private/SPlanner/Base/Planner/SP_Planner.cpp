@@ -1,9 +1,13 @@
 #include <SPlanner/Base/Planner/SP_Planner.h>
 
+#include <SPlanner/Debug/SP_Debug.h>
+
 #include <SPlanner/Base/Actions/SP_ActionStep.h>
 
 bool SP_Planner::LinearConstruct(FSP_LinearConstructInfos Infos)
 {
+	SP_BENCHMARK_SCOPE(SP_LinearConstruct)
+
 	return LinearConstruct_Internal(Infos, 0u, 0u);
 }
 
@@ -53,6 +57,8 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 
 uint64 SP_Planner::UpdateSet(FSP_LinearConstructInfos& Infos, const FSP_PlannerAction& Action)
 {
+	SP_BENCHMARK_SCOPE(SP_UpdateSet)
+	
 	uint64 ActionKey = 0u;
 
 	// Update Action list from generation type.
@@ -83,6 +89,8 @@ uint64 SP_Planner::UpdateSet(FSP_LinearConstructInfos& Infos, const FSP_PlannerA
 }
 void SP_Planner::RollbackSet(FSP_LinearConstructInfos& Infos, const FSP_PlannerAction& Action, uint64 ActionKey)
 {
+	SP_BENCHMARK_SCOPE(SP_RollbackSet)
+
 	// Update Action list from generation type.
 	// Always push in PlannerActions.Actions (this.Actions can be BeginActions).
 	switch (Action.Handle->GenerationType)

@@ -164,6 +164,8 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 
 FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel) const
 {
+	SP_BENCHMARK_SCOPE(PC_CreatePlannerActionSet)
+
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
 	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
 
@@ -175,6 +177,8 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel
 
 void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 {
+	SP_BENCHMARK_SCOPE(PC_AskNewPlan)
+
 	SP_CHECK(PlanState != ESP_PlanState::PS_Valid, "Plan still valid!")
 	SP_CHECK(PlanState != ESP_PlanState::PS_WaitForCompute, "Plan already waiting for being computed!")
 	SP_CHECK(PlanState != ESP_PlanState::PS_Inactive, "Plan LOD is inactive!")
@@ -220,6 +224,8 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 }
 void USP_PlannerComponent::ConstructPlan()
 {
+	SP_BENCHMARK_SCOPE(PC_ConstructPlan)
+
 	// LOD became out of range during TimeBeforeConstructPlan.
 	if (PlanState == ESP_PlanState::PS_Inactive)
 		return;
