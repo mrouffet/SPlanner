@@ -45,6 +45,24 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(USP_AIPlannerComponent* Planner)
+{
+	FAIMoveRequest MoveRequest;
+
+	SP_RCHECK_NULLPTR(Planner, MoveRequest)
+
+	if (Planner->Target->GetState() == ESP_TargetState::TS_Position)
+		MoveRequest.SetGoalLocation(Planner->Target->GetPosition());
+	else if (AActor* GoalActor = Planner->Target->GetAnyActor())
+		MoveRequest.SetGoalActor(GoalActor);
+	else
+		SP_LOG(Error, "Bad Target!")
+
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
+
+	return MoveRequest;
+}
+
 uint32 USP_MoveToTask::GetUserDataSize() const
 {
 	return sizeof(FSP_TaskInfos);
@@ -120,20 +138,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 
 	// Create MoveRequest.
-	FAIMoveRequest MoveRequest;
-
-	if(Planner->Target->GetState() == ESP_TargetState::TS_Position)
-		MoveRequest.SetGoalLocation(Planner->Target->GetPosition());
-	else if(AActor* GoalActor = Planner->Target->GetAnyActor())
-		MoveRequest.SetGoalActor(GoalActor);
-	else
-	{
-		SP_LOG(Error, "Bad Target!")
-		return false;
-	}
-
-	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
-
+	FAIMoveRequest MoveRequest = CreateMoveRequest(Planner);
 
 	// Request movement.
 #if SP_DEBUG
@@ -141,7 +146,6 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 #else
 	FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest);
 #endif
-
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
 	{

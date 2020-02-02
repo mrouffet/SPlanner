@@ -58,6 +58,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
+	/** Implementation of move request creation. */
+	virtual FAIMoveRequest CreateMoveRequest(USP_AIPlannerComponent* Planner);
+
 public:
 	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
