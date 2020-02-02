@@ -24,7 +24,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 	Planner->Target->SetPosition(TargetPosition);
 
 #if SP_DEBUG_EDITOR
-	SP_IF_AI_TASK_EXECUTE(Planner)
+	SP_IF_TASK_EXECUTE(Planner)
 	{
 		DrawDebugSphere(TargetOwner->GetWorld(),
 			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
@@ -35,7 +35,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPosition, DebugColor, false, DebugDrawTime);
 	}
 
-	SP_LOG_AI_TASK_EXECUTE(Planner, "%s", *TargetPosition.ToString())
+	SP_LOG_TASK_EXECUTE(Planner, "%s", *TargetPosition.ToString())
 #endif
 
 	if (bAutoLookAt)
