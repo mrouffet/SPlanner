@@ -91,8 +91,8 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 				"POI Actor type [%s] is both allowed and ignored!", *POIActorClass->GetName())
 
 			// Allowed or not ignored if no allowed.
-			if (IgnoredPOIActorTypes.Num() && IgnoredPOIActorTypes.Find(POIActorClass) != INDEX_NONE ||
-				AllowedPOIActorTypes.Num() && AllowedPOIActorTypes.Find(POIActorClass) == INDEX_NONE)
+			if ((IgnoredPOIActorTypes.Num() && IgnoredPOIActorTypes.Find(POIActorClass) != INDEX_NONE) ||
+				(AllowedPOIActorTypes.Num() && AllowedPOIActorTypes.Find(POIActorClass) == INDEX_NONE))
 				continue;
 
 			// Match overridden predicate.

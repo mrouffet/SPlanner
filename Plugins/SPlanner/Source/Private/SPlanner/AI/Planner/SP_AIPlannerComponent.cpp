@@ -267,7 +267,11 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 		}
 	};
 
+#if PLATFORM_WINDOWS
 	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate{ this });
+#else
+	FSP_PlannerActionSet PlannerActions = FSP_PlannerActionSet::Make(CurrActionSet, LODLevel, CooldownPredicate{ this });
+#endif
 
 	// Add all available actions from POI.
 	if (POIZone)

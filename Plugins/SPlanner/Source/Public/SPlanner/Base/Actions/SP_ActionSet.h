@@ -58,6 +58,9 @@ public:
 
 	FSP_PlannerActionSet Shuffle(float LODLevel = -1.0f) const;
 
+#if PLATFORM_WINDOWS
+	// Helper function: template forward declaration only works on windows.
+
 	template <typename PredicateClass>
 	FSP_PlannerActionSet Shuffle(float LODLevel, const PredicateClass& Predicate) const
 	{
@@ -65,4 +68,5 @@ public:
 
 		return FSP_PlannerActionSet::Make(this, LODLevel, Predicate);
 	}
+#endif
 };
