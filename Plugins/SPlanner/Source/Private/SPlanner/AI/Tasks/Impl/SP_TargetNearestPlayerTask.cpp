@@ -8,6 +8,13 @@
 
 #include <SPlanner/AI/Target/SP_TargetComponent.h>
 
+bool USP_TargetNearestPlayerTask::Predicate_Implementation(USP_AIPlannerComponent* Planner, APawn* Player) const
+{
+	SP_RCHECK_NULLPTR(Player, false)
+
+	return true;
+}
+
 bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
@@ -50,15 +57,21 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 
 	for(int i = 0; i < GameState->PlayerArray.Num(); ++i)
 	{
-		SP_RCHECK_NULLPTR(GameState->PlayerArray[i], ESP_PlanExecutionState::PES_Failed)
-		SP_RCHECK_NULLPTR(GameState->PlayerArray[i]->GetPawn(), ESP_PlanExecutionState::PES_Failed)
+		SP_CCHECK_NULLPTR(GameState->PlayerArray[i])
+		SP_CCHECK_NULLPTR(GameState->PlayerArray[i]->GetPawn())
 
-		float SqrDist = FVector::DistSquared(PlannerLocation, GameState->PlayerArray[i]->GetPawn()->GetActorLocation());
+		APawn* const Player = GameState->PlayerArray[i]->GetPawn();
+
+		// must validate predicate.
+		if (!Predicate(Planner, Player))
+			continue;
+
+		float SqrDist = FVector::DistSquared(PlannerLocation, Player->GetActorLocation());
 
 		if (SqrDist < CurrSqrDist)
 		{
 			CurrSqrDist = SqrDist;
-			NearestPlayer = GameState->PlayerArray[i]->GetPawn();
+			NearestPlayer = Player;
 		}
 	}
 

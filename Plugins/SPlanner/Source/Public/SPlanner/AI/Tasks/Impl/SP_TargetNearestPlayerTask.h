@@ -11,6 +11,14 @@ class SPLANNER_API USP_TargetNearestPlayerTask : public USP_Task
 {
 	GENERATED_BODY()
 
+protected:
+	/**
+	*	Predicate to validate to choose a player.
+	*	Can be overridden in children, otherwise return true.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
+	bool Predicate(USP_AIPlannerComponent* Planner, APawn* Player) const;
+
 public:
 	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
