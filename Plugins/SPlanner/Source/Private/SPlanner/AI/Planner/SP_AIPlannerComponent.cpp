@@ -245,7 +245,7 @@ bool USP_AIPlannerComponent::EndTask(USP_Task* Task)
 	return Task->End(this, TaskUserData.GetData());
 }
 
-FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel) const
+FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr) const
 {
 	SP_BENCHMARK_SCOPE(AIPC_CreatePlannerActionSet)
 
@@ -268,9 +268,9 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 	};
 
 #if PLATFORM_WINDOWS
-	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate{ this });
+	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate{ this }, bCanBeAchievedPtr);
 #else
-	FSP_PlannerActionSet PlannerActions = FSP_PlannerActionSet::Make(CurrActionSet, LODLevel, CooldownPredicate{ this });
+	FSP_PlannerActionSet PlannerActions = FSP_PlannerActionSet::Make(CurrActionSet, LODLevel, CooldownPredicate{ this }, bCanBeAchievedPtr);
 #endif
 
 	// Add all available actions from POI.
@@ -290,30 +290,25 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 				// Use INDEX_NONE to convert int32 to bool.
 				bool bAchieveGoal = POIActions[i].GetAchievedGoals().Find(Goal) != INDEX_NONE;
 
+				// Add to actions.
 				if (!IsInCooldown(POIActions[i].GetTask()) && (bAchieveGoal || POIActions[i].GetServedGoals().Find(Goal) != INDEX_NONE))
+				{
 					PlannerActions.Actions.Add(FSP_PlannerAction::Make(&POIActions[i], LODLevel, bAchieveGoal));
+
+					// Update goal achieve.
+					if (bCanBeAchievedPtr && !*bCanBeAchievedPtr)
+						*bCanBeAchievedPtr = bAchieveGoal;
+				}
 			}
 		}
 	}
 
+	// Plan can't be achieve: save performance.
+	if(bCanBeAchievedPtr && !*bCanBeAchievedPtr)
+		return PlannerActions;
+
 	// Sort newly added actions.
 	PlannerActions.Actions.Sort(FSP_PlannerActionSortFunctor());
-
-#if SP_DEBUG
-	// Check plan can be achieved.
-	bool bCanAchievePlan = false;
-	for (int i = 0; i < PlannerActions.Actions.Num(); i++)
-	{
-		if (PlannerActions.Actions[i].bAchievePlan)
-		{
-			bCanAchievePlan = true;
-			break;
-		}
-	}
-
-	if (!bCanAchievePlan)
-		SP_LOG_SCREEN(Error, FColor::Red, "%s can't achieve goal %s", *CurrActionSet->GetName(), *Goal->GetName())
-#endif
 
 	return PlannerActions;
 }
@@ -330,7 +325,7 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 	Super::OnPlanConstructionFailed_Implementation(PlanError);
 
 	// Catch construction failed because of cooldowns.
-	if (PlanError != ESP_PlanError::PE_ConstructionFailed)
+	if (PlanError != ESP_PlanError::PE_CantBeAchieved)
 		return;
 
 	float MinCooldown = FLT_MAX;

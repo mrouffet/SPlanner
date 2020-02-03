@@ -75,7 +75,7 @@ protected:
 	void SetNewPlan(TArray<USP_ActionStep*>&& Plan);
 
 	/** Create the planner action set to generate the plan with. */
-	virtual FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel) const;
+	virtual FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr = nullptr) const;
 
 	/**
 	*	Ask a new plan generation on external thread.

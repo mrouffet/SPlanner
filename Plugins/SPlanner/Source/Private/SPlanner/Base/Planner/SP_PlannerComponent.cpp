@@ -162,7 +162,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 		PlanState = ESP_PlanState::PS_Invalid;
 }
 
-FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel) const
+FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr) const
 {
 	SP_BENCHMARK_SCOPE(PC_CreatePlannerActionSet)
 
@@ -172,7 +172,7 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel
 	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(Goal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
-	return CurrActionSet->Shuffle(LODLevel);
+	return CurrActionSet->Shuffle(LODLevel, bCanBeAchievedPtr);
 }
 
 void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
@@ -250,7 +250,15 @@ void USP_PlannerComponent::ConstructPlan()
 		LODLevel = LOD->GetLevel();
 	}
 
-	FSP_PlannerActionSet PlannerActions = CreatePlannerActionSet(LODLevel);
+	bool bCanBeAchieved = false;
+	FSP_PlannerActionSet PlannerActions = CreatePlannerActionSet(LODLevel, &bCanBeAchieved);
+
+	// Check plan valid for constrution.
+	if (!bCanBeAchieved)
+	{
+		OnPlanConstructionFailed(ESP_PlanError::PE_CantBeAchieved);
+		return;
+	}
 
 #if SP_DEBUG_EDITOR
 	// Log available planner actions.

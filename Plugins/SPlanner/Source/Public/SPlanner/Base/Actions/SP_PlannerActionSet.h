@@ -56,7 +56,7 @@ struct SPLANNER_API FSP_PlannerActionSet
 	*	Shuffle every actions using random and weights.
 	*/
 	template <typename PredicateClass>
-	static FSP_PlannerActionSet Make(const USP_ActionSet* ActionSet, float LODLevel, const PredicateClass& IsAvailablePredicate)
+	static FSP_PlannerActionSet Make(const USP_ActionSet* ActionSet, float LODLevel, const PredicateClass& IsAvailablePredicate, bool* bCanBeAchievedPtr = nullptr)
 	{
 		SP_SRCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
 
@@ -110,6 +110,8 @@ struct SPLANNER_API FSP_PlannerActionSet
 			}
 
 			{
+				bool bCanBeAchieved = false;
+
 				const TArray<FSP_Action>& EndActions = ActionSet->GetEndActions();
 
 				for (int i = 0; i < EndActions.Num(); ++i)
@@ -117,12 +119,27 @@ struct SPLANNER_API FSP_PlannerActionSet
 					SP_SCCHECK(EndActions[i].Step, "%s.EndActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
 
 					if (IsAvailablePredicate(EndActions[i]))
+					{
 						Result.Actions.Add(FSP_PlannerAction::Make(&EndActions[i], LODLevel, true));
+						bCanBeAchieved = true;
+					}
+				}
+
+				// Action set can't achieve goal (due to IsAvailablePredicate).
+				if (!bCanBeAchieved)
+				{
+					if (bCanBeAchievedPtr)
+						*bCanBeAchievedPtr = false;
+
+					return Result;
 				}
 			}
 
 			Result.Actions.Sort(SortFunctor);
 		}
+
+		if (bCanBeAchievedPtr)
+			*bCanBeAchievedPtr = true;
 
 		return Result;
 	}
@@ -132,5 +149,5 @@ struct SPLANNER_API FSP_PlannerActionSet
 	*	Shuffle every actions using random and weights.
 	*	Use default predicate (always true).
 	*/
-	static FSP_PlannerActionSet Make(const USP_ActionSet* ActionSet, float LODLevel);
+	static FSP_PlannerActionSet Make(const USP_ActionSet* ActionSet, float LODLevel, bool* bCanBeAchievedPtr = nullptr);
 };

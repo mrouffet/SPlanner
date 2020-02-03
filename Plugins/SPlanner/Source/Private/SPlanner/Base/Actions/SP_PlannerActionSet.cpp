@@ -23,7 +23,7 @@ const TArray<FSP_PlannerAction>& FSP_PlannerActionSet::GetActionsFromDepth(uint8
 	return Actions;
 }
 
-FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_ActionSet* ActionSet, float LODLevel)
+FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_ActionSet* ActionSet, float LODLevel, bool* bCanBeAchievedPtr)
 {
-	return Make(ActionSet, LODLevel, DefaultPredicate());
+	return Make(ActionSet, LODLevel, DefaultPredicate(), bCanBeAchievedPtr);
 }

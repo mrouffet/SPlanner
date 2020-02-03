@@ -58,7 +58,7 @@ protected:
 	*/
 	bool EndTask(USP_Task* Task);
 
-	FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel) const override;
+	FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr = nullptr) const override;
 
 	void AskNewPlan(bool bInstantRequest = false) override;
 

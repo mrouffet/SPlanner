@@ -9,11 +9,14 @@ enum class ESP_PlanError : uint8
 	/** Unknown error. */
 	PE_Unknown								UMETA(DisplayName = "Unknown"),
 
-	/** ConstructPlan() failed. */
+	/** ConstructPlan() failed (no more details). */
+	PE_ConstructionFailed					UMETA(DisplayName = "ConstructionFailed"),
+
+	/** Bad argument provided for plan generation. */
 	PE_BadArgument							UMETA(DisplayName = "BadArgument"),
 
-	/** ConstructPlan() failed. */
-	PE_ConstructionFailed					UMETA(DisplayName = "ConstructionFailed"),
+	/** Goal can't be achieved during generation. */
+	PE_CantBeAchieved						UMETA(DisplayName = "CanBeAchieved"),
 
 	/** LOD get out of range. */
 	PE_LODOutOfRange						UMETA(DisplayName = "LODOutOfRange"),

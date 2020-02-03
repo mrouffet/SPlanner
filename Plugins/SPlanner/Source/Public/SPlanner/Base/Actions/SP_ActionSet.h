@@ -56,17 +56,17 @@ public:
 	/** Getter of EndActions. */
 	const TArray<FSP_Action>& GetEndActions() const;
 
-	FSP_PlannerActionSet Shuffle(float LODLevel = -1.0f) const;
+	FSP_PlannerActionSet Shuffle(float LODLevel = -1.0f, bool* bCanBeAchievedPtr = nullptr) const;
 
 #if PLATFORM_WINDOWS
 	// Helper function: template forward declaration only works on windows.
 
 	template <typename PredicateClass>
-	FSP_PlannerActionSet Shuffle(float LODLevel, const PredicateClass& Predicate) const
+	FSP_PlannerActionSet Shuffle(float LODLevel, const PredicateClass& Predicate, bool* bCanBeAchievedPtr = nullptr) const
 	{
 		SP_RCHECK(EndActions.Num(), FSP_PlannerActionSet(), "No EndActions: Can't generate a valid plan!")
 
-		return FSP_PlannerActionSet::Make(this, LODLevel, Predicate);
+		return FSP_PlannerActionSet::Make(this, LODLevel, Predicate, bCanBeAchievedPtr);
 	}
 #endif
 };
