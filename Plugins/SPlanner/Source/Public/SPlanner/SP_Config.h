@@ -12,7 +12,7 @@
 	// No Multithread in debug: easy breakpoint debug.
 	#define SP_MULTITHREAD 0
 
-	#define SP_WARNING_PLAN_GEN_FAILED 1
+	#define SP_WARNING_PLAN_GEN_FAILED 0
 
 	#define SP_TASK_BLUEPRINT_IMPLEMENTABLE 1
 
@@ -29,7 +29,7 @@
 	#define SP_MULTITHREAD 0
 
 	// Require SP_DEBUG for Log macros.
-	#define SP_WARNING_PLAN_GEN_FAILED SP_DEBUG
+	#define SP_WARNING_PLAN_GEN_FAILED SP_DEBUG && 0
 
 	#define SP_TASK_BLUEPRINT_IMPLEMENTABLE 1
 

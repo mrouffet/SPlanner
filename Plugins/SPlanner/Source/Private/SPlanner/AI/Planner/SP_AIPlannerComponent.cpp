@@ -96,7 +96,7 @@ float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
 
 	const float* const CooldownPtr = Cooldowns.Find(Task);
 
-	return CooldownPtr ? GetWorld()->GetTimeSeconds() - *CooldownPtr : FLT_MAX;
+	return CooldownPtr ? *CooldownPtr - GetWorld()->GetTimeSeconds() : -1.0f;
 }
 void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 {
@@ -108,10 +108,12 @@ void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 
 	float* const CooldownPtr = Cooldowns.Find(Task);
 
+	// Add 0.001f to ensure float precision.
+
 	if (CooldownPtr)
-		*CooldownPtr = GetWorld()->GetTimeSeconds() + Task->GetCooldown();
+		*CooldownPtr = GetWorld()->GetTimeSeconds() + Task->GetCooldown() + 0.001f;
 	else
-		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Task->GetCooldown());
+		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Task->GetCooldown() + 0.001f);
 }
 bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 {
@@ -121,33 +123,15 @@ bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 	if(Task->GetCooldown() <= 0.0f)
 		return false;
 
-	return GetCooldown(Task) < Task->GetCooldown();
+	float Cooldown = GetCooldown(Task);
+
+	return Cooldown > 0.0f && Cooldown >= Task->GetCooldown();
 }
 
 void USP_AIPlannerComponent::OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal)
 {
 	if (bResetTargetOnGoalChange && Target)
 		Target->Clear();
-}
-
-void USP_AIPlannerComponent::CheckCooldowns()
-{
-	// Called on planState == EPlanState::PS_WaitForCooldowns.
-
-	for (auto it = Cooldowns.begin(); it != Cooldowns.end(); ++it)
-	{
-		//Check newly available task (0.5 sec).
-		if (FMath::Abs(GetWorld()->GetTimeSeconds() - it->Value - it->Key->GetCooldown()) <= 0.5f)
-		{
-			AskNewPlan();
-			return;
-		}
-	}
-
-	/*
-	*	No newly available task which serves the goal.
-	*	Plan still get invalid.
-	*/
 }
 
 bool USP_AIPlannerComponent::BeginNextTask()
@@ -332,7 +316,7 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 
 	for (auto it = Cooldowns.begin(); it != Cooldowns.end(); ++it)
 	{
-		float Cooldown = it->Value - GetWorld()->GetTimeSeconds() - it->Key->GetCooldown();
+		float Cooldown = it->Value - GetWorld()->GetTimeSeconds();
 
 		// Still in cooldown.
 		if (Cooldown > 0.0f && Cooldown < MinCooldown)

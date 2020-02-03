@@ -35,9 +35,6 @@ protected:
 	UFUNCTION(Category = "SPlanner|Planner")
 	void OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal);
 
-	/** Check new task availability to request new plan generation. */
-	void CheckCooldowns();
-
 	/**
 	*	Begin the next task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
