@@ -46,8 +46,8 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
 	USP_POIComponent* ChoosePOI(const USP_AIPlannerComponent* Planner, const TArray<USP_POIComponent*>& POIs);
 
+	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
+
 public:
 	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
-
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
 };

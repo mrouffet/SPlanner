@@ -9,9 +9,12 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Target/SP_TargetComponent.h>
 
-ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
-	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	// Do not use SP_TASK_TICK_SUPER macro (require Super::Tick_Internal and not Super::Tick call).
+	ESP_PlanExecutionState SuperInternalResult = Super::Tick_Internal(DeltaSeconds, Planner, UserData);
+	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
+		return SuperInternalResult;
 
 	AActor* TargetOwner = Planner->Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
@@ -37,9 +40,6 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, US
 
 	SP_LOG_TASK_EXECUTE(Planner, "%s", *TargetPosition.ToString())
 #endif
-
-	if (bAutoLookAt)
-		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), TargetPosition));
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
