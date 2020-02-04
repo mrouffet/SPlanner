@@ -21,12 +21,26 @@ class SPLANNER_API USP_LookAtTask : public USP_Task
 
 protected:
 	/** Whether the rotation should be in one frame.*/
-	UPROPERTY(EditAnywhere, BLueprintReadOnly, Category = "SPlanner|Task|Target")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bInstant = false;
 
 	/** Rotation speed.*/
-	UPROPERTY(EditAnywhere, BLueprintReadOnly, Category = "SPlanner|Task|Target", meta=(EditCondition="!bInstant"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target", meta=(EditCondition="!bInstant"))
 	float Speed = 4.0f;
+
+	/** Whether pitch is freeze.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	bool bFreezePitch = true;
+
+	/** Whether yaw is freeze.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	bool bFreezeYaw = false;
+
+	/** Whether roll is freeze.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	bool bFreezeRoll = true;
+
+	FRotator ComputeTargetRotation(USP_AIPlannerComponent* Planner) const;
 
 public:
 	uint32 GetUserDataSize() const override;

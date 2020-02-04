@@ -6,6 +6,27 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Target/SP_TargetComponent.h>
 
+FRotator USP_LookAtTask::ComputeTargetRotation(USP_AIPlannerComponent* Planner) const
+{
+	SP_SRCHECK_NULLPTR(Planner, FRotator())
+	SP_SRCHECK_NULLPTR(Planner->Target, FRotator())
+	SP_SRCHECK_NULLPTR(Planner->Target->GetOwner(), FRotator())
+
+	FVector TargetPosition = Planner->Target->GetAnyPosition();
+	FVector TargetOwnerLocation = Planner->Target->GetOwner()->GetActorLocation();
+
+	if(bFreezePitch)
+		TargetPosition.X = TargetOwnerLocation.X;
+
+	if (bFreezeYaw)
+		TargetPosition.Y = TargetOwnerLocation.Y;
+
+	if (bFreezeRoll)
+		TargetPosition.Z = TargetOwnerLocation.Z;
+
+	return UKismetMathLibrary::FindLookAtRotation(TargetOwnerLocation, TargetPosition);
+}
+
 uint32 USP_LookAtTask::GetUserDataSize() const
 {
 	return sizeof(FSP_TaskInfos);
@@ -51,9 +72,9 @@ bool USP_LookAtTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 	if (!Planner->Target || !Planner->Target->IsValid())
 		return false;
 
-	// Precompute for static position.
-	if (Planner->Target->IsPosition())
-		Infos->End = UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), Planner->Target->GetPosition());
+	// Precompute for static position or instant rotation.
+	if (Planner->Target->IsPosition() || bInstant)
+		Infos->End = ComputeTargetRotation(Planner);
 
 	return true;
 }
@@ -64,17 +85,21 @@ ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 	AActor* TargetOwner = Planner->Target->GetOwner();
 	SP_SRCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
 
+	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
+
 	if(bInstant)
 	{
-		TargetOwner->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), Planner->Target->GetPosition()));
+		TargetOwner->SetActorRotation(Infos->End);
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
-	
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
 	// Re-compute for moving objects.
 	if (!Planner->Target->IsPosition())
-		Infos->End = UKismetMathLibrary::FindLookAtRotation(TargetOwner->GetActorLocation(), Planner->Target->GetAnyPosition());
+	{
+		FVector TargetPosition = Planner->Target->GetAnyPosition();
+
+		Infos->End = ComputeTargetRotation(Planner);
+	}
 
 	Infos->Alpha += DeltaSeconds * Speed;
 
