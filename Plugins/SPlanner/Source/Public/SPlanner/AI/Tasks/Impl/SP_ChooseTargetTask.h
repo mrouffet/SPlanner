@@ -16,6 +16,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bAutoLookAt = true;
 
+	/** Can target again even if a previous target has been set in plan. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	bool bAllowRetarget = false;
+
 	/** Local offset to apply to the center. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	FVector LocalOffset;
@@ -25,10 +29,10 @@ protected:
 	FVector Dimensions = FVector(100.0f, 100.0f, 100.0f);
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, Category = "SPlanner|Task|Target")
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
 	FColor DebugColor = FColor::Yellow;
 
-	UPROPERTY(EditAnywhere, Category = "SPlanner|Task|Target")
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
 	float DebugDrawTime = 2.0f;
 #endif
 

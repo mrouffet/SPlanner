@@ -14,7 +14,10 @@ bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, con
 	SP_RCHECK_NULLPTR(AIPlanner->Target, false)
 
 	// Not already re-targeted.
-	return !SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
+	if(bAllowRetarget)
+		return !SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
+
+	return true;
 }
 uint64 USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
 {
