@@ -16,7 +16,6 @@ class SPLANNER_API USP_TaskChain : public USP_Task
 	struct FSP_TaskInfos
 	{
 		int Index = 0;
-		TArray<uint8> UserData;
 	};
 
 protected:

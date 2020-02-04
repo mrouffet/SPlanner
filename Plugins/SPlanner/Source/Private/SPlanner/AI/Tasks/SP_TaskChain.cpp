@@ -2,7 +2,16 @@
 
 uint32 USP_TaskChain::GetUserDataSize() const
 {
-	return sizeof(FSP_TaskInfos);
+	uint32 MaxSize = 0;
+
+	// Query biggest user data size.
+	for (int i = 0; i < Tasks.Num(); ++i)
+	{
+		if(Tasks[i]->GetUserDataSize() > MaxSize)
+			MaxSize = Tasks[i]->GetUserDataSize();
+	}
+
+	return MaxSize + sizeof(FSP_TaskInfos);
 }
 
 bool USP_TaskChain::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
@@ -49,10 +58,7 @@ bool USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 	SP_RCHECK_NULLPTR(Tasks[0], false)
 
-	if(Tasks[0]->GetUserDataSize())
-		Infos->UserData.Reserve(Tasks[0]->GetUserDataSize());
-
-	return Tasks[0]->Begin(Planner, Infos->UserData.GetData());
+	return Tasks[0]->Begin(Planner, UserData + sizeof(FSP_TaskInfos));
 }
 ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
 {
@@ -64,14 +70,14 @@ ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComp
 	SP_RCHECK_NULLPTR(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed)
 
 	// Tick current task.
-	ESP_PlanExecutionState TickResult = Tasks[Infos->Index]->Tick(DeltaSeconds, Planner, Infos->UserData.GetData());
+	ESP_PlanExecutionState TickResult = Tasks[Infos->Index]->Tick(DeltaSeconds, Planner, UserData + sizeof(FSP_TaskInfos));
 
 	if (TickResult != ESP_PlanExecutionState::PES_Succeed)
 		return TickResult; // Failed or rurnning.
 
 
 	// End task.
-	if (!Tasks[Infos->Index]->End(Planner, Infos->UserData.GetData()))
+	if (!Tasks[Infos->Index]->End(Planner, UserData + sizeof(FSP_TaskInfos)))
 		return ESP_PlanExecutionState::PES_Failed;
 
 	// All task ended with success.
@@ -82,12 +88,8 @@ ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComp
 	// Begin next task.
 	SP_RCHECK_NULLPTR(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed)
 
-	// Reserve data size.
-	if (Tasks[Infos->Index]->GetUserDataSize())
-		Infos->UserData.Reserve(Tasks[Infos->Index]->GetUserDataSize());
-
 	// Begin task.
-	if(!Tasks[Infos->Index]->Begin(Planner, Infos->UserData.GetData()))
+	if(!Tasks[Infos->Index]->Begin(Planner, UserData + sizeof(FSP_TaskInfos)))
 		return ESP_PlanExecutionState::PES_Failed;
 
 	return ESP_PlanExecutionState::PES_Running;
@@ -104,7 +106,7 @@ bool USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 	if (Infos->Index < Tasks.Num())
 	{
 		SP_RCHECK_NULLPTR(Tasks[Infos->Index], false)
-		Result = Tasks[Infos->Index]->End(Planner, Infos->UserData.GetData()); // end failed task.
+		Result = Tasks[Infos->Index]->End(Planner, UserData + sizeof(FSP_TaskInfos)); // end failed task.
 	}
 
 	Infos->~FSP_TaskInfos();
@@ -124,7 +126,7 @@ bool USP_TaskChain::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
 	if (Infos->Index < Tasks.Num())
 	{
 		SP_RCHECK_NULLPTR(Tasks[Infos->Index], false)
-		Result = Tasks[Infos->Index]->Cancel(Planner, Infos->UserData.GetData());
+		Result = Tasks[Infos->Index]->Cancel(Planner, UserData + sizeof(FSP_TaskInfos));
 	}
 
 	Infos->~FSP_TaskInfos();
