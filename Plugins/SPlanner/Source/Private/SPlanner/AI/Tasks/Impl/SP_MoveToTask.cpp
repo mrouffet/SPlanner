@@ -45,15 +45,13 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
-FAIMoveRequest USP_MoveToTask::CreateMoveRequest(USP_AIPlannerComponent* Planner)
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(USP_AIPlannerComponent& Planner)
 {
 	FAIMoveRequest MoveRequest;
 
-	SP_RCHECK_NULLPTR(Planner, MoveRequest)
-
-	if (Planner->Target->GetState() == ESP_TargetState::TS_Position)
-		MoveRequest.SetGoalLocation(Planner->Target->GetPosition());
-	else if (AActor* GoalActor = Planner->Target->GetAnyActor())
+	if (Planner.Target->GetState() == ESP_TargetState::TS_Position)
+		MoveRequest.SetGoalLocation(Planner.Target->GetPosition());
+	else if (AActor* GoalActor = Planner.Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
 	else
 		SP_LOG(Error, "Bad Target!")
@@ -90,13 +88,12 @@ void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPat
 	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
-bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
-	SP_RCHECK_NULLPTR(AIPlanner, false)
 	SP_RCHECK_NULLPTR(AIPlanner->Target, false)
 
 	// New target will be set.
@@ -109,7 +106,7 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent* Planner, const TAr
 
 	return !HasReachedPosition(AIPlanner);
 }
-uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 	
@@ -119,13 +116,13 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent* Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
 
-	if (HasReachedPosition(Planner))
+	if (HasReachedPosition(&Planner))
 	{
 		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
@@ -133,7 +130,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 
 	// Use AIController pathfinding MoveTo.
-	AAIController* const Controller = Cast<AAIController>(Planner->GetOwner());
+	AAIController* const Controller = Cast<AAIController>(Planner.GetOwner());
 	SP_RCHECK_NULLPTR(Controller, false)
 
 
@@ -158,7 +155,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 		return true;
 	}
 
-	SP_LOG_TASK_EXECUTE(Planner, "Pathfinding: %s", *Planner->Target->GetAnyPosition().ToString())
+	SP_LOG_TASK_EXECUTE(Planner, "Pathfinding: %s", *Planner.Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
 	Infos->Controller = Controller;
@@ -170,7 +167,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	return true;
 }
-ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
@@ -183,7 +180,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 	}
 	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
 	{
-		const AAIController* const Controller = Cast<AAIController>(Planner->GetOwner());
+		const AAIController* const Controller = Cast<AAIController>(Planner.GetOwner());
 		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
 		const ACharacter* const Character = Cast<ACharacter>(Controller->GetPawn());
@@ -200,7 +197,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_END_SUPER(Planner, UserData)
 
@@ -209,7 +206,7 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 	return true;
 }
 
-bool USP_MoveToTask::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_CANCEL_SUPER(Planner, UserData)
 

@@ -91,7 +91,7 @@ protected:
 	*	Overriddable in children.
 	*	Return true on construction succeed.
 	*/
-	virtual bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel);
+	virtual bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const;
 
 
 	/** Callback function called when a plan's construction failed (no valid plan found). */

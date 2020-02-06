@@ -15,7 +15,7 @@ public:
 	*/
 	struct FSP_LinearConstructInfos
 	{
-		const USP_PlannerComponent* Planner = nullptr;
+		const USP_PlannerComponent& Planner;
 		FSP_PlannerActionSet& PlannerActions;
 		TArray<USP_ActionStep*>& OutPlan;
 		uint8 MaxDepth = 7u;

@@ -51,17 +51,17 @@ protected:
 #endif
 
 	// The internal implementation of tick.
-	virtual ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData);
 
 public:
 	uint32 GetUserDataSize() const override;
 
-	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
-	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
+	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
 
-	bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override final;
-	bool End(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override final;
+	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 
-	bool Cancel(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Cancel(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 };

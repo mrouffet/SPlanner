@@ -12,5 +12,5 @@ class SPLANNER_API USP_ChooseTargetPositionTask : public USP_ChooseTargetTask
 	GENERATED_BODY()
 	
 protected:
-	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
 };

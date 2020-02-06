@@ -328,9 +328,9 @@ void USP_PlannerComponent::ConstructPlan()
 	else // No plan found.
 		OnPlanConstructionFailed(ESP_PlanError::PE_ConstructionFailed);
 }
-bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel)
+bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const
 {
-	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ this, PlannerActions, OutPlan, MaxDepth, LODLevel });
+	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ *this, PlannerActions, OutPlan, MaxDepth, LODLevel });
 }
 
 void USP_PlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)

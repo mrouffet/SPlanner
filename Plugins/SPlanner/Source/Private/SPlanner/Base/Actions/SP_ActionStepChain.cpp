@@ -2,7 +2,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
@@ -20,7 +20,7 @@ bool USP_ActionStepChain::PreCondition(const USP_PlannerComponent* Planner, cons
 
 	return true;
 }
-uint64 USP_ActionStepChain::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_ActionStepChain::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 

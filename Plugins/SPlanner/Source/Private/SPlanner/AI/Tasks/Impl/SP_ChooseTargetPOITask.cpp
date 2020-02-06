@@ -45,7 +45,7 @@ USP_POIComponent* USP_ChooseTargetPOITask::ChoosePOI_Implementation(const USP_AI
 	return TargetPOI;
 }
 
-uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
@@ -55,14 +55,14 @@ uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent* Planne
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	// Do not use SP_TASK_TICK_SUPER macro (require Super::Tick_Internal and not Super::Tick call).
 	ESP_PlanExecutionState SuperInternalResult = Super::Tick_Internal(DeltaSeconds, Planner, UserData);
 	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
 		return SuperInternalResult;
 
-	AActor* const TargetOwner = Planner->Target->GetOwner();
+	AActor* const TargetOwner = Planner.Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
 
 	FCollisionQueryParams QParams;
@@ -71,7 +71,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 	FVector Start = TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset);
 
 	TArray<FHitResult> HitInfos;
-	Planner->GetWorld()->SweepMultiByChannel(
+	Planner.GetWorld()->SweepMultiByChannel(
 		HitInfos,
 		Start,
 		Start + FVector(0.0f, 0.0f, 0.1f),
@@ -99,7 +99,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 				continue;
 
 			// Match overridden predicate.
-			if(Predicate(Planner, POI))
+			if(Predicate(&Planner, POI))
 				POIs.Add(POI);
 		}
 	}
@@ -108,9 +108,9 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 	if(POIs.Num() == 0)
 		return ESP_PlanExecutionState::PES_Failed;
 
-	USP_POIComponent* TargetPOI = ChoosePOI(Planner, POIs);
+	USP_POIComponent* TargetPOI = ChoosePOI(&Planner, POIs);
 	
-	Planner->Target->SetPOI(TargetPOI);
+	Planner.Target->SetPOI(TargetPOI);
 
 #if SP_DEBUG_EDITOR
 

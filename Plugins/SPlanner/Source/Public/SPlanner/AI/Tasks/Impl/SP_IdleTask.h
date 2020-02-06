@@ -29,7 +29,7 @@ protected:
 public:
 	uint32 GetUserDataSize() const override;
 
-	bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	bool End(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 };

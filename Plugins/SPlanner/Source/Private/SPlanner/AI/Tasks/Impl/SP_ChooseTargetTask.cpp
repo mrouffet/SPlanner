@@ -10,11 +10,11 @@ uint32 USP_ChooseTargetTask::GetUserDataSize() const
 	return sizeof(ESP_InternalTickState) + LookAtTask ? LookAtTask->GetUserDataSize() : 0;
 }
 
-bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
 	// Valid Target component.
 	SP_RCHECK_NULLPTR(AIPlanner, false)
@@ -30,7 +30,7 @@ bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent* Planner, con
 
 	return true;
 }
-uint64 USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
@@ -44,7 +44,7 @@ uint64 USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent* Planner, 
 	return PlannerFlags;
 }
 
-bool USP_ChooseTargetTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_ChooseTargetTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
@@ -54,12 +54,12 @@ bool USP_ChooseTargetTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserDat
 
 	return true;
 }
-ESP_PlanExecutionState USP_ChooseTargetTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	// Valid Target component.
-	SP_RCHECK_NULLPTR(Planner->Target, ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK_NULLPTR(Planner.Target, ESP_PlanExecutionState::PES_Failed)
 
 	// No lookat next: only internal implementation.
 	if(!LookAtTask)
@@ -90,7 +90,7 @@ ESP_PlanExecutionState USP_ChooseTargetTask::Tick(float DeltaSeconds, USP_AIPlan
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
-bool USP_ChooseTargetTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_ChooseTargetTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_END_SUPER(Planner, UserData)
 
@@ -100,7 +100,7 @@ bool USP_ChooseTargetTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 	return true;
 }
 
-bool USP_ChooseTargetTask::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_ChooseTargetTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_CANCEL_SUPER(Planner, UserData)
 
@@ -111,7 +111,7 @@ bool USP_ChooseTargetTask::Cancel(USP_AIPlannerComponent* Planner, uint8* UserDa
 	return true;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetTask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetTask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	// Overridden in children.
 	return ESP_PlanExecutionState::PES_Succeed;

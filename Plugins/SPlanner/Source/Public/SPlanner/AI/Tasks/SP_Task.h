@@ -64,29 +64,29 @@ public:
 	/** Getter of user data size to reserve. */
 	virtual uint32 GetUserDataSize() const;
 
-	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 
 	/**
 	*	The begin implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData);
 
 	/**
 	*	The tick implementation of the task.
 	*	This is executed by the PlannerComponent (main thread).
 	*/
-	virtual ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData);
 
 	/**
 	*	The end implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual bool End(USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual bool End(USP_AIPlannerComponent& Planner, uint8* UserData);
 
 	/**
 	*	The cancel implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual bool Cancel(USP_AIPlannerComponent* Planner, uint8* UserData);
+	virtual bool Cancel(USP_AIPlannerComponent& Planner, uint8* UserData);
 };

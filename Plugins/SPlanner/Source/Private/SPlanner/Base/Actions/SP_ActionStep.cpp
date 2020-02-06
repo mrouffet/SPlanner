@@ -2,11 +2,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-bool USP_ActionStep::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_ActionStep::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
-	// Do not check Planner here: Can be nullptr during plan generation.
-	//SP_RCHECK_NULLPTR(Planner, false)
-
 	if(PreviousRequieredSteps.Num())
 	{
 		if (bUseRequiredStepOrder)
@@ -31,10 +28,8 @@ bool USP_ActionStep::PreCondition(const USP_PlannerComponent* Planner, const TAr
 
 	return true;
 }
-uint64 USP_ActionStep::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_ActionStep::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
-	// Do not check Planner here: Can be nullptr during plan generation.
-	//SP_RCHECK_NULLPTR(Planner, PlannerFlags)
 
 	return PlannerFlags;
 }

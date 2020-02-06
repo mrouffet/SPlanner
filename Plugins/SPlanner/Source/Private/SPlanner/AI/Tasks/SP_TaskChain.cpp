@@ -14,7 +14,7 @@ uint32 USP_TaskChain::GetUserDataSize() const
 	return MaxSize + sizeof(FSP_TaskInfos);
 }
 
-bool USP_TaskChain::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_TaskChain::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
@@ -32,7 +32,7 @@ bool USP_TaskChain::PreCondition(const USP_PlannerComponent* Planner, const TArr
 
 	return true;
 }
-uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
@@ -49,7 +49,7 @@ uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent* Planner, uint64 
 	return PlannerFlags;
 }
 
-bool USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_TaskChain::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
@@ -60,7 +60,7 @@ bool USP_TaskChain::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	return Tasks[0]->Begin(Planner, UserData + sizeof(FSP_TaskInfos));
 }
-ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
@@ -94,7 +94,7 @@ ESP_PlanExecutionState USP_TaskChain::Tick(float DeltaSeconds, USP_AIPlannerComp
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_TaskChain::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_END_SUPER(Planner, UserData)
 
@@ -114,7 +114,7 @@ bool USP_TaskChain::End(USP_AIPlannerComponent* Planner, uint8* UserData)
 	return Result;
 }
 
-bool USP_TaskChain::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_TaskChain::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_CANCEL_SUPER(Planner, UserData)
 

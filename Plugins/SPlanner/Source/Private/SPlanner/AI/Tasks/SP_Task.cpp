@@ -16,52 +16,44 @@ uint32 USP_Task::GetUserDataSize() const
 	return 0u;
 }
 
-bool USP_Task::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_Task::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
-	SP_RCHECK_NULLPTR(Cast<USP_AIPlannerComponent>(Planner), false)
+	SP_RCHECK_NULLPTR(Cast<USP_AIPlannerComponent>(&Planner), false)
 
 	return true;
 }
 
-bool USP_Task::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_Task::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_RCHECK_NULLPTR(Planner, false)
-
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskBegin(Planner);
+	return K2_OnTaskBegin(&Planner);
 #endif
 
 	return true;
 }
-ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
-
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskTick(DeltaSeconds, Planner);
+	return K2_OnTaskTick(DeltaSeconds, &Planner);
 #endif
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }
-bool USP_Task::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_Task::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_RCHECK_NULLPTR(Planner, false)
-
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskEnd(Planner);
+	return K2_OnTaskEnd(&Planner);
 #endif
 
 	return true;
 }
 
-bool USP_Task::Cancel(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_Task::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_RCHECK_NULLPTR(Planner, false)
-
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskCancel(Planner);
+	return K2_OnTaskCancel(&Planner);
 #endif
 
 	return true;

@@ -15,11 +15,11 @@ bool USP_TargetNearestPlayerTask::Predicate_Implementation(USP_AIPlannerComponen
 	return true;
 }
 
-bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
 	// Valid Target component.
 	SP_RCHECK_NULLPTR(AIPlanner, false)
@@ -28,7 +28,7 @@ bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent* Plann
 	// Not already re-targeted.
 	return !SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
 }
-uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const
+uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
 
@@ -39,21 +39,21 @@ uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent* Pl
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	// Valid Target component.
-	SP_RCHECK_NULLPTR(Planner->Target, ESP_PlanExecutionState::PES_Failed)
+	SP_RCHECK_NULLPTR(Planner.Target, ESP_PlanExecutionState::PES_Failed)
 
-	AGameStateBase* GameState = Planner->GetWorld()->GetGameState();
+	AGameStateBase* GameState = Planner.GetWorld()->GetGameState();
 
 	SP_RCHECK_NULLPTR(GameState, ESP_PlanExecutionState::PES_Failed)
 
 	float CurrSqrDist = FLT_MAX;
 	APawn* NearestPlayer = nullptr;
 
-	FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
+	FVector PlannerLocation = Planner.GetOwner()->GetActorLocation();
 
 	for(int i = 0; i < GameState->PlayerArray.Num(); ++i)
 	{
@@ -63,7 +63,7 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 		APawn* const Player = GameState->PlayerArray[i]->GetPawn();
 
 		// must validate predicate.
-		if (!Predicate(Planner, Player))
+		if (!Predicate(&Planner, Player))
 			continue;
 
 		float SqrDist = FVector::DistSquared(PlannerLocation, Player->GetActorLocation());
@@ -78,7 +78,7 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 	if(NearestPlayer == nullptr)
 		return ESP_PlanExecutionState::PES_Failed;
 
-	Planner->Target->SetPlayer(NearestPlayer);
+	Planner.Target->SetPlayer(NearestPlayer);
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }

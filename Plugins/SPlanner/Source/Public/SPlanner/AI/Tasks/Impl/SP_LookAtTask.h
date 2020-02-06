@@ -40,16 +40,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bFreezeRoll = true;
 
-	FRotator ComputeTargetRotation(USP_AIPlannerComponent* Planner) const;
+	FRotator ComputeTargetRotation(const USP_AIPlannerComponent& Planner) const;
 
 public:
 	uint32 GetUserDataSize() const override;
 
-	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
-	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
+	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
 
 
-	bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	bool End(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 };

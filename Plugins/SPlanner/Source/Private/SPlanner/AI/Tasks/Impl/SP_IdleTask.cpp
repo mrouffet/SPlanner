@@ -7,7 +7,7 @@ uint32 USP_IdleTask::GetUserDataSize() const
 	return sizeof(FSP_TaskInfos);
 }
 
-bool USP_IdleTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_IdleTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
@@ -17,7 +17,7 @@ bool USP_IdleTask::Begin(USP_AIPlannerComponent* Planner, uint8* UserData)
 
 	return true;
 }
-ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
@@ -30,7 +30,7 @@ ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_AIPlannerCompo
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_IdleTask::End(USP_AIPlannerComponent* Planner, uint8* UserData)
+bool USP_IdleTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_END_SUPER(Planner, UserData)
 

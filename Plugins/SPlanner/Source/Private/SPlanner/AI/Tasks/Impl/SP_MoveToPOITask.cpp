@@ -4,7 +4,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Target/SP_TargetComponent.h>
 
-bool USP_MoveToPOITask::PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_MoveToPOITask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
@@ -13,5 +13,5 @@ bool USP_MoveToPOITask::PreCondition(const USP_PlannerComponent* Planner, const 
 		return true;
 
 	// No traget change, check current is POI.
-	return Cast<USP_AIPlannerComponent>(Planner)->Target->GetState() == ESP_TargetState::TS_POI;
+	return Cast<USP_AIPlannerComponent>(&Planner)->Target->GetState() == ESP_TargetState::TS_POI;
 }

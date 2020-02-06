@@ -9,14 +9,14 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Target/SP_TargetComponent.h>
 
-ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	// Do not use SP_TASK_TICK_SUPER macro (require Super::Tick_Internal and not Super::Tick call).
 	ESP_PlanExecutionState SuperInternalResult = Super::Tick_Internal(DeltaSeconds, Planner, UserData);
 	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
 		return SuperInternalResult;
 
-	AActor* TargetOwner = Planner->Target->GetOwner();
+	AActor* TargetOwner = Planner.Target->GetOwner();
 	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
 
 
@@ -24,7 +24,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal(float DeltaSe
 	FVector TargetPosition = TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset) +
 		FVector(FMath::RandRange(-1.0f, 1.0f) * Dimensions.X, FMath::RandRange(-1.0f, 1.0f) * Dimensions.Y, 0.0f);
 
-	Planner->Target->SetPosition(TargetPosition);
+	Planner.Target->SetPosition(TargetPosition);
 
 #if SP_DEBUG_EDITOR
 	SP_IF_TASK_EXECUTE(Planner)

@@ -27,14 +27,14 @@ public:
 	uint32 GetUserDataSize() const override;
 
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
-	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
+	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 
 	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
-	uint64 PostCondition(const USP_PlannerComponent* Planner, uint64 PlannerFlags) const override;
+	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
 
-	bool Begin(USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent* Planner, uint8* UserData) override;
-	bool End(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 	
-	bool Cancel(USP_AIPlannerComponent* Planner, uint8* UserData) override;
+	bool Cancel(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 };
