@@ -8,7 +8,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_FloatAssetEvent, float, Value);
 /**
 *	Serialized float asset.
 */
-UCLASS(BlueprintType, Blueprintable, Category = "SPlanner|Asset")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Asset")
 class SPLANNER_API USP_FloatAsset : public UDataAsset
 {
 	GENERATED_BODY()

@@ -68,15 +68,24 @@ uint64 SP_Planner::UpdateSet(FSP_LinearConstructInfos& Infos, const FSP_PlannerA
 	case ESP_ActionGenerationType::AGT_OnceInPlan:
 		break;
 	case ESP_ActionGenerationType::AGT_PushBack:
-		Infos.PlannerActions.Actions.Push(Action);
+	{
+
+		// Get Last action for min weight.
+		float MinWeight = Infos.PlannerActions.Actions[Infos.PlannerActions.Actions.Num() - 1].GeneratedWeight;
+		FSP_PlannerAction& NewAction = Infos.PlannerActions.Actions.Add_GetRef(Action);
+
+		// Set new min weight. PushBacked tasks always have weight < 0.0f.
+		NewAction.GeneratedWeight = MinWeight < 0.0f ? MinWeight - 1.0f : -1.0f;
+
 		ActionKey = Infos.PlannerActions.Actions.Num() - 1; // Store index.
 		break;
+	}
 	case ESP_ActionGenerationType::AGT_RandomWeight:
 	{
 		FSP_PlannerAction NewAction = FSP_PlannerAction::Make(Action.Handle, Infos.LODLevel, Action.bAchievePlan);
 		ActionKey = reinterpret_cast<uint64&>(NewAction.GeneratedWeight); // Store generated weight.
 
-		Infos.PlannerActions.Actions.Push(NewAction);
+		Infos.PlannerActions.Actions.Add(NewAction);
 		Infos.PlannerActions.Actions.Sort(FSP_PlannerActionSortFunctor());
 		break;
 	}
