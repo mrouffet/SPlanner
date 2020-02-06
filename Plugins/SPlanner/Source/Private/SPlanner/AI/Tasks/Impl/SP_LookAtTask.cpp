@@ -14,16 +14,18 @@ FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent& Pla
 	FVector TargetPosition = Planner.Target->GetAnyPosition();
 	FVector TargetOwnerLocation = Planner.Target->GetOwner()->GetActorLocation();
 
-	if(bFreezePitch)
-		TargetPosition.X = TargetOwnerLocation.X;
+	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(TargetOwnerLocation, TargetPosition);
+
+	if (bFreezePitch)
+		Rotator.Pitch = 0.0f;
 
 	if (bFreezeYaw)
-		TargetPosition.Y = TargetOwnerLocation.Y;
+		Rotator.Yaw = 0.0f;
 
 	if (bFreezeRoll)
-		TargetPosition.Z = TargetOwnerLocation.Z;
+		Rotator.Roll = 0.0f;
 
-	return UKismetMathLibrary::FindLookAtRotation(TargetOwnerLocation, TargetPosition);
+	return Rotator;
 }
 
 uint32 USP_LookAtTask::GetUserDataSize() const
