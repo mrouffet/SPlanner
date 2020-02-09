@@ -5,6 +5,9 @@
 
 class USP_Task;
 
+class USP_BlackboardAsset;
+class USP_BlackboardComponent;
+
 class USP_TargetComponent;
 class USP_POIZoneComponent;
 
@@ -18,6 +21,17 @@ class SPLANNER_API USP_AIPlannerComponent : public USP_PlannerComponent
 	GENERATED_BODY()
 
 protected:
+	/**
+	*	The blackboard asset to use.
+	*	Instantiate a USP_BlackboardComponent with this asset.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
+	const USP_BlackboardAsset* BloackboardAsset = nullptr;
+
+	/** Instantiated Blackboard using BloackboardAsset. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
+	USP_BlackboardComponent* Blackboard = nullptr;
+
 	/**
 	*	The current index in plan executed.
 	*	Avoid Plan.PopFront().
@@ -102,6 +116,9 @@ public:
 	USP_POIZoneComponent* POIZone = nullptr;
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
+
+	/** Getter of Blackboard component. */
+	USP_BlackboardComponent* GetBlackboard() const;
 
 	/** Getter of the previous executed ActionStep in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")

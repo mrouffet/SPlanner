@@ -15,6 +15,9 @@
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
 
+#include <SPlanner/AI/Blackboard/SP_BlackboardAsset.h>
+#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+
 #include <SPlanner/AI/Tasks/SP_Task.h>
 #include <SPlanner/AI/Target/SP_TargetComponent.h>
 
@@ -24,6 +27,13 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 	PrimaryComponentTick.bCanEverTick = true;
 
 	bWantsInitializeComponent = true;
+
+	Blackboard = CreateDefaultSubobject<USP_BlackboardComponent>("Blackboard");
+}
+
+USP_BlackboardComponent* USP_AIPlannerComponent::GetBlackboard() const
+{
+	return Blackboard;
 }
 
 USP_ActionStep* USP_AIPlannerComponent::GetPrevActionStep() const
@@ -385,6 +395,10 @@ void USP_AIPlannerComponent::InitializeComponent()
 		return;
 	
 	OnGoalChange.AddDynamic(this, &USP_AIPlannerComponent::OnGoalChange_Bind);
+
+	// Blackboard.
+	SP_CHECK(BloackboardAsset, "AI Planner must have a Blackboard!")
+	Blackboard->InitBlackboard(BloackboardAsset);
 }
 void USP_AIPlannerComponent::UninitializeComponent()
 {
