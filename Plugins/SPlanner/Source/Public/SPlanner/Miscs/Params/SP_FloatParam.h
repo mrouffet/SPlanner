@@ -4,40 +4,39 @@
 
 #include <SPlanner/Miscs/Assets/SP_FloatAsset.h>
 
-#include "SP_Weight.generated.h"
+#include "SP_FloatParam.generated.h"
 
 /**
-*	Weight struct implementation.
-*	Increase Weight to increase chances of adding the action to the plan.
+*	float parameter struct implementation.
 */
-USTRUCT(BlueprintType, Category = "SPlanner|Misc")
-struct SPLANNER_API FSP_Weight
+USTRUCT(BlueprintType, Category = "SPlanner|Misc|Param")
+struct SPLANNER_API FSP_FloatParam
 {
 	GENERATED_BODY()
 
-protected:
-	/** The default weight. */
+public:
+	/** The default value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float DefaultWeight = 1.0f;
+	float Default = 1.0f;
 
 	/**
 	*	The weight of the action depending on the LOD level.
 	*	Override DefaultWeight.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	FRuntimeFloatCurve WeightLODCurve;
+	FRuntimeFloatCurve LODCurve;
 
 	/**
-	*	Additionnal input weights.
+	*	Additionnal input values.
+	*	The average input value will be computed and then multiplied to the current value.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_FloatAsset*> InputWeights;
+	TArray<USP_FloatAsset*> Inputs;
 
-public:
-	FSP_Weight() = default;
+	FSP_FloatParam() = default;
 
 	/**
-	*	Getter of Weight using WeightCurve with valid LODLevel, otherwise DefaultWeight.
+	*	Getter of value using Curve with valid LODLevel, otherwise Default.
 	*	Multiply with all InputWeights.
 	*/
 	float Get(float LODLevel = -1.0f) const;

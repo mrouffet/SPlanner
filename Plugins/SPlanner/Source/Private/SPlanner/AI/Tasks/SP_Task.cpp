@@ -2,13 +2,19 @@
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
+USP_Task::USP_Task(const FObjectInitializer& ObjectInitializer)
+{
+	// Default Cooldown is 0.
+	Cooldown.Default = 0.0f;
+}
+
 bool USP_Task::GetUseCooldownOnFailed() const
 {
 	return bUseCooldownOnFailed;
 }
-float USP_Task::GetCooldown() const
+float USP_Task::GetCooldown(float LODLevel) const
 {
-	return Cooldown;
+	return Cooldown.Get(LODLevel);
 }
 
 uint32 USP_Task::GetUserDataSize() const

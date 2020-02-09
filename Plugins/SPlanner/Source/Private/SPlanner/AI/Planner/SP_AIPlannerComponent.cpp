@@ -9,6 +9,7 @@
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 #include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
 #include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
+#include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
@@ -103,8 +104,10 @@ void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 {
 	SP_CHECK_NULLPTR(Task)
 
+	float Cooldown = Task->GetCooldown(LOD ? LOD->GetLevel() : -1.0f);
+
 	// Never save task without cooldown.
-	if(Task->GetCooldown() <= 0.0f)
+	if(Cooldown <= 0.0f)
 		return;
 
 	float* const CooldownPtr = Cooldowns.Find(Task);
@@ -112,21 +115,23 @@ void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 	// Add 0.001f to ensure float precision.
 
 	if (CooldownPtr)
-		*CooldownPtr = GetWorld()->GetTimeSeconds() + Task->GetCooldown() + 0.001f;
+		*CooldownPtr = GetWorld()->GetTimeSeconds() + Cooldown + 0.001f;
 	else
-		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Task->GetCooldown() + 0.001f);
+		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Cooldown + 0.001f);
 }
 bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, false)
 
+	float TaskCooldown = Task->GetCooldown(LOD ? LOD->GetLevel() : -1.0f);
+
 	// Never check task without cooldown.
-	if(Task->GetCooldown() <= 0.0f)
+	if(TaskCooldown <= 0.0f)
 		return false;
 
 	float Cooldown = GetCooldown(Task);
 
-	return Cooldown > 0.0f && Cooldown >= Task->GetCooldown();
+	return Cooldown > 0.0f && Cooldown >= TaskCooldown;
 }
 
 void USP_AIPlannerComponent::OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal)

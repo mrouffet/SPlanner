@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SPlanner/Miscs/Params/SP_FloatParam.h>
+
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 
 #include <SPlanner/AI/Tasks/SP_TaskMacro.h>
@@ -18,13 +20,13 @@ class SPLANNER_API USP_Task : public USP_ActionStep
 	GENERATED_BODY()
 
 protected:
+	/** The cooldown of this task. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
+	FSP_FloatParam Cooldown;
+
 	/** Should use cooldown even if the task has failed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
 	bool bUseCooldownOnFailed = true;
-
-	/** The cooldown of this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
-	float Cooldown = 0.0f;
 
 	/**
 	*	Blueprint event called by Begin().
@@ -55,11 +57,13 @@ protected:
 	bool K2_OnTaskCancel(USP_AIPlannerComponent* Planner);
 
 public:
+	USP_Task(const FObjectInitializer& ObjectInitializer);
+
 	/** Gette of bUseCooldownOnFailed. */
 	bool GetUseCooldownOnFailed() const;
 
 	/** Getter of Cooldown. */
-	float GetCooldown() const;
+	float GetCooldown(float LODLevel = -1.0f) const;
 
 	/** Getter of user data size to reserve. */
 	virtual uint32 GetUserDataSize() const;

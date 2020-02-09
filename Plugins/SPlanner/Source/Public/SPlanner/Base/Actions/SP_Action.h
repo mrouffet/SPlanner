@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SPlanner/Miscs/SP_Weight.h>
+#include <SPlanner/Miscs/Params/SP_FloatParam.h>
 
 #include <SPlanner/Base/Actions/SP_ActionBase.h>
 #include "SP_Action.generated.h"
@@ -19,5 +19,7 @@ public:
 	*	Increase Weight to increase chances of adding the task to the plan.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	FSP_Weight Weight;
+	FSP_FloatParam Weight;
+
+	FSP_Action();
 };
