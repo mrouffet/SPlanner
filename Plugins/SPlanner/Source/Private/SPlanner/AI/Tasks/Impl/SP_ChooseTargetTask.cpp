@@ -11,7 +11,7 @@
 
 uint32 USP_ChooseTargetTask::GetUserDataSize() const
 {
-	return sizeof(ESP_InternalTickState) + LookAtTask ? LookAtTask->GetUserDataSize() : 0;
+	return sizeof(ESP_InternalTickState) + (LookAtTask ? LookAtTask->GetUserDataSize() : 0);
 }
 
 bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
@@ -58,7 +58,7 @@ bool USP_ChooseTargetTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserDat
 	SP_TASK_BEGIN_SUPER(Planner, UserData)
 
 	// Set internal state.
-	if (!LookAtTask)
+	if (LookAtTask)
 		ESP_InternalTickState* InternalTickState = new(UserData) ESP_InternalTickState{ ESP_InternalTickState::ITS_WaitForSuccess };
 
 	return true;
