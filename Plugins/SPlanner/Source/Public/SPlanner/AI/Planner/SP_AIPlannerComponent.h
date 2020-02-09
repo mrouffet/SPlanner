@@ -147,9 +147,23 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	ASP_AIController* GetController() const;
 
+	/** Get casted Controller this planner is attached to. */
+	template <typename T>
+	T* GetController() const
+	{
+		return Cast<T>(GetController());
+	}
+
 	/** Get pawn controlled by this planner. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	APawn* GetPawn() const;
+
+	/** Get casted pawn controlled by this planner. */
+	template <typename T>
+	T* GetPawn() const
+	{
+		return Cast<T>(GetPawn());
+	}
 
 #if WITH_EDITOR
 	bool IsSelectedInEditor() const override;
