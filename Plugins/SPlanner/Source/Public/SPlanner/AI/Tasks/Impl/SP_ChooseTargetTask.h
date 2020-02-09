@@ -23,6 +23,10 @@ class SPLANNER_API USP_ChooseTargetTask : public USP_Task
 	};
 
 protected:
+	/** The entry name to access Target object in Blackboard. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	FName TargetEntryName = "None";
+
 	/**
 	*	LookAt task to execute after target.
 	*	Set nullptr for no look at.

@@ -5,6 +5,8 @@
 #include <SPlanner/AI/Tasks/SP_Task.h>
 #include "SP_MoveToTask.generated.h"
 
+class USP_Target;
+
 /**
  *	MoveTo implementation.
  */
@@ -32,19 +34,23 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 	TMap<int, FSP_TaskInfos*> RequestIDToTaskInfos;
 
 protected:
+	/** The entry name to access Target object in Blackboard. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	FName TargetEntryName = "None";
+
 	/** The radius to accept the move to as completed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	float AcceptanceRadius = 10.0f;
 
 	/** Check if owner actor has reached its target. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|MoveTo")
-	bool HasReachedPosition(const USP_AIPlannerComponent* Planner) const;
+	bool HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const;
 
 	/**
 	*	Check if owner actor has reached its target.
 	*	Internal implementation.
 	*/
-	bool HasReachedPosition(AActor* Actor, const FVector& TargetPosition) const;
+	bool HasReachedPosition(APawn* Pawn, const FVector& TargetPosition) const;
 
 	/**
 	*	Check if owner character has reached its target.
@@ -59,7 +65,7 @@ protected:
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 	/** Implementation of move request creation. */
-	virtual FAIMoveRequest CreateMoveRequest(USP_AIPlannerComponent& Planner);
+	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
 
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;

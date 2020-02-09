@@ -6,7 +6,9 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Target/SP_TargetComponent.h>
+#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+
+#include <SPlanner/AI/Target/SP_Target.h>
 
 bool USP_TargetNearestPlayerTask::Predicate_Implementation(USP_AIPlannerComponent* Planner, APawn* Player) const
 {
@@ -19,11 +21,16 @@ bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent& Plann
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
+#if SP_DEBUG
+	// Check valid blackboard entry.
 	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
-	// Valid Target component.
-	SP_RCHECK_NULLPTR(AIPlanner, false)
-	SP_RCHECK_NULLPTR(AIPlanner->Target, false)
+	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, false)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, false)
+#endif
 
 	// Not already re-targeted.
 	return !SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
@@ -43,8 +50,11 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
-	// Valid Target component.
-	SP_RCHECK_NULLPTR(Planner.Target, ESP_PlanExecutionState::PES_Failed)
+	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
 	AGameStateBase* GameState = Planner.GetWorld()->GetGameState();
 
@@ -78,7 +88,7 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 	if(NearestPlayer == nullptr)
 		return ESP_PlanExecutionState::PES_Failed;
 
-	Planner.Target->SetPlayer(NearestPlayer);
+	Target->SetPlayer(NearestPlayer);
 
 	return ESP_PlanExecutionState::PES_Succeed;
 }

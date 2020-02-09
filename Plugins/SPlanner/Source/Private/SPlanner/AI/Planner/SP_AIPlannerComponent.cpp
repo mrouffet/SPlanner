@@ -11,6 +11,8 @@
 #include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
 #include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
 
+#include <SPlanner/AI/Controllers/SP_AIController.h>
+
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
@@ -19,7 +21,6 @@
 #include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
 
 #include <SPlanner/AI/Tasks/SP_Task.h>
-#include <SPlanner/AI/Target/SP_TargetComponent.h>
 
 USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -144,10 +145,20 @@ bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 	return Cooldown > 0.0f && Cooldown >= TaskCooldown;
 }
 
-void USP_AIPlannerComponent::OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal)
+ASP_AIController* USP_AIPlannerComponent::GetController() const
 {
-	if (bResetTargetOnGoalChange && Target)
-		Target->Clear();
+	ASP_AIController* const AIController = Cast<ASP_AIController>(GetOwner());
+
+	SP_RCHECK(AIController, nullptr, "AIController nullptr! AIPlanner is not attached to a SP_AIController")
+
+	return AIController;
+}
+APawn* USP_AIPlannerComponent::GetPawn() const
+{
+	if (ASP_AIController* const AIController = GetController())
+		return AIController->GetPawn();
+
+	return nullptr;
 }
 
 bool USP_AIPlannerComponent::BeginNextTask()
@@ -394,21 +405,9 @@ void USP_AIPlannerComponent::InitializeComponent()
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 	
-	OnGoalChange.AddDynamic(this, &USP_AIPlannerComponent::OnGoalChange_Bind);
-
 	// Blackboard.
 	SP_CHECK(BloackboardAsset, "AI Planner must have a Blackboard!")
 	Blackboard->InitBlackboard(BloackboardAsset);
-}
-void USP_AIPlannerComponent::UninitializeComponent()
-{
-	Super::UninitializeComponent();
-
-	// Server only while owner is replicated.
-	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
-		return;
-
-	OnGoalChange.RemoveDynamic(this, &USP_AIPlannerComponent::OnGoalChange_Bind);
 }
 
 void USP_AIPlannerComponent::BeginPlay()

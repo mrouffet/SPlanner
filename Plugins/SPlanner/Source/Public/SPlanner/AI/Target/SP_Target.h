@@ -2,18 +2,18 @@
 
 #include <SPlanner/AI/Target/SP_TargetState.h>
 
-#include <Components/ActorComponent.h>
-#include "SP_TargetComponent.generated.h"
+#include <UObject/Object.h>
+#include "SP_Target.generated.h"
 
 class USP_POIComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_TargetEvent, USP_TargetComponent*, Target);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_TargetEvent, USP_Target*, Target);
 
 /**
 *	Implementation of planner target.
 */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Target", DisplayName = "SP_Target", meta = (BlueprintSpawnableComponent))
-class SPLANNER_API USP_TargetComponent : public UActorComponent
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Target", DisplayName = "SP_Target")
+class SPLANNER_API USP_Target : public UObject
 {
 	GENERATED_BODY()
 
@@ -36,10 +36,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_TargetEvent OnTargetChange;
 
-	USP_TargetComponent(const FObjectInitializer& ObjectInitializer);
+	USP_Target(const FObjectInitializer& ObjectInitializer);
 	
 	// DO NOT USE. Unreal internal use only.
-	USP_TargetComponent(FVTableHelper& Helper);
+	USP_Target(FVTableHelper& Helper);
 
 
 	/** Getter of State. */

@@ -1,49 +1,49 @@
-#include <SPlanner/AI/Target/SP_TargetComponent.h>
+#include <SPlanner/AI/Target/SP_Target.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 
-USP_TargetComponent::USP_TargetComponent(const FObjectInitializer& ObjectInitializer) :
+USP_Target::USP_Target(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer),
 	Position{}
 {
 }
-USP_TargetComponent::USP_TargetComponent(FVTableHelper& Helper) :
+USP_Target::USP_Target(FVTableHelper& Helper) :
 	Super(Helper),
 	Position{}
 {
 }
 
-ESP_TargetState USP_TargetComponent::GetState() const
+ESP_TargetState USP_Target::GetState() const
 {
 	return State;
 }
 
-bool USP_TargetComponent::IsPosition() const
+bool USP_Target::IsPosition() const
 {
 	return State == ESP_TargetState::TS_Position;
 }
-bool USP_TargetComponent::IsActor() const
+bool USP_Target::IsActor() const
 {
 	return State == ESP_TargetState::TS_Actor || State == ESP_TargetState::TS_Player;
 }
-bool USP_TargetComponent::IsPlayer() const
+bool USP_Target::IsPlayer() const
 {
 	return State == ESP_TargetState::TS_Player;
 }
-bool USP_TargetComponent::IsPOI() const
+bool USP_Target::IsPOI() const
 {
 	return State == ESP_TargetState::TS_POI;
 }
 
-const FVector& USP_TargetComponent::GetPosition() const
+const FVector& USP_Target::GetPosition() const
 {
 	SP_RCHECK(IsPosition(), Position, "Bad target!")
 
 	return Position;
 }
-FVector USP_TargetComponent::GetAnyPosition() const
+FVector USP_Target::GetAnyPosition() const
 {
 	switch (State)
 	{
@@ -64,13 +64,13 @@ FVector USP_TargetComponent::GetAnyPosition() const
 		return FVector::ZeroVector;
 	}
 }
-AActor* USP_TargetComponent::GetActor() const
+AActor* USP_Target::GetActor() const
 {
 	SP_RCHECK(IsActor(), nullptr, "Bad target!")
 
 	return Actor;
 }
-AActor* USP_TargetComponent::GetAnyActor() const
+AActor* USP_Target::GetAnyActor() const
 {
 	switch (State)
 	{
@@ -88,13 +88,13 @@ AActor* USP_TargetComponent::GetAnyActor() const
 
 	return nullptr;
 }
-APawn* USP_TargetComponent::GetPlayer() const
+APawn* USP_Target::GetPlayer() const
 {
 	SP_RCHECK(IsPlayer(), nullptr, "Bad target!")
 
 	return Player;
 }
-USP_POIComponent* USP_TargetComponent::GetPOI() const
+USP_POIComponent* USP_Target::GetPOI() const
 {
 	SP_RCHECK(IsPOI(), nullptr, "Bad target!")
 
@@ -102,14 +102,14 @@ USP_POIComponent* USP_TargetComponent::GetPOI() const
 }
 
 
-void USP_TargetComponent::SetPosition(const FVector& InPosition)
+void USP_Target::SetPosition(const FVector& InPosition)
 {
 	Position = InPosition;
 	State = ESP_TargetState::TS_Position;
 
 	OnTargetChange.Broadcast(this);
 }
-void USP_TargetComponent::SetActor(AActor* InActor)
+void USP_Target::SetActor(AActor* InActor)
 {
 	SP_CHECK_NULLPTR(InActor)
 
@@ -118,7 +118,7 @@ void USP_TargetComponent::SetActor(AActor* InActor)
 
 	OnTargetChange.Broadcast(this);
 }
-void USP_TargetComponent::SetPlayer(APawn* InPlayer)
+void USP_Target::SetPlayer(APawn* InPlayer)
 {
 	SP_CHECK_NULLPTR(InPlayer)
 
@@ -127,7 +127,7 @@ void USP_TargetComponent::SetPlayer(APawn* InPlayer)
 
 	OnTargetChange.Broadcast(this);
 }
-void USP_TargetComponent::SetPOI(USP_POIComponent* InPOI)
+void USP_Target::SetPOI(USP_POIComponent* InPOI)
 {
 	SP_CHECK_NULLPTR(InPOI)
 
@@ -137,12 +137,12 @@ void USP_TargetComponent::SetPOI(USP_POIComponent* InPOI)
 	OnTargetChange.Broadcast(this);
 }
 
-bool USP_TargetComponent::IsValid() const
+bool USP_Target::IsValid() const
 {
 	return State != ESP_TargetState::TS_None;
 }
 
-void USP_TargetComponent::Clear()
+void USP_Target::Clear()
 {
 	Position = FVector::ZeroVector;
 	State = ESP_TargetState::TS_None;

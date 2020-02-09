@@ -1,33 +1,37 @@
 #include <SPlanner/AI/Tasks/Impl/SP_MoveToTask.h>
 
-#include <AIController.h>
 #include <GameFramework/Character.h>
 #include <Components/CapsuleComponent.h>
+
+#include <SPlanner/AI/Controllers/SP_AIController.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/POI/SP_POIComponent.h>
-#include <SPlanner/AI/Target/SP_TargetComponent.h>
+#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
 
-bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner) const
+#include <SPlanner/AI/Target/SP_Target.h>
+
+#include <SPlanner/AI/POI/SP_POIComponent.h>
+
+bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {
 	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(Target, false)
 
-	if(AAIController* Controller = Cast<AAIController>(Planner->GetOwner()))
-	{
-		if (ACharacter* Character = Cast<ACharacter>(Controller->GetPawn()))
-			return HasReachedPosition(Character, Planner->Target->GetAnyPosition());
-	}
+	APawn* Pawn = Planner->GetPawn();
 
-	return HasReachedPosition(Planner->GetOwner(), Planner->Target->GetAnyPosition());
+	if(ACharacter* Character = Cast<ACharacter>(Pawn))
+		return HasReachedPosition(Character, Target->GetAnyPosition());
+
+	return HasReachedPosition(Planner->GetPawn(), Target->GetAnyPosition());
 }
-bool USP_MoveToTask::HasReachedPosition(AActor* Actor, const FVector& TargetPosition) const
+bool USP_MoveToTask::HasReachedPosition(APawn* Pawn, const FVector& TargetPosition) const
 {
-	SP_RCHECK_NULLPTR(Actor, false)
+	SP_RCHECK_NULLPTR(Pawn, false)
 
 	// Move distance (XY only).
-	float SqrMoveDist = (Actor->GetActorLocation() - TargetPosition).SizeSquared2D();
+	float SqrMoveDist = (Pawn->GetActorLocation() - TargetPosition).SizeSquared2D();
 
 	return SqrMoveDist <= AcceptanceRadius * AcceptanceRadius;
 }
@@ -45,13 +49,15 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
-FAIMoveRequest USP_MoveToTask::CreateMoveRequest(USP_AIPlannerComponent& Planner)
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
 {
 	FAIMoveRequest MoveRequest;
 
-	if (Planner.Target->GetState() == ESP_TargetState::TS_Position)
-		MoveRequest.SetGoalLocation(Planner.Target->GetPosition());
-	else if (AActor* GoalActor = Planner.Target->GetAnyActor())
+	SP_RCHECK_NULLPTR(Target, MoveRequest)
+
+	if (Target->GetState() == ESP_TargetState::TS_Position)
+		MoveRequest.SetGoalLocation(Target->GetPosition());
+	else if (AActor* GoalActor = Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
 	else
 		SP_LOG(Error, "Bad Target!")
@@ -94,17 +100,21 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
-	SP_RCHECK_NULLPTR(AIPlanner->Target, false)
+	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, false)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, false)
 
 	// New target will be set.
 	if(SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
 		return true;
 
 	// Check valid target and has not already moved.
-	if (!AIPlanner->Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
+	if (!Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
 		return false;
 
-	return !HasReachedPosition(AIPlanner);
+	return !HasReachedPosition(AIPlanner, Target);
 }
 uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
@@ -122,7 +132,13 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
 
-	if (HasReachedPosition(&Planner))
+	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, false)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, false)
+
+	if (HasReachedPosition(&Planner, Target))
 	{
 		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
@@ -130,12 +146,12 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 
 	// Use AIController pathfinding MoveTo.
-	AAIController* const Controller = Cast<AAIController>(Planner.GetOwner());
+	ASP_AIController* const Controller = Planner.GetController();
 	SP_RCHECK_NULLPTR(Controller, false)
 
 
 	// Create MoveRequest.
-	FAIMoveRequest MoveRequest = CreateMoveRequest(Planner);
+	FAIMoveRequest MoveRequest = CreateMoveRequest(Target);
 
 	// Request movement.
 #if SP_DEBUG
@@ -155,7 +171,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 		return true;
 	}
 
-	SP_LOG_TASK_EXECUTE(Planner, "Pathfinding: %s", *Planner.Target->GetAnyPosition().ToString())
+	SP_LOG_TASK_EXECUTE(Planner, "Pathfinding: %s", *Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
 	Infos->Controller = Controller;

@@ -3,6 +3,8 @@
 #include <SPlanner/AI/Tasks/SP_Task.h>
 #include "SP_LookAtTask.generated.h"
 
+class USP_Target;
+
 /**
  *	Look at task implementation.
  */
@@ -20,6 +22,10 @@ class SPLANNER_API USP_LookAtTask : public USP_Task
 	};
 
 protected:
+	/** The entry name to access Target object in Blackboard. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	FName TargetEntryName = "None";
+
 	/** Whether the rotation should be in one frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bInstant = false;
@@ -40,7 +46,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bFreezeRoll = true;
 
-	FRotator ComputeTargetRotation(const USP_AIPlannerComponent& Planner) const;
+	FRotator ComputeTargetRotation(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
 
 public:
 	uint32 GetUserDataSize() const override;

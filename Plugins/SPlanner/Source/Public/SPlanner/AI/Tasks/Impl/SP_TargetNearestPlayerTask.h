@@ -12,6 +12,10 @@ class SPLANNER_API USP_TargetNearestPlayerTask : public USP_Task
 	GENERATED_BODY()
 
 protected:
+	/** The entry name to access Target object in Blackboard. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	FName TargetEntryName = "None";
+
 	/**
 	*	Predicate to validate to choose a player.
 	*	Can be overridden in children, otherwise return true.

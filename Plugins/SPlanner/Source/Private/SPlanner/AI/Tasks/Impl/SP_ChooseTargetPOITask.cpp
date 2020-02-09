@@ -9,8 +9,10 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
+#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+
+#include <SPlanner/AI/Target/SP_Target.h>
 #include <SPlanner/AI/POI/SP_POIComponent.h>
-#include <SPlanner/AI/Target/SP_TargetComponent.h>
 
 bool USP_ChooseTargetPOITask::Predicate_Implementation(const USP_AIPlannerComponent* Planner, const USP_POIComponent* TargetPOI) const
 {
@@ -62,20 +64,26 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
 		return SuperInternalResult;
 
-	AActor* const TargetOwner = Planner.Target->GetOwner();
-	SP_RCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
+	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
+
+	APawn* const Pawn = Planner.GetPawn();
+	SP_RCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
 
 	FCollisionQueryParams QParams;
-	QParams.AddIgnoredActor(TargetOwner);
+	QParams.AddIgnoredActor(Pawn);
 
-	FVector Start = TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset);
+	FVector Start = Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset);
 
 	TArray<FHitResult> HitInfos;
 	Planner.GetWorld()->SweepMultiByChannel(
 		HitInfos,
 		Start,
 		Start + FVector(0.0f, 0.0f, 0.1f),
-		TargetOwner->GetActorRotation().Quaternion(),
+		Pawn->GetActorRotation().Quaternion(),
 		ECollisionChannel::ECC_Pawn,
 		FCollisionShape::MakeBox(Dimensions / 2.0f),
 		QParams
@@ -110,19 +118,19 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 
 	USP_POIComponent* TargetPOI = ChoosePOI(&Planner, POIs);
 	
-	Planner.Target->SetPOI(TargetPOI);
+	Target->SetPOI(TargetPOI);
 
 #if SP_DEBUG_EDITOR
 
 	SP_IF_TASK_EXECUTE(Planner)
 	{
-		DrawDebugSphere(TargetOwner->GetWorld(),
-			TargetOwner->GetActorLocation() + TargetOwner->GetActorRotation().RotateVector(LocalOffset),
+		DrawDebugSphere(Pawn->GetWorld(),
+			Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset),
 			Dimensions.X > Dimensions.Y ? Dimensions.X : Dimensions.Y,
 			25, DebugColor, false,
 			USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
 
-		DrawDebugLine(TargetOwner->GetWorld(), TargetOwner->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), DebugColor, false, DebugDrawTime);
+		DrawDebugLine(Pawn->GetWorld(), Pawn->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), DebugColor, false, DebugDrawTime);
 	}
 
 	SP_LOG_TASK_EXECUTE(Planner, "%s", *TargetPOI->GetOwner()->GetName())

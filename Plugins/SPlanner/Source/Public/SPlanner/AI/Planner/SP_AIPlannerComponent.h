@@ -8,8 +8,10 @@ class USP_Task;
 class USP_BlackboardAsset;
 class USP_BlackboardComponent;
 
-class USP_TargetComponent;
 class USP_POIZoneComponent;
+
+class APawn;
+class ASP_AIController;
 
 /**
 *	Planner behavior.
@@ -44,10 +46,6 @@ protected:
 
 	/** Allocated memory for user data during task execution. */
 	TArray<uint8> TaskUserData;
-
-	/** Callback function bind to OnGoalChange. */
-	UFUNCTION(Category = "SPlanner|Planner")
-	void OnGoalChange_Bind(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal);
 
 	/**
 	*	Begin the next task of the Plan.
@@ -94,20 +92,11 @@ protected:
 	bool OnInactive_Internal_Implementation() override;
 
 	void InitializeComponent() override;
-	void UninitializeComponent() override;
 
 	void BeginPlay() override;
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	/** Should reset target on goal change. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SPlanner")
-	bool bResetTargetOnGoalChange = true;
-	
-	/** Target component used. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_TargetComponent* Target = nullptr;
-
 	/**
 	*	The POI interact zone used.
 	*	Used to add action set from interactible POIs.
@@ -119,6 +108,7 @@ public:
 
 	/** Getter of Blackboard component. */
 	USP_BlackboardComponent* GetBlackboard() const;
+
 
 	/** Getter of the previous executed ActionStep in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
@@ -152,6 +142,14 @@ public:
 	/** Helper function for cooldown check */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	bool IsInCooldown(const USP_Task* Task) const;
+
+	/** Get Controller this planner is attached to. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	ASP_AIController* GetController() const;
+
+	/** Get pawn controlled by this planner. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	APawn* GetPawn() const;
 
 #if WITH_EDITOR
 	bool IsSelectedInEditor() const override;

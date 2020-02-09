@@ -4,17 +4,18 @@
 
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
-#include <SPlanner/AI/Target/SP_TargetComponent.h>
 
-FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent& Planner) const
+#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+
+#include <SPlanner/AI/Target/SP_Target.h>
+
+FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const
 {
-	SP_SRCHECK_NULLPTR(Planner.Target, FRotator())
-	SP_SRCHECK_NULLPTR(Planner.Target->GetOwner(), FRotator())
+	APawn* Pawn = Planner.GetPawn();
+	SP_SRCHECK_NULLPTR(Pawn, FRotator())
+	SP_SRCHECK_NULLPTR(Target, FRotator())
 
-	FVector TargetPosition = Planner.Target->GetAnyPosition();
-	FVector TargetOwnerLocation = Planner.Target->GetOwner()->GetActorLocation();
-
-	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(TargetOwnerLocation, TargetPosition);
+	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(Pawn->GetActorLocation(), Target->GetAnyPosition());
 
 	if (bFreezePitch)
 		Rotator.Pitch = 0.0f;
@@ -42,9 +43,14 @@ bool USP_LookAtTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 	SP_SRCHECK_NULLPTR(AIPlanner, false)
-	SP_SRCHECK_NULLPTR(AIPlanner->Target, false)
 
-	return AIPlanner->Target->IsValid();
+	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, false)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, false)
+
+	return Target->IsValid();
 }
 uint64 USP_LookAtTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
@@ -62,20 +68,27 @@ bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	if(bInstant)
 		return true;
 
-	AActor* TargetOwner = Planner.Target->GetOwner();
-	SP_SRCHECK_NULLPTR(TargetOwner, false)
-
+	// Construct before any return for correct destruction in End().
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos();
 
-	Infos->Start = TargetOwner->GetActorRotation();
+	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, false)
+
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, false)
+
+	APawn* Pawn = Planner.GetPawn();
+	SP_SRCHECK_NULLPTR(Pawn, false)
+
+	Infos->Start = Pawn->GetActorRotation();
 
 	// Target become invalid during plan execution.
-	if (!Planner.Target || !Planner.Target->IsValid())
+	if (!Target || !Target->IsValid())
 		return false;
 
 	// Precompute for static position or instant rotation.
-	if (Planner.Target->IsPosition() || bInstant)
-		Infos->End = ComputeTargetRotation(Planner);
+	if (Target->IsPosition() || bInstant)
+		Infos->End = ComputeTargetRotation(Planner, Target);
 
 	return true;
 }
@@ -83,28 +96,34 @@ ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
-	AActor* TargetOwner = Planner.Target->GetOwner();
-	SP_SRCHECK_NULLPTR(TargetOwner, ESP_PlanExecutionState::PES_Failed)
+	APawn* Pawn = Planner.GetPawn();
+	SP_SRCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
 
 	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
 
 	if(bInstant)
 	{
-		TargetOwner->SetActorRotation(Infos->End);
+		Pawn->SetActorRotation(Infos->End);
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
 
-	// Re-compute for moving objects.
-	if (!Planner.Target->IsPosition())
-	{
-		FVector TargetPosition = Planner.Target->GetAnyPosition();
+	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
-		Infos->End = ComputeTargetRotation(Planner);
+	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
+
+	// Re-compute for moving objects.
+	if (!Target->IsPosition())
+	{
+		FVector TargetPosition = Target->GetAnyPosition();
+
+		Infos->End = ComputeTargetRotation(Planner, Target);
 	}
 
 	Infos->Alpha += DeltaSeconds * Speed;
 
-	TargetOwner->SetActorRotation(UKismetMathLibrary::RLerp(Infos->Start, Infos->End, Infos->Alpha, true));
+	Pawn->SetActorRotation(UKismetMathLibrary::RLerp(Infos->Start, Infos->End, Infos->Alpha, true));
 
 	return Infos->Alpha >= 1.0f ? ESP_PlanExecutionState::PES_Succeed : ESP_PlanExecutionState::PES_Running;
 }
@@ -112,7 +131,8 @@ bool USP_LookAtTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_END_SUPER(Planner, UserData)
 
-	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
+	if(!bInstant)
+		reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
 
 	return true;
 }
