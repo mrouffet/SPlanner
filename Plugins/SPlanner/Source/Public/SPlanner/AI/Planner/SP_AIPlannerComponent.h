@@ -59,6 +59,13 @@ protected:
 
 	void AskNewPlan(bool bInstantRequest = false) override;
 
+	/**
+	*	Construction plan method.
+	*	Use linear plan construction algorithm.
+	*	Return true on construction succeed.
+	*/
+	bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const override;
+
 	/** Check cooldown and call AskNewPlan after newly available task. */
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;
 

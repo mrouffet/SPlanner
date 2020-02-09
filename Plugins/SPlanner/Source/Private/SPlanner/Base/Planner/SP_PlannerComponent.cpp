@@ -8,8 +8,6 @@
 
 #include <SPlanner/Base/Goal/SP_Goal.h>
 
-#include <SPlanner/Base/Planner/SP_Planner.h>
-
 #include <SPlanner/Base/Actions/SP_ActionStep.h>
 #include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
 #include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
@@ -330,7 +328,9 @@ void USP_PlannerComponent::ConstructPlan()
 }
 bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const
 {
-	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ *this, PlannerActions, OutPlan, MaxDepth, LODLevel });
+	// Must be overridden in children.
+
+	return false;
 }
 
 void USP_PlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)

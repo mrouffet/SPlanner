@@ -88,7 +88,7 @@ protected:
 
 	/**
 	*	Construction plan method.
-	*	Overriddable in children.
+	*	Must be overridden in children.
 	*	Return true on construction succeed.
 	*/
 	virtual bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const;

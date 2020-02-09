@@ -5,6 +5,7 @@
 #include <SPlanner/Miscs/SP_Settings.h>
 
 #include <SPlanner/Base/Goal/SP_Goal.h>
+#include <SPlanner/Base/Planner/SP_Planner.h>
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 #include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
 #include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
@@ -302,6 +303,11 @@ void USP_AIPlannerComponent::AskNewPlan(bool bInstantRequest)
 	CurrentPlanIndex = -1;
 
 	Super::AskNewPlan(bInstantRequest);
+}
+
+bool USP_AIPlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const
+{
+	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ *this, PlannerActions, OutPlan, MaxDepth, LODLevel });
 }
 
 void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)
