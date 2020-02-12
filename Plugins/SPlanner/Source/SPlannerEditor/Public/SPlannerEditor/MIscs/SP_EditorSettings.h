@@ -1,9 +1,7 @@
 #pragma once
 
 #include <Engine/DeveloperSettings.h>
-#include "SP_Settings.generated.h"
-
-#if WITH_EDITORONLY_DATA
+#include "SP_EditorSettings.generated.h"
 
 /**
 *	Debug plan enum flags.
@@ -23,18 +21,15 @@ enum class ESP_DebugFlag : uint8
 
 ENUM_CLASS_FLAGS(ESP_DebugFlag);
 
-#endif
-
 /**
- *	SPlanner static settings.
+ *	SPlanner editor static settings.
  */
-UCLASS(Config = Game, DisplayName = "SPlanner") // WARNING: Add defaultconfig to save UPROPERTY(Config).
-class SPLANNER_API USP_Settings : public UDeveloperSettings
+UCLASS(Config = Game, DisplayName = "SPlannerEditor")
+class SPLANNEREDITOR_API USP_EditorSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
 protected:
-#if WITH_EDITORONLY_DATA
 	/** Debug log flags for planner. */
 	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "ESP_DebugFlag"), Category = "Debug")
 	uint8 DebugMask = 0u;
@@ -46,40 +41,37 @@ protected:
 	/** The base log key for log. */
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	int DebugLogKey = 12158;
-#endif
 
 public:
-#if WITH_EDITOR
 	/** Static accessor of DebugMask. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static uint8 GetDebugMask();
 
 	/** Static accessor of DebugScreenDisplayTime. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static float GetDebugScreenDisplayTime();
 
 	/** Static accessor of MoveListLogKey. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static int GetActionListLogKey();
 
 	/** Static accessor of PlanLogKey. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static int GetPlanLogKey();
 
 	/** Static accessor of PlanLogKey. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static int GetPlanGenerationLogKey();
 
 	/** Static accessor of TaskExecuteLogKey. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static int GetTaskExecuteLogKey();
 
 	/** Static accessor to increment TaskExecuteLogKey. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static void IncrementTaskExecuteLogKey();
 
 	/** Static accessor to reset TaskExecuteLogKey. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Settings")
+	UFUNCTION(BlueprintCallable, Category = "SPlannerEditor|Settings")
 	static void ResetTaskExecuteLogKey();
-#endif
 };

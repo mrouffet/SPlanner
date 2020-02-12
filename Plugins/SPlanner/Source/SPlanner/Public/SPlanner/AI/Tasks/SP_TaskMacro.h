@@ -2,7 +2,6 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Miscs/SP_Settings.h>
 #include <SPlanner/Miscs/SP_FlagHelper.h>
 
 
@@ -42,17 +41,19 @@
 
 #if SP_DEBUG_EDITOR
 
+#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+
 /**
 *	Helper macro to check whether task execute debug is shown.
 */
 #define SP_IF_TASK_EXECUTE(CheckSelected)\
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskExecute) && CheckSelected.IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_TaskExecute) && CheckSelected.IsSelectedInEditor())
 
 /**
 *	Helper macro to check whether task execute debug is shown.
 */
 #define SP_IF_TASK_TICK(CheckSelected)\
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_TaskTick) && CheckSelected.IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_TaskTick) && CheckSelected.IsSelectedInEditor())
 
 
 /**
@@ -60,14 +61,14 @@
 */
 #define SP_LOG_TASK_EXECUTE(CheckSelected, Str, ...)\
 	SP_IF_TASK_EXECUTE(CheckSelected)\
-	SP_LOG_SCREEN_FULL(Display, USP_Settings::GetTaskExecuteLogKey(), FColor::Green,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
+	SP_LOG_SCREEN_FULL(Display, USP_EditorSettings::GetTaskExecuteLogKey(), FColor::Green,  USP_EditorSettings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 
 /**
 *	Helper macro to log all task ticks.
 */
 #define SP_LOG_TASK_TICK(CheckSelected, Str, ...)\
 	SP_IF_TASK_TICK(CheckSelected)\
-	SP_LOG_SCREEN_FULL(Display, -1, FColor::Magenta,  USP_Settings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
+	SP_LOG_SCREEN_FULL(Display, -1, FColor::Magenta,  USP_EditorSettings::GetDebugScreenDisplayTime(), "%s: " Str, *GetName(), ##__VA_ARGS__)
 
 #else
 

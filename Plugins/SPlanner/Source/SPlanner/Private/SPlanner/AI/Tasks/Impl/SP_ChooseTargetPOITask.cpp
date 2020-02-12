@@ -128,7 +128,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 			Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset),
 			Dimensions.X > Dimensions.Y ? Dimensions.X : Dimensions.Y,
 			25, DebugColor, false,
-			USP_Settings::GetDebugScreenDisplayTime() / 2.0f);
+			USP_EditorSettings::GetDebugScreenDisplayTime() / 2.0f);
 
 		DrawDebugLine(Pawn->GetWorld(), Pawn->GetActorLocation(), TargetPOI->GetOwner()->GetActorLocation(), DebugColor, false, DebugDrawTime);
 	}

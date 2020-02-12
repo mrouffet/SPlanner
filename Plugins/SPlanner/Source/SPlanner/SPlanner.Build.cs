@@ -16,6 +16,8 @@ public class SPlanner : ModuleRules
 			new string[]
 			{
 				"Core",
+
+				"SPlannerEditor"
 			}
 		);
 
@@ -25,7 +27,7 @@ public class SPlanner : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"AIModule"
+				"AIModule",
 			}
 		);
 

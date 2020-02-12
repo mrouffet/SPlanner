@@ -3,7 +3,6 @@
 #include <TimerManager.h>
 
 #include <SPlanner/SP_Config.h>
-#include <SPlanner/Miscs/SP_Settings.h>
 #include <SPlanner/Miscs/SP_FlagHelper.h>
 
 #include <SPlanner/Base/Goal/SP_Goal.h>
@@ -15,6 +14,12 @@
 #include <SPlanner/Base/Director/SP_Director.h>
 
 #include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
+
+#if SP_DEBUG_EDITOR
+
+#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+
+#endif
 
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -139,8 +144,8 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 		PlanDebugStr += "null";
 
 #if SP_DEBUG_EDITOR
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
-		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanLogKey(), FColor::Orange, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+		SP_LOG_SCREEN_FULL(Display, USP_EditorSettings::GetPlanLogKey(), FColor::Orange, USP_EditorSettings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
 #endif
 
 #if SP_LOG_PLAN
@@ -184,7 +189,7 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 #if SP_DEBUG_EDITOR
 	// Reset debug keys.
 	if (GetOwner()->IsSelectedInEditor())
-		USP_Settings::ResetTaskExecuteLogKey();
+		USP_EditorSettings::ResetTaskExecuteLogKey();
 #endif
 
 	Plan.Empty();
@@ -205,8 +210,8 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 	}
 
 #if SP_DEBUG_EDITOR
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
-		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetPlanGenerationLogKey(), FColor::Purple, USP_Settings::GetDebugScreenDisplayTime(), "Time before construct: %f", TimeBeforeConstructPlan)
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+		SP_LOG_SCREEN_FULL(Display, USP_EditorSettings::GetPlanGenerationLogKey(), FColor::Purple, USP_EditorSettings::GetDebugScreenDisplayTime(), "Time before construct: %f", TimeBeforeConstructPlan)
 #endif
 
 	if (TimeBeforeConstructPlan <= 0.0f)
@@ -260,7 +265,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 #if SP_DEBUG_EDITOR
 	// Log available planner actions.
-	if (SP_IS_FLAG_SET(USP_Settings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
 	{
 		FString PlanDebugStr = "Action list: ";
 
@@ -296,7 +301,7 @@ void USP_PlannerComponent::ConstructPlan()
 		else if (PlanDebugStr == "Action list: ")
 			PlanDebugStr += "null";
 
-		SP_LOG_SCREEN_FULL(Display, USP_Settings::GetActionListLogKey(), FColor::Yellow, USP_Settings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
+		SP_LOG_SCREEN_FULL(Display, USP_EditorSettings::GetActionListLogKey(), FColor::Yellow, USP_EditorSettings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
 	}
 #endif
 

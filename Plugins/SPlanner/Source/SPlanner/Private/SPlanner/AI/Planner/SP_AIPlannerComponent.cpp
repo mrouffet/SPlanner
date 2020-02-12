@@ -2,8 +2,6 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Miscs/SP_Settings.h>
-
 #include <SPlanner/Base/Goal/SP_Goal.h>
 #include <SPlanner/Base/Planner/SP_Planner.h>
 #include <SPlanner/Base/Planner/SP_PlanState.h>
@@ -21,6 +19,12 @@
 #include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
 
 #include <SPlanner/AI/Tasks/SP_Task.h>
+
+#if SP_DEBUG_EDITOR
+
+#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+
+#endif
 
 USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -173,7 +177,7 @@ bool USP_AIPlannerComponent::BeginNextTask()
 #if SP_DEBUG_EDITOR
 	// Update debug keys.
 	if(IsSelectedInEditor())
-		USP_Settings::IncrementTaskExecuteLogKey();
+		USP_EditorSettings::IncrementTaskExecuteLogKey();
 #endif
 
 	// No other task left.
