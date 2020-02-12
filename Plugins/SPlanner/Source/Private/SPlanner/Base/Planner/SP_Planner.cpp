@@ -18,12 +18,6 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 
 	TArray<FSP_PlannerAction>& Actions = Infos.PlannerActions.GetActionsFromDepth(CurrDepth);
 
-#if SP_DEBUG
-	// TODO: Use Forced Actions.
-	if (Infos.PlannerActions.ForcedActions.Num())
-		SP_SLOG(Warning, "Forced actions not implemented yet!")
-#endif
-
 	for (int i = 0; i < Actions.Num(); ++i)
 	{
 		// Make copy because of future Remove.
@@ -43,7 +37,23 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 
 		// Check if action achieve plan or plan with this action can be achieved.
 		if (Action.bAchievePlan || LinearConstruct_Internal(Infos, CurrDepth + 1u, Action.Handle->Step->PostCondition(Infos.Planner, PlannerFlags)))
+		{
+			// Check if all forced action has been correctly added.
+			if (Infos.PlannerActions.bHasForcedActions && CurrDepth == 0u)
+			{
+				for (int j = 0; j < Infos.PlannerActions.Actions.Num(); ++j)
+				{
+					/**
+					*	One forced action has been left in action set.
+					*	Since ForcedAction.Weight > EndAction.Weight, a plan which succeed already tried every combination using forced actions.
+					*/
+					if (Infos.PlannerActions.Actions[j].bIsForced)
+						return false;
+				}
+			}
+
 			return true;
+		}
 
 		// Plan generation failed, remove this action from plan.
 		Infos.OutPlan.RemoveAt(Infos.OutPlan.Num() - 1); // Remove last.
@@ -69,10 +79,10 @@ uint64 SP_Planner::UpdateSet(FSP_LinearConstructInfos& Infos, const FSP_PlannerA
 		break;
 	case ESP_ActionGenerationType::AGT_PushBack:
 	{
-
 		// Get Last action for min weight.
 		float MinWeight = Infos.PlannerActions.Actions[Infos.PlannerActions.Actions.Num() - 1].GeneratedWeight;
 		FSP_PlannerAction& NewAction = Infos.PlannerActions.Actions.Add_GetRef(Action);
+		NewAction.bIsForced = false; // Never copy forced action.
 
 		// Set new min weight. PushBacked tasks always have weight < 0.0f.
 		NewAction.GeneratedWeight = MinWeight < 0.0f ? MinWeight - 1.0f : -1.0f;

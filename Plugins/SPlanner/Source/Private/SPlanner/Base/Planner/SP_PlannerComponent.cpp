@@ -274,23 +274,22 @@ void USP_PlannerComponent::ConstructPlan()
 			PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
 		}
 
-		if (PlannerActions.ForcedActions.Num() != 0)
-		{
-			PlanDebugStr += "\nForced: ";
-
-			for (int i = 0; i < PlannerActions.ForcedActions.Num(); ++i)
-				PlanDebugStr += PlannerActions.ForcedActions[i].Handle->GetDebugStr() + ", ";
-
-			PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
-		}
-
 		if (PlannerActions.Actions.Num() != 0)
 		{
 			if(PlanDebugStr != "Action list: ")
 				PlanDebugStr += "\nCore: ";
 
 			for (int i = 0; i < PlannerActions.Actions.Num(); ++i)
+			{
+				if (PlannerActions.Actions[i].bIsForced)
+					PlanDebugStr += "F_"; // Forced action.
+				else if (PlannerActions.Actions[i].bAchievePlan)
+					PlanDebugStr += "E_"; // End action.
+				else
+					PlanDebugStr += "C_"; // Core action.
+
 				PlanDebugStr += PlannerActions.Actions[i].Handle->GetDebugStr() + ", ";
+			}
 
 			PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
 		}

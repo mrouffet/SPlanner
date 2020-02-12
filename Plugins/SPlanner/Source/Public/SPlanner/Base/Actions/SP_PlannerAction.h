@@ -24,6 +24,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
 	bool bAchievePlan = false;
 
+	/** Achieve current plan (ie: EndActions). */
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
+	bool bIsForced = false;
+
 	/** Create PlannerAction with random GeneratedWeight. */
-	static FSP_PlannerAction Make(const FSP_Action* Action, float LODLevel, bool bInAchievePlan = false);
+	static FSP_PlannerAction Make(const FSP_Action* Action, float LODLevel, bool bInAchievePlan = false, bool bInIsForced = false);
 };
