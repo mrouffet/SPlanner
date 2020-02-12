@@ -13,6 +13,7 @@ Build/
 *.suo
 *.dp
 *.sln
+*.tmp
 .vs/*
 
 # Build folders
