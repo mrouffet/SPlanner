@@ -1,5 +1,6 @@
-#include <SPlanner/AI/Characters/SP_Character.h>
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
+#include <SPlanner/AI/Characters/SP_Character.h>
 
 #include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
 #include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>

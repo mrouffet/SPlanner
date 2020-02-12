@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/Base/Actions/SP_Action.h>
 
 FSP_Action::FSP_Action()

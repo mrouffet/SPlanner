@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Tasks/Impl/SP_ChooseTargetTask.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>

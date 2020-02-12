@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/POI/SP_POIActor.h>
 
 #include <Components/SphereComponent.h>

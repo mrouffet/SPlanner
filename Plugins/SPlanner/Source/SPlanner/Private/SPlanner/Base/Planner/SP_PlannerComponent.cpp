@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
 #include <TimerManager.h>

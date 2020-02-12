@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Blackboard/Keys/SP_BlackboardKey_Rotator.h>
 
 const FRotator& USP_BlackboardKey_Rotator::GetValue() const

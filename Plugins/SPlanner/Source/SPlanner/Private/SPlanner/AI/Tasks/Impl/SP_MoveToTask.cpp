@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Tasks/Impl/SP_MoveToTask.h>
 
 #include <GameFramework/Character.h>

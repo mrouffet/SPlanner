@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlannerEditor/SPlannerEditor.h>
 
 #define LOCTEXT_NAMESPACE "FSPlannerEditorModule"

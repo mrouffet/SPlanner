@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/Base/Zones/SP_ReactZoneComponent.h>
 
 #include <TimerManager.h>

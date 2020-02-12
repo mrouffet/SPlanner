@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Blackboard/Keys/SP_BlackboardKey_Name.h>
 
 const FName& USP_BlackboardKey_Name::GetValue() const

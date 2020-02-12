@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Director/SP_AIDirector.h>
 
 void ASP_AIDirector::OnRegistedPlannerActive(USP_PlannerComponent* InPlanner)

@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/Miscs/SP_FlagHelper.h>
 
 bool USP_FlagHelper::IsFlagSet(int BitMask, uint8 Flag)

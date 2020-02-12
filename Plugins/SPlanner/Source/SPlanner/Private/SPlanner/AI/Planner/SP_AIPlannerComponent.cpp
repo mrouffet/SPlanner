@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/Debug/SP_Debug.h>

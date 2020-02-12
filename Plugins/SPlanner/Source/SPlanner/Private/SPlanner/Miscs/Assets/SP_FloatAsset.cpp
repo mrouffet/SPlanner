@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/Miscs/Assets/SP_FloatAsset.h>
 
 float USP_FloatAsset::Get() const

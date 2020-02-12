@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Tasks/SP_TaskChain.h>
 
 uint32 USP_TaskChain::GetUserDataSize() const

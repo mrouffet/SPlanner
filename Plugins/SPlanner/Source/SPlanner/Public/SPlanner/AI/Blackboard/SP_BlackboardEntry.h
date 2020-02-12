@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #pragma once
 
 #include "SP_BlackboardEntry.generated.h"

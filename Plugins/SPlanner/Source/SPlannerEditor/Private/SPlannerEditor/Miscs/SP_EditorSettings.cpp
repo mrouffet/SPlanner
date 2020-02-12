@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlannerEditor/Miscs/SP_EditorSettings.h>
 
 static int TaskExecuteKeyOffset = 0;

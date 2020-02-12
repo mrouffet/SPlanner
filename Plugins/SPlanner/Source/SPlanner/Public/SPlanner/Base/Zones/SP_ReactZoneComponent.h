@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #pragma once
 
 #include <SPlanner/Base/Zones/SP_ZoneComponent.h>

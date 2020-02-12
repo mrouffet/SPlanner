@@ -1,3 +1,5 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 #include <SPlanner/AI/Tasks/SP_Task.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
