@@ -1,23 +1,30 @@
 {
-  "FileVersion": 3,
-  "Version": 1,
-  "VersionName": "1.0",
-  "FriendlyName": "SPlanner",
-  "Description": "Action plan generation using planning algorithm",
-  "Category": "Other",
-  "CreatedBy": "Maxime ROUFFET",
-  "CreatedByURL": "https://github.com/mrouffet/SPlanner",
-  "DocsURL": "https://github.com/mrouffet/SPlanner/blob/master/README.md",
-  "MarketplaceURL": "",
-  "SupportURL": "",
-  "CanContainContent": true,
-  "IsBetaVersion": false,
-  "Installed": false,
-  "Modules": [
-    {
-      "Name": "SPlanner",
-      "Type": "Runtime",
-      "LoadingPhase": "Default"
-    }
-  ]
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "SPlanner",
+	"Description": "Action plan generation using planning algorithm",
+	"Category": "Planning",
+	"CreatedBy": "Maxime ROUFFET",
+	"CreatedByURL": "https://github.com/mrouffet/SPlanner",
+	"DocsURL": "https://github.com/mrouffet/SPlanner/blob/master/README.md",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault": true,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+
+	"Modules": [
+		{
+			"Name": "SPlanner",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SPlannerEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+	]
 }
