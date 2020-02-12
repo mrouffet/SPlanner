@@ -3,6 +3,7 @@
 #include <Components/ActorComponent.h>
 #include "SP_BlackboardComponent.generated.h"
 
+class USP_BlackboardKey;
 class USP_BlackboardAsset;
 
 /**
