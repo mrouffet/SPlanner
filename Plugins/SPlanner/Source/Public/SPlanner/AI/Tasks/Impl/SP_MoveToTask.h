@@ -38,6 +38,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	FName TargetEntryName = "None";
 
+	/** Whether can strafe during move to. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	bool bCanStrafe = true;
+
 	/** The radius to accept the move to as completed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	float AcceptanceRadius = 10.0f;
