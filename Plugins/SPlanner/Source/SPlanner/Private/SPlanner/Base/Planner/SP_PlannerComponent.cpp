@@ -81,6 +81,11 @@ void USP_PlannerComponent::UpdateGoal()
 	USP_Goal* OldGoal = Goal;
 	Goal = NextGoal;
 
+	if (OldGoal)
+		OldGoal->OnEnd(this);
+	if (Goal)
+		Goal->OnStart(this);
+
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
 
 	// Inactive planner.
@@ -357,7 +362,10 @@ bool USP_PlannerComponent::OnActive_Internal_Implementation()
 	PlanState = ESP_PlanState::PS_Finished;
 
 	if (Goal) // Active goal already set.
+	{
+		Goal->OnStart(this);
 		AskNewPlan();
+	}
 
 	OnActive.Broadcast(this);
 
@@ -376,6 +384,8 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 
 	if(bResetGoalOnInactive)
 		SetGoal(nullptr);
+	else if(Goal)
+		Goal->OnEnd(this);
 
 	OnInactive.Broadcast(this);
 

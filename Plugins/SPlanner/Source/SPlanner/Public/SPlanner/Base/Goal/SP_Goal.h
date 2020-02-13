@@ -5,6 +5,8 @@
 #include <Engine/DataAsset.h>
 #include "SP_Goal.generated.h"
 
+class USP_PlannerComponent;
+
 /**
  *	Planner goal asset.
  */
@@ -41,4 +43,12 @@ public:
 	*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Goal")
 	bool CanTransitTo(USP_Goal* NewGoal) const;
+
+	/** Callback method called when Planner starts this goal. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
+	void OnStart(USP_PlannerComponent* Planner);
+
+	/** Callback method called when Planner ends this goal. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
+	void OnEnd(USP_PlannerComponent* Planner);
 };

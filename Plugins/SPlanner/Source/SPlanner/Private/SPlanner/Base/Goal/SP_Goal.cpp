@@ -27,3 +27,12 @@ bool USP_Goal::CanTransitTo(USP_Goal* NewGoal) const
 
 	return false;
 }
+
+void USP_Goal::OnStart_Implementation(USP_PlannerComponent* Planner)
+{
+	SP_CHECK_NULLPTR(Planner)
+}
+void USP_Goal::OnEnd_Implementation(USP_PlannerComponent* Planner)
+{
+	SP_CHECK_NULLPTR(Planner)
+}
