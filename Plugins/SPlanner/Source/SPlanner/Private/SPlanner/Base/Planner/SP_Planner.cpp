@@ -37,12 +37,14 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 
 		uint64 ActionKey = UpdateSet(Infos, Action);
 
-		// Check if action achieve plan or plan with this action can be achieved.
-		if (Action.bAchievePlan || LinearConstruct_Internal(Infos, CurrDepth + 1u, Action.Handle->Step->PostCondition(Infos.Planner, PlannerFlags)))
+		// Check if action achieve plan
+		if (Action.bAchievePlan)
 		{
 			// Check if all forced action has been correctly added.
-			if (Infos.PlannerActions.bHasForcedActions && CurrDepth == 0u)
+			if (Infos.PlannerActions.bHasForcedActions)
 			{
+				bool bAllForcedActionAdded = true;
+
 				for (int j = 0; j < Infos.PlannerActions.Actions.Num(); ++j)
 				{
 					/**
@@ -50,12 +52,22 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 					*	Since ForcedAction.Weight > EndAction.Weight, a plan which succeed already tried every combination using forced actions.
 					*/
 					if (Infos.PlannerActions.Actions[j].bIsForced)
-						return false;
+					{
+						bAllForcedActionAdded = false;
+						break;
+					}
 				}
-			}
 
-			return true;
+				// No forced action left: success.
+				if (bAllForcedActionAdded)
+					return true;
+			}
+			else // No forced action to check: success.
+				return true;
 		}
+		// Check if plan with this action can be achieved.
+		else if (LinearConstruct_Internal(Infos, CurrDepth + 1u, Action.Handle->Step->PostCondition(Infos.Planner, PlannerFlags)))
+			return true;
 
 		// Plan generation failed, remove this action from plan.
 		Infos.OutPlan.RemoveAt(Infos.OutPlan.Num() - 1); // Remove last.
