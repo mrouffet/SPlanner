@@ -6,16 +6,11 @@ public class SPlannerEditor : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicIncludePaths.AddRange(new string[] { });
-
-
-		PrivateIncludePaths.AddRange(new string[] { });
-
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core"
 			}
 		);
 
@@ -23,13 +18,11 @@ public class SPlannerEditor : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
 				"Engine",
+				"CoreUObject",
+
 				"SPlanner"
 			}
 		);
-
-
-		DynamicallyLoadedModuleNames.AddRange(new string[] { });
 	}
 }
