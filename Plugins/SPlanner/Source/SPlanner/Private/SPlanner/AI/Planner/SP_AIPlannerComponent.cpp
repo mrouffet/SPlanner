@@ -114,7 +114,6 @@ float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
 	SP_RCHECK_NULLPTR(Task, -1.0f)
 
 	const float* const CooldownPtr = Cooldowns.Find(Task);
-
 	return CooldownPtr ? *CooldownPtr - GetWorld()->GetTimeSeconds() : -1.0f;
 }
 void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
@@ -126,29 +125,15 @@ void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 	// Never save task without cooldown.
 	if(Cooldown <= 0.0f)
 		return;
-
-	float* const CooldownPtr = Cooldowns.Find(Task);
-
+	
 	// Add 0.001f to ensure float precision.
-
-	if (CooldownPtr)
-		*CooldownPtr = GetWorld()->GetTimeSeconds() + Cooldown + 0.001f;
-	else
-		Cooldowns.Add(Task, GetWorld()->GetTimeSeconds() + Cooldown + 0.001f);
+	Cooldowns.FindOrAdd(Task) = GetWorld()->GetTimeSeconds() + Cooldown + 0.001f;
 }
 bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, false)
 
-	float TaskCooldown = Task->GetCooldown(LOD ? LOD->GetLevel() : -1.0f);
-
-	// Never check task without cooldown.
-	if(TaskCooldown <= 0.0f)
-		return false;
-
-	float Cooldown = GetCooldown(Task);
-
-	return Cooldown > 0.0f && Cooldown >= TaskCooldown;
+	return GetCooldown(Task) > 0.0f;
 }
 
 ASP_AIController* USP_AIPlannerComponent::GetController() const

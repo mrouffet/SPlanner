@@ -42,8 +42,10 @@ protected:
 	*/
 	int CurrentPlanIndex = -1;
 
-	/** Cooldown of all tasks of this planner. */
-	UPROPERTY(Transient)
+	/**
+	*	Cooldown time of all tasks of this planner.
+	*	World Time since beginning + task cooldown is stored.
+	*/
 	TMap<const USP_Task*, float> Cooldowns;
 
 	/** Allocated memory for user data during task execution. */
@@ -133,11 +135,11 @@ public:
 	TArray<USP_ActionStep*> GetNextActionSteps() const;
 
 
-	/** Getter of cooldown for one behavior. */
+	/** Getter of cooldown for one task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
 	float GetCooldown(const USP_Task* Task) const;
 
-	/** Getter of cooldown for one behavior. */
+	/** Getter of cooldown for one task. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
 	void SetCooldown(const USP_Task* Task);
 
