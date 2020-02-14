@@ -6,13 +6,9 @@
 	"Modules":
 	[
 		{
-			"Name": "SPlanner",
+			"Name": "SPlannerDemo",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies":
-			[
-				"Engine"
-			]
+			"LoadingPhase": "Default"
 		}
 	]
 }

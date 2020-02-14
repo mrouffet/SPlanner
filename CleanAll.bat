@@ -14,4 +14,4 @@ RMDIR /s /q Saved
 RMDIR /s /q Plugins\SPlanner\Binaries
 RMDIR /s /q Plugins\SPlanner\Intermediate
 
-DEL /s /q SPlanner.sln
+DEL /s /q *.sln

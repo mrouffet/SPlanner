@@ -1,8 +1,10 @@
+// Copyright 2020 Maxime ROUFFET. All Rights Reserved.
+
 using UnrealBuildTool;
 
-public class SPlannerProject : ModuleRules
+public class SPlannerDemo : ModuleRules
 {
-	public SPlannerProject(ReadOnlyTargetRules Target) : base(Target)
+	public SPlannerDemo(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
