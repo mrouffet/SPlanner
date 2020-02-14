@@ -52,12 +52,17 @@ void USP_FormationShape::OnStart_Implementation(const USP_Formation* Formation)
 {
 	SP_CHECK_NULLPTR(Formation)
 	SP_CHECK_NULLPTR(Formation->GetLeadActor())
+
+	if (bShareCooldown)
+		SavedTimeCooldown = GetWorld()->GetTimeSeconds() + GetCooldown(Formation->GetLeadLOD() ? Formation->GetLeadLOD()->GetLevel() : -1.0f);
 }
 void USP_FormationShape::OnEnd_Implementation(const USP_Formation* Formation)
 {
 	SP_CHECK_NULLPTR(Formation)
 	SP_CHECK_NULLPTR(Formation->GetLeadActor())
+}
 
-	if(bShareCooldown)
-		SavedTimeCooldown = GetWorld()->GetTimeSeconds() + GetCooldown(Formation->GetLeadLOD() ? Formation->GetLeadLOD()->GetLevel() : -1.0f);
+void USP_FormationShape::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
+{
+	SP_LOG(Error, "Method must be overridden in children!")
 }

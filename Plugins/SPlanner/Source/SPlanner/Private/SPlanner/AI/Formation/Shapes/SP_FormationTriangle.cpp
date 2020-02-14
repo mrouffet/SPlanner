@@ -6,3 +6,7 @@ USP_FormationTriangle::USP_FormationTriangle(const FObjectInitializer& ObjectIni
 {
 	MaxNum = 3;
 }
+
+void USP_FormationTriangle::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
+{
+}

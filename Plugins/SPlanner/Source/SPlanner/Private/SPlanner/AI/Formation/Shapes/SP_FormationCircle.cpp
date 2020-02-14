@@ -6,3 +6,7 @@ USP_FormationCircle::USP_FormationCircle(const FObjectInitializer& ObjectInitial
 {
 	MaxNum = 5;
 }
+
+void USP_FormationCircle::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
+{
+}

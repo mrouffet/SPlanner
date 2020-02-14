@@ -48,14 +48,15 @@ void USP_Formation::Remove_Implementation(USP_AIPlannerComponent* Planner)
 	UpdateFormation();
 }
 
-void USP_Formation::UpdateFormation()
+void USP_Formation::ChangeShape()
 {
 	SP_CHECK_NULLPTR(LeadActor)
-	SP_BENCHMARK_SCOPE(UpdateFormation)
+	SP_BENCHMARK_SCOPE(ChangeShape)
 
 	// Select new shape.
 	USP_FormationShape* NewShape = SelectRandomShapes(FindAvailableShapes());
 
+	// Random the same shape.
 	if (CurrentShape == NewShape)
 		return;
 
@@ -74,6 +75,17 @@ void USP_Formation::UpdateFormation()
 	// Start new.
 	if (CurrentShape)
 		CurrentShape->OnStart(this);
+}
+void USP_Formation::UpdateFormation()
+{
+	SP_CHECK_NULLPTR(LeadActor)
+	SP_BENCHMARK_SCOPE(UpdateFormation)
+
+	TArray<USP_FormationShape*> AvailableShapes = FindAvailableShapes();
+	
+	if(AvailableShapes.Find(CurrentShape) == INDEX_NONE ||									// Shape no longer available.
+		(RandomChangeFormationRate >= 0.0f && FMath::FRand() <= RandomChangeFormationRate))	// Random rate.
+		ChangeShape();
 }
 
 TArray<USP_FormationShape*> USP_Formation::FindAvailableShapes() const
@@ -100,7 +112,6 @@ TArray<USP_FormationShape*> USP_Formation::FindAvailableShapes() const
 
 	return Result;
 }
-
 USP_FormationShape* USP_Formation::SelectRandomShapes(const TArray<USP_FormationShape*>& AvailableShapes) const
 {
 	SP_RCHECK_NULLPTR(LeadActor, nullptr)
@@ -147,6 +158,10 @@ bool USP_Formation::PredicateAvailable_Implementation(USP_FormationShape* Shape)
 	SP_RCHECK_NULLPTR(Shape, false)
 	SP_RCHECK_NULLPTR(LeadActor, false)
 
+	// Do not check availability while in use.
+	if(Shape == CurrentShape)
+		return true;
+
 	if(!Shape->IsAvailable(this))
 		return false;
 
@@ -170,7 +185,7 @@ void USP_Formation::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 		bool operator()(const USP_FormationShape& Rhs, const USP_FormationShape& Lhs) const
 		{
 			if (Rhs.GetMinNum() == Lhs.GetMinNum())
-				return Rhs.GetMaxNum() < Lhs.GetMaxNum();
+				return Rhs.GetMaxNum() <= Lhs.GetMaxNum();
 
 			return Rhs.GetMinNum() < Lhs.GetMinNum();
 		}

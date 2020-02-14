@@ -27,6 +27,13 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_LODComponent* LeadLOD = nullptr;
 
+	/**
+	*	The rate of changing formation when a new planner is joining.
+	*	Set < 0.0f to never random.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	float RandomChangeFormationRate = 0.05f;
+
 	/** All possible shapes for this formation. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	TArray<USP_FormationShape*> Shapes;
@@ -79,4 +86,8 @@ public:
 	/** Remove a planner to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void Remove(USP_AIPlannerComponent* Planner);
+
+	/** Change formation shape. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void ChangeShape();
 };

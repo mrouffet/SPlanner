@@ -9,6 +9,8 @@
 
 class USP_Formation;
 
+class USP_AIPlannerComponent;
+
 /**
  *	Base formation shape.
  */
@@ -80,4 +82,11 @@ public:
 	/** Callback method called when Formation ends this shape. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void OnEnd(const USP_Formation* Formation);
+
+	/**
+	*	Compute the new position for each planners.
+	*	Must be overridden in children.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	virtual void Compute(const TArray<USP_AIPlannerComponent*>& Planners) /* = 0*/;
 };

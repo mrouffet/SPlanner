@@ -13,6 +13,17 @@ class SPLANNER_API USP_FormationTriangle : public USP_FormationShape
 {
 	GENERATED_BODY()
 	
+protected:
+	/** The base of the triangle. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Triangle")
+	float Base = 100.0f;
+
+	/** The height of the triangle. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Triangle")
+	float Height = 100.0f;
+
 public:
 	USP_FormationTriangle(const FObjectInitializer& ObjectInitializer);
+
+	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };

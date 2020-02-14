@@ -13,6 +13,13 @@ class SPLANNER_API USP_FormationCircle : public USP_FormationShape
 {
 	GENERATED_BODY()
 
+protected:
+	/** The radius of the circle. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Rectangle")
+	float Radius = 100.0f;
+
 public:
 	USP_FormationCircle(const FObjectInitializer& ObjectInitializer);
+
+	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };
