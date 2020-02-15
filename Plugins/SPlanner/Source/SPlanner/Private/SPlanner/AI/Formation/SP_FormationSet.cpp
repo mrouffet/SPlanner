@@ -12,6 +12,13 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
+#if SP_DEBUG_EDITOR
+	#include <DrawDebugHelpers.h>
+
+	#include <SPlanner/Miscs/SP_FlagHelper.h>
+	#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+#endif
+
 AActor* USP_FormationSet::GetLeadActor() const
 {
 	return LeadActor;
@@ -75,6 +82,57 @@ void USP_FormationSet::Remove_Implementation(USP_AIPlannerComponent* Planner)
 	}
 }
 
+bool USP_FormationSet::AddMultiple_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
+{
+	SP_RCHECK_NULLPTR(LeadActor, false)
+
+	for (int i = 0; i < InPlanners.Num(); ++i)
+	{
+		SP_RCHECK_NULLPTR(InPlanners[i], false)
+		
+		Planners.Add(InPlanners[i]);
+		SetFormationFocus(InPlanners[i]);
+
+		// Set lead actor target.
+		USP_AIBlackboardComponent* const AIBlackboard = InPlanners[i]->GetBlackboard<USP_AIBlackboardComponent>();
+		SP_RCHECK_NULLPTR(AIBlackboard, false)
+
+		USP_Target* const Target = AIBlackboard->GetObject<USP_Target>(TargetEntryName);
+		Target->SetActor(LeadActor);
+	}
+
+	UpdateFormation();
+
+	return true;
+}
+void USP_FormationSet::RemoveMultiple_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
+{
+	SP_CHECK_NULLPTR(LeadActor)
+
+	for (int i = 0; i < InPlanners.Num(); ++i)
+	{
+		SP_CHECK_NULLPTR(InPlanners[i])
+
+		Planners.Remove(InPlanners[i]);
+		ClearFormationFocus(InPlanners[i]);
+
+		// Clear blackboard.
+		USP_AIBlackboardComponent* const AIBlackboard = InPlanners[i]->GetBlackboard<USP_AIBlackboardComponent>();
+		SP_CHECK_NULLPTR(AIBlackboard)
+
+		AIBlackboard->ResetValue(TargetEntryName);
+		AIBlackboard->ResetValue(OffsetEntryName);
+	}
+
+	if (Planners.Num())
+		UpdateFormation();
+	else if (CurrentFormation)
+	{
+		CurrentFormation->OnEnd(this);
+		CurrentFormation = nullptr;
+	}
+}
+
 void USP_FormationSet::ChangeFormation()
 {
 	SP_CHECK_NULLPTR(LeadActor)
@@ -127,7 +185,7 @@ void USP_FormationSet::UpdateFormation()
 		return;
 	}
 	
-	SP_CHECK(Planners.Num() == Offsets.Num(), "Formation Offset num doen't match planner num.")
+	SP_CHECK(Planners.Num() == Offsets.Num(), "Formation [%s] offsets num doen't match planner num.", *CurrentFormation->GetName())
 
 	for (int i = 0; i < Planners.Num(); ++i)
 	{
@@ -137,6 +195,14 @@ void USP_FormationSet::UpdateFormation()
 		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetName())
 
 		AIBlackboard->SetVector(OffsetEntryName, Offsets[i]);
+
+#if SP_DEBUG_EDITOR
+		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		{
+			DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offsets[i], DebugColor, false, DebugDrawTime);
+			DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offsets[i], 10.0f, DebugColor, false, DebugDrawTime);
+		}
+#endif
 	}
 }
 

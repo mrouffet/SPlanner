@@ -75,6 +75,14 @@ protected:
 	/** Cooldown of all formations from this set. */
 	TMap<const USP_Formation*, float> Cooldowns;
 
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
+	FColor DebugColor = FColor::Green;
+
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
+	float DebugDrawTime = 2.5f;
+#endif
+
 	/** Update current formation. */
 	void UpdateFormation();
 
@@ -126,6 +134,22 @@ public:
 	/** Remove a planner to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void Remove(USP_AIPlannerComponent* Planner);
+
+	/**
+	*	Add planners to the formation.
+	*	Warning: This won't call Add().
+	*	Only re-compute formation once.
+	*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	bool AddMultiple(const TArray<USP_AIPlannerComponent*>& InPlanners);
+
+	/**
+	*	Remove planners to the formation.
+	*	Warning: This won't call Add().
+	*	Only re-compute formation once.
+	*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void RemoveMultiple(const TArray<USP_AIPlannerComponent*>& InPlanners);
 
 	/** Change formation type. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")

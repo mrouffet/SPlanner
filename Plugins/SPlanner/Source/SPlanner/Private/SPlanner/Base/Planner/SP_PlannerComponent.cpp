@@ -160,7 +160,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 		PlanDebugStr += "null";
 
 #if SP_DEBUG_EDITOR
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Plan) && IsSelectedInEditor())
 		SP_LOG_SCREEN_FULL(Display, USP_EditorSettings::GetPlanLogKey(), FColor::Orange, USP_EditorSettings::GetDebugScreenDisplayTime(), "%s", *PlanDebugStr)
 #endif
 
@@ -226,7 +226,7 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 	}
 
 #if SP_DEBUG_EDITOR
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Plan) && IsSelectedInEditor())
 		SP_LOG_SCREEN_FULL(Display, USP_EditorSettings::GetPlanGenerationLogKey(), FColor::Purple, USP_EditorSettings::GetDebugScreenDisplayTime(), "Time before construct: %f", TimeBeforeConstructPlan)
 #endif
 
@@ -281,7 +281,7 @@ void USP_PlannerComponent::ConstructPlan()
 
 #if SP_DEBUG_EDITOR
 	// Log available planner actions.
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_DebugFlag::PD_Plan) && IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Plan) && IsSelectedInEditor())
 	{
 		FString PlanDebugStr = "Action list: ";
 

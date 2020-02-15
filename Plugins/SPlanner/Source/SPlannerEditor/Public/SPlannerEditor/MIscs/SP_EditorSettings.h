@@ -8,32 +8,35 @@
 /**
 *	Debug plan enum flags.
 */
-UENUM(Meta = (Bitflags))
-enum class ESP_DebugFlag : uint8
+UENUM(Meta = (Bitflags), Category = "SPlannerEditor")
+enum class ESP_EditorDebugFlag : uint8
 {
 	/** Log move list and generated plan. */
-	PD_Plan				UMETA(DisplayName = "Plan"),
+	ED_Plan				UMETA(DisplayName = "Plan"),
 
 	/** Log task execution (1 time). */
-	PD_TaskExecute		UMETA(DisplayName = "Execute"),
+	ED_TaskExecute		UMETA(DisplayName = "Execute"),
 
 	/** Log task execution frames. */
-	PD_TaskTick			UMETA(DisplayName = "Task"),
+	ED_TaskTick			UMETA(DisplayName = "Task"),
+
+	/** Log task execution frames. */
+	ED_Formation		UMETA(DisplayName = "Formation"),
 };
 
-ENUM_CLASS_FLAGS(ESP_DebugFlag);
+ENUM_CLASS_FLAGS(ESP_EditorDebugFlag);
 
 /**
  *	SPlanner editor static settings.
  */
-UCLASS(Config = Game, DisplayName = "SPlannerEditor")
+UCLASS(Config = Game, DisplayName = "SPlannerEditor", Category = "SPlannerEditor")
 class SPLANNEREDITOR_API USP_EditorSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
 protected:
 	/** Debug log flags for planner. */
-	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "ESP_DebugFlag"), Category = "Debug")
+	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "ESP_EditorDebugFlag"), Category = "Debug")
 	uint8 DebugMask = 0u;
 
 	/** Display time of planner logs. */
