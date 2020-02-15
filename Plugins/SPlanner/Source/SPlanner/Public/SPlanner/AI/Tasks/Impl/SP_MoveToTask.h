@@ -23,7 +23,11 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 		FNavPathSharedPtr DebugPath;
 #endif
 
+		FAIMoveRequest MoveRequest;
 		AAIController* Controller = nullptr;
+
+		/** Whether goal position must be re-compute each tick. */
+		bool bIsDynamic = false;
 
 		/** Internal request execution state. */
 		ESP_PlanExecutionState ExecutionState = ESP_PlanExecutionState::PES_Running;
@@ -38,11 +42,25 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	FName TargetEntryName = "None";
+	FName TargetEntryName = "MainTarget";
+
+	/**
+	*	The entry name to access Target object in Blackboard.
+	*	Set to "None" to not use any offset.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	FName OffsetEntryName = "None";
 
 	/** Whether can strafe during move to. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	bool bCanStrafe = true;
+	bool bCanStrafe = false;
+
+	/**
+	*	Whether precondition should fail if Pawn is already at goal.
+	*	Mostly use true, should use false when using Formation.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	bool bPreconditionFailWhileAlreadyAtGoal = true;
 
 	/** The radius to accept the move to as completed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
@@ -50,7 +68,7 @@ protected:
 
 	/** Check if owner actor has reached its target. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|MoveTo")
-	bool HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const;
+	bool HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target, const FVector& Offset) const;
 
 	/**
 	*	Check if owner actor has reached its target.
@@ -71,7 +89,7 @@ protected:
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 	/** Implementation of move request creation. */
-	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
+	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target, const FVector& Offset);
 
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;

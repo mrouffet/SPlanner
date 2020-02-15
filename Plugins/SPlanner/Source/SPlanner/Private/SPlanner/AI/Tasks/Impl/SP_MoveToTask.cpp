@@ -16,7 +16,7 @@
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 
-bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
+bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target, const FVector& Offset) const
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(Target, false)
@@ -24,9 +24,9 @@ bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, c
 	APawn* Pawn = Planner->GetPawn();
 
 	if(ACharacter* Character = Cast<ACharacter>(Pawn))
-		return HasReachedPosition(Character, Target->GetAnyPosition());
+		return HasReachedPosition(Character, Target->GetAnyPosition() + Offset);
 
-	return HasReachedPosition(Planner->GetPawn(), Target->GetAnyPosition());
+	return HasReachedPosition(Planner->GetPawn(), Target->GetAnyPosition() + Offset);
 }
 bool USP_MoveToTask::HasReachedPosition(APawn* Pawn, const FVector& TargetPosition) const
 {
@@ -51,14 +51,14 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
-FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target, const FVector& Offset)
 {
 	FAIMoveRequest MoveRequest;
 
 	SP_RCHECK_NULLPTR(Target, MoveRequest)
 
-	if (Target->GetState() == ESP_TargetState::TS_Position)
-		MoveRequest.SetGoalLocation(Target->GetPosition());
+	if (Target->GetState() == ESP_TargetState::TS_Position || !FMath::IsNearlyZero(Offset.SizeSquared())) // Target position or offset.
+		MoveRequest.SetGoalLocation(Target->GetAnyPosition() + Offset);
 	else if (AActor* GoalActor = Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
 	else
@@ -101,23 +101,29 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
+	// New target will be set.
+	if (SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
+		return true;
+
 	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
 	USP_AIBlackboardComponent* const Blackboard = AIPlanner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
+	// Get Target.
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
-
-	// New target will be set.
-	if(SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
-		return true;
 
 	// Check valid target and has not already moved.
 	if (!Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
 		return false;
 
-	return !HasReachedPosition(AIPlanner, Target);
+	// Get Offset.
+	FVector Offset = FVector::ZeroVector;
+	if (OffsetEntryName != "None")
+		Offset = Blackboard->GetVector(OffsetEntryName);
+
+	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(AIPlanner, Target, Offset) : true;
 }
 uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
@@ -141,7 +147,11 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
 
-	if (HasReachedPosition(&Planner, Target))
+	FVector Offset = FVector::ZeroVector;
+	if(OffsetEntryName != "None")
+		Offset = Blackboard->GetVector(OffsetEntryName);
+
+	if (HasReachedPosition(&Planner, Target, Offset))
 	{
 		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
@@ -154,13 +164,13 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 
 	// Create MoveRequest.
-	FAIMoveRequest MoveRequest = CreateMoveRequest(Target);
+	Infos->MoveRequest = CreateMoveRequest(Target, Offset);
 
 	// Request movement.
 #if SP_DEBUG
-	FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest, &Infos->DebugPath);
+	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
 #else
-	FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest);
+	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
 #endif
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
@@ -180,9 +190,11 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	Infos->Controller = Controller;
 	Controller->ReceiveMoveCompleted.AddDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 
-
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
+
+	// Set dynamic.
+	Infos->bIsDynamic = Target->IsActor() && !FMath::IsNearlyZero(Offset.SizeSquared());
 
 	return true;
 }
@@ -213,6 +225,37 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
+
+	// TODO: Clean later.
+	if (Infos->bIsDynamic)
+	{
+		USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+		SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
+
+		USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+		SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
+
+		Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition() + Blackboard->GetVector(OffsetEntryName));
+
+		ASP_AIController* const Controller = Planner.GetController();
+		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
+
+		// Request movement.
+		#if SP_DEBUG
+			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
+		#else
+			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
+		#endif
+
+		if (Request.Code == EPathFollowingRequestResult::Failed)
+		{
+			SP_LOG_TASK_EXECUTE(Planner, "Move request failed!")
+			return ESP_PlanExecutionState::PES_Failed;
+		}
+		else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
+			return ESP_PlanExecutionState::PES_Succeed;
+	}
+	//
 
 	return ESP_PlanExecutionState::PES_Running;
 }
