@@ -62,9 +62,12 @@ void USP_Formation::OnEnd_Implementation(const USP_FormationSet* FormationSet)
 	SP_CHECK_NULLPTR(FormationSet->GetLeadActor())
 }
 
-void USP_Formation::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
+bool USP_Formation::Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets)
 {
-	SP_LOG(Error, "Method must be overridden in children!")
+	SP_RCHECK_NULLPTR(LeadActor, false)
+	SP_RCHECK(Planners.Num() >= MinNum && Planners.Num() <= MaxNum, false, "Planners num not supported by formation!")
+
+	return true;
 }
 
 void USP_Formation::Reset_Implementation()

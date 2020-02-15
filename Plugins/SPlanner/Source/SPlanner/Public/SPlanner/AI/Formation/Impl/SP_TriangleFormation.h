@@ -24,6 +24,4 @@ protected:
 
 public:
 	USP_TriangleFormation(const FObjectInitializer& ObjectInitializer);
-
-	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };

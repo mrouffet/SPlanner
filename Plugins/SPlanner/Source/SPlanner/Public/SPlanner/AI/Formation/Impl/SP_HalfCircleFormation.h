@@ -20,6 +20,4 @@ protected:
 
 public:
 	USP_HalfCircleFormation(const FObjectInitializer& ObjectInitializer);
-
-	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };

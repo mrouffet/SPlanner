@@ -6,7 +6,3 @@ USP_HalfCircleFormation::USP_HalfCircleFormation(const FObjectInitializer& Objec
 {
 	MaxNum = 5;
 }
-
-void USP_HalfCircleFormation::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
-{
-}

@@ -6,7 +6,3 @@ USP_RectangleFormation::USP_RectangleFormation(const FObjectInitializer& ObjectI
 {
 	MaxNum = 4;
 }
-
-void USP_RectangleFormation::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
-{
-}

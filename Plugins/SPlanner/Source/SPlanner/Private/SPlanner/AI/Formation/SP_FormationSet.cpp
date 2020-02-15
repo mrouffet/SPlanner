@@ -6,8 +6,11 @@
 
 #include <SPlanner/Base/Zones/SP_LODComponent.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
+#include <SPlanner/AI/Target/SP_Target.h>
 #include <SPlanner/AI/Formation/SP_Formation.h>
+#include <SPlanner/AI/Controllers/SP_AIController.h>
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 AActor* USP_FormationSet::GetLeadActor() const
 {
@@ -34,6 +37,15 @@ bool USP_FormationSet::Add_Implementation(USP_AIPlannerComponent* Planner)
 
 	Planners.Add(Planner);
 
+	SetFormationFocus(Planner);
+
+	// Set lead actor target.
+	USP_AIBlackboardComponent* const AIBlackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
+	SP_RCHECK_NULLPTR(AIBlackboard, false)
+
+	USP_Target* const Target = AIBlackboard->GetObject<USP_Target>(TargetEntryName);
+	Target->SetActor(LeadActor);
+
 	UpdateFormation();
 
 	return true;
@@ -45,7 +57,22 @@ void USP_FormationSet::Remove_Implementation(USP_AIPlannerComponent* Planner)
 
 	Planners.Remove(Planner);
 
-	UpdateFormation();
+	ClearFormationFocus(Planner);
+
+	// Clear blackboard.
+	USP_AIBlackboardComponent* const AIBlackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
+	SP_CHECK_NULLPTR(AIBlackboard)
+
+	AIBlackboard->ResetValue(TargetEntryName);
+	AIBlackboard->ResetValue(OffsetEntryName);
+
+	if (Planners.Num())
+		UpdateFormation();
+	else if(CurrentFormation)
+	{
+		CurrentFormation->OnEnd(this);
+		CurrentFormation = nullptr;
+	}
 }
 
 void USP_FormationSet::ChangeFormation()
@@ -83,9 +110,91 @@ void USP_FormationSet::UpdateFormation()
 
 	TArray<USP_Formation*> AvailableFormations = FindAvailableFormations();
 	
-	if(AvailableFormations.Find(CurrentFormation) == INDEX_NONE ||								// Formation no longer available.
+	if(!CurrentFormation ||
+		AvailableFormations.Find(CurrentFormation) == INDEX_NONE ||								// Formation no longer available.
 		(RandomChangeFormationRate >= 0.0f && FMath::FRand() <= RandomChangeFormationRate))		// Random rate.
 		ChangeFormation();
+
+	TArray<FVector> Offsets;
+	Offsets.Reserve(Planners.Num());
+
+	SP_CHECK_NULLPTR(CurrentFormation)
+	bool FormationResult = CurrentFormation->Compute(LeadActor, TargetActor, Planners, Offsets);
+
+	if (!FormationResult)
+	{
+		SP_LOG(Error, "Formation [%s] Compute failed!", *CurrentFormation->GetName())
+		return;
+	}
+	
+	SP_CHECK(Planners.Num() == Offsets.Num(), "Formation Offset num doen't match planner num.")
+
+	for (int i = 0; i < Planners.Num(); ++i)
+	{
+		SP_CCHECK(Planners[i], "Planners[%d] nullptr!", i)
+
+		USP_AIBlackboardComponent* const AIBlackboard = Planners[i]->GetBlackboard<USP_AIBlackboardComponent>();
+		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetName())
+
+		AIBlackboard->SetVector(OffsetEntryName, Offsets[i]);
+	}
+}
+
+void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
+{
+	SP_CHECK_NULLPTR(Planner)
+
+	switch (FormationFocus)
+	{
+	case ESP_FormationFocus::FLA_None:
+		break;
+	case ESP_FormationFocus::FLA_Lead:
+	{
+		ASP_AIController* const AIController = Planner->GetController();
+		SP_CHECK_NULLPTR(AIController)
+
+		AIController->SetFocus(LeadActor, EAIFocusPriority::Gameplay);
+
+		break;
+	}
+	case ESP_FormationFocus::FLA_Target:
+	{
+		SP_CHECK_NULLPTR(TargetActor)
+
+		ASP_AIController* const AIController = Planner->GetController();
+		SP_CHECK_NULLPTR(AIController)
+
+		AIController->SetFocus(TargetActor, EAIFocusPriority::Gameplay);
+
+		break;
+	}
+	default:
+		SP_LOG(Warning, "FormationFocus not supported yet!")
+		break;
+	}
+}
+void USP_FormationSet::ClearFormationFocus(USP_AIPlannerComponent* Planner)
+{
+	SP_CHECK_NULLPTR(Planner)
+
+	switch (FormationFocus)
+	{
+	case ESP_FormationFocus::FLA_None:
+		break;
+	case ESP_FormationFocus::FLA_Lead:
+	case ESP_FormationFocus::FLA_Target:
+	{
+		ASP_AIController* const AIController = Planner->GetController();
+		SP_CHECK_NULLPTR(AIController)
+
+		AIController->ClearFocus(EAIFocusPriority::Gameplay);
+
+		break;
+	}
+	default:
+		SP_LOG(Warning, "FormationFocus not supported yet!")
+		break;
+	}
 }
 
 TArray<USP_Formation*> USP_FormationSet::FindAvailableFormations() const
@@ -177,9 +286,6 @@ bool USP_FormationSet::PredicateAvailable_Implementation(USP_Formation* Formatio
 
 void USP_FormationSet::Reset_Implementation()
 {
-	LeadActor = nullptr;
-	LeadLOD = nullptr;
-
 	if (CurrentFormation)
 	{
 		CurrentFormation->OnEnd(this);
@@ -187,6 +293,9 @@ void USP_FormationSet::Reset_Implementation()
 		CurrentFormation->Reset();
 		CurrentFormation = nullptr;
 	}
+
+	LeadActor = nullptr;
+	LeadLOD = nullptr;
 
 	Planners.Empty();
 	Cooldowns.Empty();

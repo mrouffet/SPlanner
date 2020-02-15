@@ -21,5 +21,5 @@ protected:
 public:
 	USP_CircleFormation(const FObjectInitializer& ObjectInitializer);
 
-	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
+	bool Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets) final override;
 };

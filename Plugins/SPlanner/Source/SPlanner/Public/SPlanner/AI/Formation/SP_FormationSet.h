@@ -10,6 +10,20 @@ class USP_Formation;
 class USP_LODComponent;
 class USP_AIPlannerComponent;
 
+/** enum of formation focus action. */
+UENUM(Category = "SPlanner|AI|Formation")
+enum class ESP_FormationFocus : uint8
+{
+	/** Don't perform focus. */
+	FLA_None			UMETA(DisplayName = "None"),
+
+	/** Focus Lead actor. */
+	FLA_Lead			UMETA(DisplayName = "Lead"),
+
+	/** Focus Target actor. */
+	FLA_Target			UMETA(DisplayName = "Target"),
+};
+
 /**
  *	Base implementation of AI Formation.
  */
@@ -26,6 +40,18 @@ protected:
 	/** The cached LOD component of LeadActor. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_LODComponent* LeadLOD = nullptr;
+
+	/** The entry name to set main target object in Blackboard. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	FName TargetEntryName = "MainTarget";
+
+	/** The entry name to offset vector in Blackboard. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	FName OffsetEntryName = "TargetOffset";
+
+	/** The formation focus to apply. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	ESP_FormationFocus FormationFocus = ESP_FormationFocus::FLA_None;
 
 	/**
 	*	The rate of changing formation when a new planner is joining.
@@ -52,6 +78,12 @@ protected:
 	/** Update current formation. */
 	void UpdateFormation();
 
+	/** Set the formation focus to new Planner. */
+	void SetFormationFocus(USP_AIPlannerComponent* Planner);
+
+	/** Clear the formation focus of Planner. */
+	void ClearFormationFocus(USP_AIPlannerComponent* Planner);
+
 	/** Find all suitable formations. */
 	virtual TArray<USP_Formation*> FindAvailableFormations() const;
 
@@ -67,6 +99,13 @@ protected:
 #endif
 
 public:
+	/**
+	*	The targeted actor.
+	*	Used for formation rotation.
+	*/
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner")
+	AActor* TargetActor = nullptr;
+
 	/** Getter of LeadActor. */
 	AActor* GetLeadActor() const;
 

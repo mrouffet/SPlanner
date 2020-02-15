@@ -84,11 +84,11 @@ public:
 	void OnEnd(const USP_FormationSet* FormationSet);
 
 	/**
-	*	Compute the new position for each planners.
+	*	Compute the offset position for each planners.
 	*	Must be overridden in children.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	virtual void Compute(const TArray<USP_AIPlannerComponent*>& Planners) /* = 0*/;
+	virtual bool Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets) /* = 0*/;
 
 	/** Reset this formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")

@@ -24,6 +24,4 @@ protected:
 
 public:
 	USP_RectangleFormation(const FObjectInitializer& ObjectInitializer);
-
-	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };

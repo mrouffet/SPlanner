@@ -6,7 +6,3 @@ USP_LineFormation::USP_LineFormation(const FObjectInitializer& ObjectInitializer
 {
 	MaxNum = 3;
 }
-
-void USP_LineFormation::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
-{
-}
