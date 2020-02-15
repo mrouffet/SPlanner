@@ -2,92 +2,91 @@
 
 #pragma once
 
+#include <SPlanner/Miscs/Params/SP_FloatParam.h>
+
 #include <Engine/DataAsset.h>
 #include "SP_Formation.generated.h"
 
-class USP_FormationShape;
+class USP_Formation;
 
-class USP_LODComponent;
 class USP_AIPlannerComponent;
 
 /**
- *	Base implementation of AI Formation.
+ *	Base formation shape.
  */
-UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation")
+UCLASS(Abstract, Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation")
 class SPLANNER_API USP_Formation : public UDataAsset
 {
 	GENERATED_BODY()
-
+	
 protected:
-	/** The leader actor of the formation. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	AActor* LeadActor = nullptr;
+	/** Minimum of AI for this shape. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	int MinNum = 1;
 
-	/** The cached LOD component of LeadActor. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_LODComponent* LeadLOD = nullptr;
+	/** Maximum of AI for this shape. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	int MaxNum = 4;
+
+	/** Whether cooldown should be shared across all formations. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bShareCooldown = false;
 
 	/**
-	*	The rate of changing formation when a new planner is joining.
-	*	Set < 0.0f to never random.
+	*	Saved world time with cooldown.
+	*	Require bShareCooldown == true.
+	*/
+	float SavedTimeCooldown = -1.0f;
+
+	/**
+	*	Weight of this shape.
+	*	Increase weight for chances to be selected.
+	*	LOD Level will be computed from formation's lead actor.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float RandomChangeFormationRate = 0.05f;
+	FSP_FloatParam Weight;
 
-	/** All possible shapes for this formation. */
+	/**
+	*	Cooldown of this shape.
+	*	Time before this shape become available again.
+	*	LOD Level will be computed from formation's lead actor.
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_FormationShape*> Shapes;
-
-	/** List of all planners on this formation. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_AIPlannerComponent*> Planners;
-
-	/** Current Shape in use. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_FormationShape* CurrentShape = nullptr;
-
-	/** Cooldown of all shapes of this formation. */
-	TMap<const USP_FormationShape*, float> Cooldowns;
-
-	/** Update current formation. */
-	void UpdateFormation();
-
-	/** Find all suitable shapes. */
-	virtual TArray<USP_FormationShape*> FindAvailableShapes() const;
-
-	/** Select a random shape from AvailableShapes using weights. */
-	USP_FormationShape* SelectRandomShapes(const TArray<USP_FormationShape*>& AvailableShapes) const;
-
-	/** Predicate to add Shape to AvailableShape list during generation. */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool PredicateAvailable(USP_FormationShape* Shape) const;
-
-#if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+	FSP_FloatParam Cooldown;
 
 public:
-	/** Getter of LeadActor. */
-	AActor* GetLeadActor() const;
+	USP_Formation(const FObjectInitializer& ObjectInitializer);
 
-	/** Getter of LeadLOD. */
-	USP_LODComponent* GetLeadLOD() const;
+	/** Getter of MinNum. */
+	int GetMinNum() const;
+
+	/** Getter of MaxNum. */
+	int GetMaxNum() const;
+
+	/** Getter of Weight. */
+	float GetWeight(float LODLevel = -1.0f) const;
+
+	/** Getter of Cooldown. */
+	float GetCooldown(float LODLevel = -1.0f) const;
+
+	/** Getter of bShareCooldown. */
+	bool IsCooldownShared() const;
+
+	UFUNCTION(BlueprintPure, Category = "SPlanner|AI|Formation")
+	virtual bool IsAvailable(const USP_FormationSet* FormationSet) const;
+
+	/** Callback method called when Formation starts this shape. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void OnStart(const USP_FormationSet* FormationSet);
+
+	/** Callback method called when Formation ends this shape. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void OnEnd(const USP_FormationSet* FormationSet);
 
 	/**
-	*	Initialize the LeadActor.
-	*	Must be done once at start before doing anything else.
+	*	Compute the new position for each planners.
+	*	Must be overridden in children.
 	*/
-	void InitLeadActor(AActor* NewLeadActor);
-
-	/** Add a planner to the formation. */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool Add(USP_AIPlannerComponent* Planner);
-
-	/** Remove a planner to the formation. */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	void Remove(USP_AIPlannerComponent* Planner);
-
-	/** Change formation shape. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	void ChangeShape();
+	virtual void Compute(const TArray<USP_AIPlannerComponent*>& Planners) /* = 0*/;
 };

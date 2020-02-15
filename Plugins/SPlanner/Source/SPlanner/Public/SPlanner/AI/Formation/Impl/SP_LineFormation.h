@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Formation/Shapes/SP_FormationShape.h>
-#include "SP_FormationLine.generated.h"
+#include <SPlanner/AI/Formation/SP_Formation.h>
+#include "SP_LineFormation.generated.h"
 
 /**
  *	Line shape formation implementation.
  */
-UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation|Shape")
-class SPLANNER_API USP_FormationLine : public USP_FormationShape
+UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation")
+class SPLANNER_API USP_LineFormation : public USP_Formation
 {
 	GENERATED_BODY()
 	
@@ -23,7 +23,7 @@ protected:
 	float DistToLead = 100.0f;
 
 public:
-	USP_FormationLine(const FObjectInitializer& ObjectInitializer);
+	USP_LineFormation(const FObjectInitializer& ObjectInitializer);
 
 	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };

@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Formation/Shapes/SP_FormationShape.h>
-#include "SP_FormationTriangle.generated.h"
+#include <SPlanner/AI/Formation/SP_Formation.h>
+#include "SP_TriangleFormation.generated.h"
 
 /**
  *	Triangle shape formation implementation.
  */
-UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation|Shape")
-class SPLANNER_API USP_FormationTriangle : public USP_FormationShape
+UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation")
+class SPLANNER_API USP_TriangleFormation : public USP_Formation
 {
 	GENERATED_BODY()
 	
@@ -23,7 +23,7 @@ protected:
 	float Height = 100.0f;
 
 public:
-	USP_FormationTriangle(const FObjectInitializer& ObjectInitializer);
+	USP_TriangleFormation(const FObjectInitializer& ObjectInitializer);
 
 	void Compute(const TArray<USP_AIPlannerComponent*>& Planners) override;
 };
