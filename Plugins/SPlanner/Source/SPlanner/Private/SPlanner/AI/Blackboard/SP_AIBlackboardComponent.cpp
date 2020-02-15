@@ -29,7 +29,7 @@ void USP_AIBlackboardComponent::InitializeBlackboard_Implementation()
 	{
 		SP_CCHECK(!Keys.Find(Entries[i].Name), "Blackboard Entry already registered! 2 entries can't have the same name!")
 
-		Keys.Add(Entries[i].Name, Entries[i].Key);
+		Keys.Add(Entries[i].Name, Entries[i].Key->CreateInstance());
 	}
 }
 void USP_AIBlackboardComponent::UnInitializeBlackboard_Implementation()
@@ -244,5 +244,5 @@ void USP_AIBlackboardComponent::ResetValue(const FName& EntryName)
 
 	SP_CHECK(OriginalKey, "Key with name %s not found in Blackboard %s", *EntryName.ToString(), *BlackboardAsset->GetName())
 
-	(*KeyPtr)->CopyValue(OriginalKey);
+	(*KeyPtr)->ResetValue(OriginalKey);
 }

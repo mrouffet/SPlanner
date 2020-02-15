@@ -14,11 +14,18 @@ void USP_AIBlackboardKey_Object::SetValue(UObject* Value)
 	Handle = Value;
 }
 
-void USP_AIBlackboardKey_Object::CopyValue(const USP_AIBlackboardKey* Other)
+void USP_AIBlackboardKey_Object::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
-	const USP_AIBlackboardKey_Object* CastedOther = Cast<USP_AIBlackboardKey_Object>(Other);
+	const USP_AIBlackboardKey_Object* CastedOther = Cast<USP_AIBlackboardKey_Object>(OriginalKey);
 
 	SP_CHECK(CastedOther, "Other is not of type USP_AIBlackboardKey_Object")
 
-	Handle = CastedOther->Handle;
+	Handle = DuplicateObject(CastedOther->Handle, this);
+}
+USP_AIBlackboardKey* USP_AIBlackboardKey_Object::CreateInstance()
+{
+	USP_AIBlackboardKey_Object* NewInstance = NewObject<USP_AIBlackboardKey_Object>(this);
+	NewInstance->Handle = DuplicateObject(Handle, NewInstance);
+
+	return NewInstance;
 }

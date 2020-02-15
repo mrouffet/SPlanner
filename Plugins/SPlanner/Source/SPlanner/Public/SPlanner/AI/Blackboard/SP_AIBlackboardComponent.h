@@ -16,7 +16,7 @@ class SPLANNER_API USP_AIBlackboardComponent : public USP_BlackboardComponent
 	GENERATED_BODY()
 
 protected:
-	/** BlackboardKeys by entry name. */
+	/** Blackboard instantiated keys by entry name. */
 	TMap<FName, USP_AIBlackboardKey*> Keys;
 
 	void InitializeBlackboard_Implementation() override;

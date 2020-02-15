@@ -14,11 +14,18 @@ void USP_AIBlackboardKey_Bool::SetValue(bool Value)
 	Handle = Value;
 }
 
-void USP_AIBlackboardKey_Bool::CopyValue(const USP_AIBlackboardKey* Other)
+void USP_AIBlackboardKey_Bool::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
-	const USP_AIBlackboardKey_Bool* CastedOther = Cast<USP_AIBlackboardKey_Bool>(Other);
+	const USP_AIBlackboardKey_Bool* CastedOther = Cast<USP_AIBlackboardKey_Bool>(OriginalKey);
 
 	SP_CHECK(CastedOther, "Other is not of type USP_AIBlackboardKey_Bool")
 
 	Handle = CastedOther->Handle;
+}
+USP_AIBlackboardKey* USP_AIBlackboardKey_Bool::CreateInstance()
+{
+	USP_AIBlackboardKey_Bool* NewInstance = NewObject<USP_AIBlackboardKey_Bool>(this);
+	NewInstance->Handle = Handle;
+
+	return NewInstance;
 }

@@ -15,8 +15,14 @@ class USP_AIBlackboardKey : public UObject
 
 public:
 	/**
-	*	Copy the value from Other.
+	*	reset the value from the original key.
 	*	Must be overridden in children.
 	*/
-	virtual void CopyValue(const USP_AIBlackboardKey* Other) /* = 0 */;
+	virtual void ResetValue(const USP_AIBlackboardKey* OriginalKey) /* = 0 */;
+
+	/**
+	*	Create a new instance of this key.
+	*	Must be overridden in children.
+	*/
+	virtual USP_AIBlackboardKey* CreateInstance() /* = 0 */;
 };

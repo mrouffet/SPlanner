@@ -4,7 +4,13 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-void USP_AIBlackboardKey::CopyValue(const USP_AIBlackboardKey* Other)
+void USP_AIBlackboardKey::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
 	SP_LOG(Error, "Must be overridden in children!")
+}
+USP_AIBlackboardKey* USP_AIBlackboardKey::CreateInstance()
+{
+	SP_LOG(Error, "Must be overridden in children!")
+
+	return nullptr;
 }

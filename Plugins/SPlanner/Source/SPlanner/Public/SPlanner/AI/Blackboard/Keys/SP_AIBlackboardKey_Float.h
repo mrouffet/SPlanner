@@ -26,5 +26,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI|Key")
 	void SetValue(float Value);
 
-	void CopyValue(const USP_AIBlackboardKey* Other) override final;
+	void ResetValue(const USP_AIBlackboardKey* OriginalKey) override final;
+	USP_AIBlackboardKey* CreateInstance() override final;
 };
