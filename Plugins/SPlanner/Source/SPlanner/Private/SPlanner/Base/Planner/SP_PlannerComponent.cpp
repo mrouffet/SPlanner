@@ -336,7 +336,7 @@ void USP_PlannerComponent::ConstructPlan()
 			SetNewPlan(std::move(NewPlan));
 	}
 	else // No plan found.
-		OnPlanConstructionFailed(ESP_PlanError::PE_ConstructionFailed);
+		OnPlanConstructionFailed(ESP_PlanError::PE_CantBeAchieved);
 }
 bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const
 {

@@ -11,9 +11,6 @@ enum class ESP_PlanError : uint8
 	/** Unknown error. */
 	PE_Unknown								UMETA(DisplayName = "Unknown"),
 
-	/** ConstructPlan() failed (no more details). */
-	PE_ConstructionFailed					UMETA(DisplayName = "ConstructionFailed"),
-
 	/** Bad argument provided for plan generation. */
 	PE_BadArgument							UMETA(DisplayName = "BadArgument"),
 

@@ -326,6 +326,7 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 
 	float MinCooldown = FLT_MAX;
 
+	// Check among all cooldown registered, not only action in current ActionSet: POI Task may be in cooldown.
 	for (auto it = Cooldowns.begin(); it != Cooldowns.end(); ++it)
 	{
 		float Cooldown = it->Value - GetWorld()->GetTimeSeconds();
