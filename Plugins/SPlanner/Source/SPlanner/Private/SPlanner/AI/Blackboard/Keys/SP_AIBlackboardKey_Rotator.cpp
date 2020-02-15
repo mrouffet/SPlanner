@@ -4,6 +4,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+
 const FRotator& USP_AIBlackboardKey_Rotator::GetValue() const
 {
 	return Handle;
@@ -22,9 +24,11 @@ void USP_AIBlackboardKey_Rotator::ResetValue(const USP_AIBlackboardKey* Original
 
 	Handle = CastedOther->Handle;
 }
-USP_AIBlackboardKey* USP_AIBlackboardKey_Rotator::CreateInstance()
+USP_AIBlackboardKey* USP_AIBlackboardKey_Rotator::CreateInstance(USP_AIBlackboardComponent* Outer)
 {
-	USP_AIBlackboardKey_Rotator* NewInstance = NewObject<USP_AIBlackboardKey_Rotator>(this);
+	SP_RCHECK_NULLPTR(Outer, nullptr)
+
+	USP_AIBlackboardKey_Rotator* NewInstance = NewObject<USP_AIBlackboardKey_Rotator>(Outer);
 	NewInstance->Handle = Handle;
 
 	return NewInstance;

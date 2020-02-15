@@ -87,6 +87,17 @@ void USP_PlannerComponent::UpdateGoal()
 	if (Goal == NextGoal)
 		return;
 
+	// Inactive planner.
+	if (PlanState == ESP_PlanState::PS_Inactive)
+		return;
+	else if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
+	{
+		CancelPlan();
+
+		PlanState = ESP_PlanState::PS_Finished;
+	}
+
+	// Set new goal after plan state change and possible cancel.
 	USP_Goal* OldGoal = Goal;
 	Goal = NextGoal;
 
@@ -106,16 +117,6 @@ void USP_PlannerComponent::UpdateGoal()
 	}
 
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
-
-	// Inactive planner.
-	if (PlanState == ESP_PlanState::PS_Inactive)
-		return;
-	else if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
-	{
-		CancelPlan();
-
-		PlanState = ESP_PlanState::PS_Finished;
-	}
 
 	// Out dated plan: Do not ask again if already / still waiting for computation.
 	if (PlanState != ESP_PlanState::PS_WaitForCompute)

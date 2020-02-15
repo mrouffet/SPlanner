@@ -5,6 +5,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+
 const FVector& USP_AIBlackboardKey_Vector::GetValue() const
 {
 	return Handle;
@@ -23,9 +25,11 @@ void USP_AIBlackboardKey_Vector::ResetValue(const USP_AIBlackboardKey* OriginalK
 
 	Handle = CastedOther->Handle;
 }
-USP_AIBlackboardKey* USP_AIBlackboardKey_Vector::CreateInstance()
+USP_AIBlackboardKey* USP_AIBlackboardKey_Vector::CreateInstance(USP_AIBlackboardComponent* Outer)
 {
-	USP_AIBlackboardKey_Vector* NewInstance = NewObject<USP_AIBlackboardKey_Vector>(this);
+	SP_RCHECK_NULLPTR(Outer, nullptr)
+
+	USP_AIBlackboardKey_Vector* NewInstance = NewObject<USP_AIBlackboardKey_Vector>(Outer);
 	NewInstance->Handle = Handle;
 
 	return NewInstance;

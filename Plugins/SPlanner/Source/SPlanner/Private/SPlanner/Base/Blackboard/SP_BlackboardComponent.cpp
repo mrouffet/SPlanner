@@ -30,8 +30,6 @@ void USP_BlackboardComponent::UnInitializeBlackboard_Implementation()
 
 void USP_BlackboardComponent::Reset_Implementation()
 {
-	UnInitializeBlackboard();
-	InitializeBlackboard();
 }
 
 void USP_BlackboardComponent::InitializeComponent()
@@ -44,6 +42,5 @@ void USP_BlackboardComponent::UninitializeComponent()
 {
 	Super::UninitializeComponent();
 
-	// This can cause crash. TODO: Fix later.
-	//UnInitializeBlackboard();
+	UnInitializeBlackboard();
 }

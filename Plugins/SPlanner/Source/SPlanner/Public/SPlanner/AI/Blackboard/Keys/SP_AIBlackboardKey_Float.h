@@ -27,5 +27,5 @@ public:
 	void SetValue(float Value);
 
 	void ResetValue(const USP_AIBlackboardKey* OriginalKey) override final;
-	USP_AIBlackboardKey* CreateInstance() override final;
+	USP_AIBlackboardKey* CreateInstance(USP_AIBlackboardComponent* Outer) override final;
 };

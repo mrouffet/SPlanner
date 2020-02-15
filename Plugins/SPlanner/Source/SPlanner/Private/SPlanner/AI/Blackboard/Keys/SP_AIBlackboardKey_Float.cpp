@@ -4,6 +4,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+
 float USP_AIBlackboardKey_Float::GetValue() const
 {
 	return Handle;
@@ -22,9 +24,11 @@ void USP_AIBlackboardKey_Float::ResetValue(const USP_AIBlackboardKey* OriginalKe
 
 	Handle = CastedOther->Handle;
 }
-USP_AIBlackboardKey* USP_AIBlackboardKey_Float::CreateInstance()
+USP_AIBlackboardKey* USP_AIBlackboardKey_Float::CreateInstance(USP_AIBlackboardComponent* Outer)
 {
-	USP_AIBlackboardKey_Float* NewInstance = NewObject<USP_AIBlackboardKey_Float>(this);
+	SP_RCHECK_NULLPTR(Outer, nullptr)
+
+	USP_AIBlackboardKey_Float* NewInstance = NewObject<USP_AIBlackboardKey_Float>(Outer);
 	NewInstance->Handle = Handle;
 
 	return NewInstance;

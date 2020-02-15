@@ -5,6 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardObject.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 USP_AIBlackboardObject* USP_AIBlackboardKey_Object::GetValue() const
 {
@@ -24,10 +25,12 @@ void USP_AIBlackboardKey_Object::ResetValue(const USP_AIBlackboardKey* OriginalK
 
 	Handle->Reset(CastedOther->Handle);
 }
-USP_AIBlackboardKey* USP_AIBlackboardKey_Object::CreateInstance()
+USP_AIBlackboardKey* USP_AIBlackboardKey_Object::CreateInstance(USP_AIBlackboardComponent* Outer)
 {
-	USP_AIBlackboardKey_Object* NewInstance = NewObject<USP_AIBlackboardKey_Object>(this);
-	NewInstance->Handle = DuplicateObject(Handle, NewInstance);
+	SP_RCHECK_NULLPTR(Outer, nullptr)
+
+	USP_AIBlackboardKey_Object* NewInstance = NewObject<USP_AIBlackboardKey_Object>(Outer);
+	NewInstance->Handle = DuplicateObject(Handle, Outer);
 	
 	Handle->Reset(Handle);
 

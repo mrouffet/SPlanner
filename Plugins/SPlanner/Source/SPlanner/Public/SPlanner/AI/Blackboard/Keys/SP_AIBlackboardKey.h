@@ -5,6 +5,8 @@
 #include <UObject/Object.h>
 #include "SP_AIBlackboardKey.generated.h"
 
+class USP_AIBlackboardComponent;
+
 /**
 *	Blackboard key base implementation.
 */
@@ -24,5 +26,5 @@ public:
 	*	Create a new instance of this key.
 	*	Must be overridden in children.
 	*/
-	virtual USP_AIBlackboardKey* CreateInstance() /* = 0 */;
+	virtual USP_AIBlackboardKey* CreateInstance(USP_AIBlackboardComponent* Outer) /* = 0 */;
 };

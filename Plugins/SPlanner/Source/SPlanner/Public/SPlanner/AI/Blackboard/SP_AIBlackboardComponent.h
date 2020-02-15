@@ -17,8 +17,14 @@ class SPLANNER_API USP_AIBlackboardComponent : public USP_BlackboardComponent
 	GENERATED_BODY()
 
 protected:
-	/** Blackboard instantiated keys by entry name. */
+	/**
+	*	Blackboard instantiated keys by entry name.
+	*	Must be UPROPERTY() to avoid USP_AIBlackboardKey* garbage collection.
+	*/
+	UPROPERTY()
 	TMap<FName, USP_AIBlackboardKey*> Keys;
+
+	void Reset_Implementation() override;
 
 	void InitializeBlackboard_Implementation() override;
 	void UnInitializeBlackboard_Implementation() override;
