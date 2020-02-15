@@ -212,6 +212,10 @@ public:
 
 	ESP_PlanState GetPlanState() const;
 
+	/** Getter of enable/disable behavior. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner")
+	bool IsBehaviorEnabled() const;
+
 	/**
 	*	Enable or disable behavior.
 	*	Call OnActive / OnInactive.

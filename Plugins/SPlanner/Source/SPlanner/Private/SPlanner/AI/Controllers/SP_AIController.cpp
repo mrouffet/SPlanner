@@ -77,6 +77,9 @@ void ASP_AIController::OnPossess(APawn* InPawn)
 
 	for (int i = 0; i < ReactZones.Num(); ++i)
 		ReactZones[i]->SetPlanner(Planner);
+
+	if (Planner->bStartActive && !Planner->IsBehaviorEnabled()) // Planner was waiting for possess (blackboard) to start.
+		Planner->SetEnableBehavior(true);
 }
 void ASP_AIController::OnUnPossess()
 {

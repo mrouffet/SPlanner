@@ -44,5 +44,6 @@ void USP_BlackboardComponent::UninitializeComponent()
 {
 	Super::UninitializeComponent();
 
-	UnInitializeBlackboard();
+	// This can cause crash. TODO: Fix later.
+	//UnInitializeBlackboard();
 }

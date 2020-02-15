@@ -29,8 +29,12 @@ USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectIniti
 	bTickInEditor = false;
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// Must be init in cpp file (Standard).
-	PlanState = ESP_PlanState::PS_Inactive;
+	/**
+	*	Must be init in cpp file (Standard).
+	*	Strat as invalid (not initialized).
+	*	Will be set to Valid / Inactive in BeginPlay.
+	*/
+	PlanState = ESP_PlanState::PS_Invalid;
 }
 
 ESP_PlanState USP_PlannerComponent::GetPlanState() const
@@ -38,6 +42,10 @@ ESP_PlanState USP_PlannerComponent::GetPlanState() const
 	return PlanState;
 }
 
+bool USP_PlannerComponent::IsBehaviorEnabled() const
+{
+	return PlanState != ESP_PlanState::PS_Inactive;
+}
 void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
 {
 	if (bEnable)
@@ -383,13 +391,13 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 
 	PlanState = ESP_PlanState::PS_Inactive;
 
-	if(bResetGoalOnInactive)
+	// Blackboard can be null while planner is waiting for possess.
+	if(Blackboard)
+		Blackboard->Reset();
+	else if(bResetGoalOnInactive) // Use else: do not reset goal while waiting for possess.
 		SetGoal(nullptr);
 	else if(Goal)
 		Goal->OnEnd(this);
-
-	SP_RCHECK_NULLPTR(Blackboard, nullptr)
-	Blackboard->Reset();
 
 	OnInactive.Broadcast(this);
 
@@ -417,8 +425,11 @@ void USP_PlannerComponent::BeginPlay()
 	if(!NextGoal)
 		NextGoal = Goal;
 
-	if (bStartActive)
+	if (bStartActive && Blackboard) // Wait for possessed blackboard.
 	{
+		// PlanState start as Invalid. Set Inactive to Activate.
+		PlanState = ESP_PlanState::PS_Inactive;
+
 		// Register before set active.
 		if (bAutoRegisterInDirector)
 			ASP_Director::Register(this);
