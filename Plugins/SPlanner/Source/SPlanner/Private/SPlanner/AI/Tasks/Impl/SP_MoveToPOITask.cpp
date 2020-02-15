@@ -5,7 +5,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
@@ -17,7 +17,7 @@ bool USP_MoveToPOITask::PreCondition(const USP_PlannerComponent& Planner, const 
 	if (SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetPOI))
 		return true;
 
-	USP_BlackboardComponent* const Blackboard = Cast<USP_AIPlannerComponent>(&Planner)->GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

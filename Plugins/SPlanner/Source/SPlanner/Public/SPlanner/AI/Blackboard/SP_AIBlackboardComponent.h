@@ -2,84 +2,84 @@
 
 #pragma once
 
-#include <Components/ActorComponent.h>
-#include "SP_BlackboardComponent.generated.h"
+#include <SPlanner/Base/Blackboard/SP_BlackboardComponent.h>
+#include "SP_AIBlackboardComponent.generated.h"
 
-class USP_BlackboardKey;
-class USP_BlackboardAsset;
+class USP_AIBlackboardKey;
 
 /**
-*	Blackboard component, holding a duplicated SP_BlackboardAsset.
-*/
-UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), DisplayName = "SP_Blackboard", ClassGroup = "SPlanner|Blackboard")
-class SPLANNER_API USP_BlackboardComponent : public UActorComponent
+ *	SPlanner AI Blackboard component implementation
+ */
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Blackboard|AI")
+class SPLANNER_API USP_AIBlackboardComponent : public USP_BlackboardComponent
 {
 	GENERATED_BODY()
 
 protected:
 	/** BlackboardKeys by entry name. */
-	TMap<FName, USP_BlackboardKey*> Keys;
+	TMap<FName, USP_AIBlackboardKey*> Keys;
+
+	void InitializeComponent() override;
+	void UninitializeComponent() override;
 
 public:
-	/** Create a duplicated asset to use it. */
-	void InitBlackboard(const USP_BlackboardAsset* BlackboardAssetSource);
-
+	USP_AIBlackboardComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Getter of bool value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	bool GetBool(const FName& EntryName) const;
 
 	/** Setter of bool value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetBool(const FName& EntryName, bool Value);
 
 
 	/** Getter of int value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	int GetInt(const FName& EntryName) const;
 
 	/** Setter of int value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetInt(const FName& EntryName, int Value);
 
 
 	/** Getter of float value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	float GetFloat(const FName& EntryName) const;
 
 	/** Setter of float value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetFloat(const FName& EntryName, float Value);
 
 
 	/** Getter of FVector value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	const FVector& GetVector(const FName& EntryName) const;
 
 	/** Setter of FVector value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetVector(const FName& EntryName, const FVector& Value);
 
 
 	/** Getter of FRotator value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	const FRotator& GetRotator(const FName& EntryName) const;
 
 	/** Setter of FRotator value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetRotator(const FName& EntryName, const FRotator& Value);
 
 
 	/** Getter of FName value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	const FName& GetFName(const FName& EntryName) const;
 
 	/** Setter of FName value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetFName(const FName& EntryName, const FName& Value);
 
 	/** Getter of Object value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	UObject* GetObject(const FName& EntryName) const;
 
 	/** Getter of casted Object value registered as EntryName. */
@@ -90,6 +90,6 @@ public:
 	}
 
 	/** Setter of Object value registered as EntryName. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetObject(const FName& EntryName, UObject* Value);
 };

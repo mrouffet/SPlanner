@@ -4,12 +4,12 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
 #include <SPlanner/Base/Zones/SP_ReactZoneComponent.h>
-#include <SPlanner/Base/Zones//SP_PlannerLODComponent.h>
+#include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
 
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 FName ASP_AIController::PlannerComponentName(TEXT("Planner"));
 
@@ -68,7 +68,7 @@ void ASP_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
-	Planner->ActionSet = Cast<USP_ActionSetComponent>(InPawn->GetComponentByClass(USP_ActionSetComponent::StaticClass()));
+	Planner->Blackboard = Cast<USP_AIBlackboardComponent>(InPawn->GetComponentByClass(USP_AIBlackboardComponent::StaticClass()));
 	Planner->SetLOD(Cast<USP_PlannerLODComponent>(InPawn->GetComponentByClass(USP_PlannerLODComponent::StaticClass())));
 
 	// Setup pawn's react zones.
@@ -90,7 +90,7 @@ void ASP_AIController::OnUnPossess()
 			ReactZones[i]->SetPlanner(nullptr);
 	}
 
-	Planner->ActionSet = nullptr;
+	Planner->Blackboard = nullptr;
 	Planner->SetLOD(nullptr);
 
 	// UnPossess after reset (Pawn still valid).

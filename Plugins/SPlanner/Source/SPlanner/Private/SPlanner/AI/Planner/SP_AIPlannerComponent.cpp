@@ -8,7 +8,6 @@
 #include <SPlanner/Base/Planner/SP_Planner.h>
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 #include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
-#include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
 #include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
 
 #include <SPlanner/AI/Controllers/SP_AIController.h>
@@ -17,8 +16,7 @@
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardAsset.h>
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Tasks/SP_Task.h>
 
@@ -32,15 +30,6 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 {
 	// Execute task in tick or check cooldowns.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	bWantsInitializeComponent = true;
-
-	Blackboard = CreateDefaultSubobject<USP_BlackboardComponent>("Blackboard");
-}
-
-USP_BlackboardComponent* USP_AIPlannerComponent::GetBlackboard() const
-{
-	return Blackboard;
 }
 
 USP_ActionStep* USP_AIPlannerComponent::GetPrevActionStep() const
@@ -252,9 +241,9 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 	SP_BENCHMARK_SCOPE(AIPC_CreatePlannerActionSet)
 
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
-	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
+	SP_RCHECK_NULLPTR(Blackboard, FSP_PlannerActionSet())
 
-	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(Goal);
+	const USP_ActionSet* const CurrActionSet = Blackboard->GetActionSet(Goal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
 	struct CooldownPredicate
@@ -388,19 +377,6 @@ bool USP_AIPlannerComponent::OnInactive_Internal_Implementation()
 	return true;
 }
 
-void USP_AIPlannerComponent::InitializeComponent()
-{
-	Super::InitializeComponent();
-
-	// Server only while owner is replicated.
-	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
-		return;
-	
-	// Blackboard.
-	SP_CHECK(BloackboardAsset, "AI Planner must have a Blackboard!")
-	Blackboard->InitBlackboard(BloackboardAsset);
-}
-
 void USP_AIPlannerComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -433,13 +409,8 @@ bool USP_AIPlannerComponent::IsSelectedInEditor() const
 		return true;
 
 	// ActionSet owner selected (usually Character).
-	if (ActionSet)
-	{
-		AActor* ActionSetOwner = ActionSet->GetOwner();
-
-		if (ActionSetOwner)
-			return ActionSetOwner->IsSelectedInEditor();
-	}
+	if (APawn* Pawn = GetPawn())
+		return Pawn->IsSelectedInEditor();
 
 	return false;
 }

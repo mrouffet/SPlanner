@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Blackboard/Keys/SP_BlackboardKey.h>
-#include "SP_BlackboardKey_Name.generated.h"
+#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey.h>
+#include "SP_AIBlackboardKey_Name.generated.h"
 
 /**
 *	Blackboard key FName implementation.
 */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, DisplayName = "SP_BB_Name", ClassGroup = "SPlanner|Blackboard|Key")
-class USP_BlackboardKey_Name : public USP_BlackboardKey
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, DisplayName = "SP_BB_Name", ClassGroup = "SPlanner|Blackboard|AI|Key")
+class USP_AIBlackboardKey_Name : public USP_AIBlackboardKey
 {
 	GENERATED_BODY()
 
@@ -23,6 +23,6 @@ public:
 	const FName& GetValue() const;
 
 	/** Setter of Handle. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|Key")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI|Key")
 	void SetValue(const FName& Value);
 };

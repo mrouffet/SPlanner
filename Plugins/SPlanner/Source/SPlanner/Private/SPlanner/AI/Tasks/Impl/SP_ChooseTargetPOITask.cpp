@@ -11,7 +11,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
 #include <SPlanner/AI/POI/SP_POIComponent.h>
@@ -66,7 +66,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds
 	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
 		return SuperInternalResult;
 
-	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

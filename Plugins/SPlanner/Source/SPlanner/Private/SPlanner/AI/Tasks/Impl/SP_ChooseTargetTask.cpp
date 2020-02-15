@@ -7,7 +7,7 @@
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Tasks/Impl/SP_LookAtTask.h>
 
@@ -22,9 +22,7 @@ bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent& Planner, con
 
 #if SP_DEBUG
 	// Check valid blackboard entry.
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
-
-	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

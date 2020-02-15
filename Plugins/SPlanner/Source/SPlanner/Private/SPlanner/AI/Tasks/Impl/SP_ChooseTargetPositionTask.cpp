@@ -8,7 +8,7 @@
 
 #include <Kismet/KismetMathLibrary.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
@@ -21,7 +21,7 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal(float DeltaSe
 	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
 		return SuperInternalResult;
 
-	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

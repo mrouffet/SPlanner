@@ -11,7 +11,8 @@
 
 #include <SPlanner/Base/Actions/SP_ActionStep.h>
 #include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
-#include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
+
+#include <SPlanner/Base/Blackboard/SP_BlackboardComponent.h>
 
 #include <SPlanner/Base/Director/SP_Director.h>
 
@@ -177,9 +178,9 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel
 	SP_BENCHMARK_SCOPE(PC_CreatePlannerActionSet)
 
 	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
-	SP_RCHECK_NULLPTR(ActionSet, FSP_PlannerActionSet())
+	SP_RCHECK_NULLPTR(Blackboard, FSP_PlannerActionSet())
 
-	const USP_ActionSet* const CurrActionSet = ActionSet->GetActionSet(Goal);
+	const USP_ActionSet* const CurrActionSet = Blackboard->GetActionSet(Goal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
 	return CurrActionSet->Shuffle(LODLevel, bCanBeAchievedPtr);

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "SP_BlackboardEntry.generated.h"
+#include "SP_AIBlackboardEntry.generated.h"
 
-class USP_BlackboardKey;
+class USP_AIBlackboardKey;
 
-USTRUCT(BlueprintType, Blueprintable, Category = "SPlanner|Blackboard")
-struct SPLANNER_API FSP_BlackboardEntry
+USTRUCT(BlueprintType, Blueprintable, Category = "SPlanner|AI|Blackboard")
+struct SPLANNER_API FSP_AIBlackboardEntry
 {
 	GENERATED_BODY()
 	
@@ -23,5 +23,5 @@ struct SPLANNER_API FSP_BlackboardEntry
 
 	/** The class of the handled object. */
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
-	USP_BlackboardKey* Key = nullptr;
+	USP_AIBlackboardKey* Key = nullptr;
 };

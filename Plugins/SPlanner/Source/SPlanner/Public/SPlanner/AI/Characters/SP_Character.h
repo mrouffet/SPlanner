@@ -5,7 +5,7 @@
 #include <GameFramework/Character.h>
 #include "SP_Character.generated.h"
 
-class USP_ActionSetComponent;
+class USP_AIBlackboardComponent;
 class USP_POIZoneComponent;
 class USP_PlannerLODComponent;
 
@@ -18,9 +18,9 @@ class SPLANNER_API ASP_Character : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	/** Action set used by Planner. */
+	/** Blackboard used by Planner. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_ActionSetComponent* ActionSet = nullptr;
+	USP_AIBlackboardComponent* Blackboard = nullptr;
 
 	/** POI Interact zone behavior. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")

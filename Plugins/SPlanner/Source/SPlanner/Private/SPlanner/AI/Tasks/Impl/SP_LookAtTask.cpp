@@ -7,7 +7,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
@@ -43,10 +43,7 @@ bool USP_LookAtTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 	if(SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
 		return true;
 
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
-	SP_SRCHECK_NULLPTR(AIPlanner, false)
-
-	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -73,7 +70,7 @@ bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	// Construct before any return for correct destruction in End().
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos();
 
-	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -109,7 +106,7 @@ ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
 
-	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

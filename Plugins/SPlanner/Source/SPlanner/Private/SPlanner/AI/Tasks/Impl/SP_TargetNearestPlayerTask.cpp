@@ -8,7 +8,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
@@ -25,9 +25,7 @@ bool USP_TargetNearestPlayerTask::PreCondition(const USP_PlannerComponent& Plann
 
 #if SP_DEBUG
 	// Check valid blackboard entry.
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
-
-	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -52,7 +50,7 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 {
 	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
-	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

@@ -15,7 +15,7 @@ class USP_Goal;
 class USP_ActionStep;
 struct FSP_PlannerActionSet;
 
-class USP_ActionSetComponent;
+class USP_BlackboardComponent;
 class USP_PlannerLODComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_PlannerDelegate, USP_PlannerComponent*, Planner);
@@ -170,9 +170,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	bool bResetGoalOnInactive = false;
 
-	/** Action set component used. */
+	/** Blackboard component used. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_ActionSetComponent* ActionSet = nullptr;
+	USP_BlackboardComponent* Blackboard = nullptr;
 
 	/**
 	*	Callback event when planner become active.
@@ -200,7 +200,15 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
 	FSP_PlannerGoalDelegate OnGoalChange;
 
+
 	USP_PlannerComponent(const FObjectInitializer& ObjectInitializer);
+
+	/** Get casted Blackboard used by this planner. */
+	template <typename T>
+	T* GetBlackboard() const
+	{
+		return Cast<T>(Blackboard);
+	}
 
 	ESP_PlanState GetPlanState() const;
 

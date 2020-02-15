@@ -8,8 +8,6 @@
 
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
-#include <SPlanner/Base/Actions/SP_ActionSetComponent.h>
-
 ASP_Director* ASP_Director::Instance = nullptr;
 
 ASP_Director::ASP_Director(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

@@ -10,7 +10,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Blackboard/SP_BlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
@@ -103,7 +103,7 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
 
-	USP_BlackboardComponent* const Blackboard = AIPlanner->GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = AIPlanner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -135,7 +135,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
 
-	USP_BlackboardComponent* const Blackboard = Planner.GetBlackboard();
+	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
