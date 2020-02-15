@@ -89,7 +89,7 @@ public:
 	const TArray<USP_PlannerComponent*>& QueryAllPlannersWithGoal(USP_Goal* Goal, bool bIncludeInactive = false);
 
 	/** Getter of Instance. */
-	UFUNCTION(BlueprintPure, DisplayName = "Get SP_Director", Category = "SPlanner|Director")
+	UFUNCTION(BlueprintPure, DisplayName = "Get SP_Director", Category = "SPlanner|Director", meta=(Keywords = "SP Director"))
 	static ASP_Director* GetInstance();
 
 	/**
@@ -119,4 +119,13 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
 	static bool TryUnRegister(USP_PlannerComponent* InPlanner);
+
+	/**
+	*	Set goal to all selected planner in editor.
+	*	In editor, only selected planner will be set.
+	*	In SP_DEBUG build, every registered planner will be set.
+	*	Does nothing in non SP_DEBUG.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
+	void SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAllIfNoSelected = true);
 };

@@ -238,3 +238,55 @@ void ASP_Director::OnRegistedPlannerGoalChange(USP_PlannerComponent* InPlanner, 
 	else
 		GoalPlannersMap.Add(NewGoal, { InPlanner });
 }
+
+void ASP_Director::SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAllIfNoSelected)
+{
+	SP_CHECK_NULLPTR(NewGoal)
+
+#if !SP_DEBUG
+	// The method is not defined using WITH_EDITOR to be able to call it in BP as debug.
+
+	SP_LOG(Warning, "This method should only be called in debug (require SP_DEBUG)!")
+	return;
+
+#else
+
+#if SP_DEBUG_EDITOR
+
+	TArray<USP_PlannerComponent*> AllPlanners;
+
+	for (auto it = GoalPlannersMap.begin(); it != GoalPlannersMap.end(); ++it)
+	{
+		for (int i = 0; i < it->Value.Num(); ++i)
+		{
+			SP_CCHECK_NULLPTR(it->Value[i])
+
+			if (it->Value[i]->IsSelected())
+			{
+				it->Value[i]->SetGoal(NewGoal, true);
+				bApplyToAllIfNoSelected = false; // Almost one is selected.
+			}
+			else if (bApplyToAllIfNoSelected)
+				AllPlanners.Add(it->Value[i]);
+		}
+	}
+
+	if (bApplyToAllIfNoSelected)
+	{
+		for (int i = 0; i < AllPlanners.Num(); ++i)
+			AllPlanners[i]->SetGoal(NewGoal, true);
+	}
+#else
+
+	TArray<USP_PlannerComponent*> AllPlanners = QueryAllPlanners();
+	
+	for (int i = 0; i < AllPlanners.Num(); ++i)
+		AllPlanners[i]->SetGoal(NewGoal, true);
+
+#endif
+
+
+	SP_LOG_SCREEN(Display, FColor::Magenta, "Set Goal: %s", *NewGoal->GetName())
+
+#endif
+}
