@@ -93,7 +93,17 @@ void USP_PlannerComponent::UpdateGoal()
 	if (OldGoal)
 		OldGoal->OnEnd(this);
 	if (Goal)
+	{
+		// Blackboard must be reset to start this goal.
+		if (Goal->GetResetBlackboard())
+		{
+			SP_CHECK_NULLPTR(Blackboard)
+			Blackboard->Reset();
+		}
+
+		// Start after reset.
 		Goal->OnStart(this);
+	}
 
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
 

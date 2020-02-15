@@ -4,6 +4,11 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+bool USP_Goal::GetResetBlackboard() const
+{
+	return bResetBlackboard;
+}
+
 const TArray<USP_Goal*>& USP_Goal::GetAllowedTransitions() const
 {
 	return AllowedTransitions;

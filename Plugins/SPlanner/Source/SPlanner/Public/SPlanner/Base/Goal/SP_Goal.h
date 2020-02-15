@@ -16,6 +16,10 @@ class SPLANNER_API USP_Goal : public UDataAsset
 	GENERATED_BODY()
 
 protected:
+	/** Whether blackboard must be reset when planner start this goal. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
+	bool bResetBlackboard = true;
+
 	/**
 	*	Allowed transition list from this goal to a new one.
 	*	Let empty to allow transition with all other goals.
@@ -36,6 +40,9 @@ public:
 
 	/** Getter of BlockedTransitions. */
 	const TArray<USP_Goal*>& GetBlockedTransitions() const;
+
+	/** Getter of bResetBlackboard. */
+	bool GetResetBlackboard() const;
 
 	/*
 	*	Whether this goal can transit to NewGoal.
