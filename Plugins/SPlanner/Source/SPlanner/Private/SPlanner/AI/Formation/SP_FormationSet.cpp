@@ -18,7 +18,7 @@ USP_LODComponent* USP_FormationSet::GetLeadLOD() const
 	return LeadLOD;
 }
 
-void USP_FormationSet::InitLeadActor(AActor* NewLeadActor)
+void USP_FormationSet::SetLeadActor(AActor* NewLeadActor)
 {
 	SP_CHECK_NULLPTR(NewLeadActor)
 
@@ -173,6 +173,23 @@ bool USP_FormationSet::PredicateAvailable_Implementation(USP_Formation* Formatio
 	}
 
 	return true;
+}
+
+void USP_FormationSet::Reset_Implementation()
+{
+	LeadActor = nullptr;
+	LeadLOD = nullptr;
+
+	if (CurrentFormation)
+	{
+		CurrentFormation->OnEnd(this);
+
+		CurrentFormation->Reset();
+		CurrentFormation = nullptr;
+	}
+
+	Planners.Empty();
+	Cooldowns.Empty();
 }
 
 #if SP_DEBUG_EDITOR

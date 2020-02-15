@@ -10,7 +10,7 @@ class USP_FormationSet;
 /**
  *	AI Planner goal with formation asset.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|AI|Goal")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Goal|AI")
 class SPLANNER_API USP_FormationGoal : public USP_Goal
 {
 	GENERATED_BODY()

@@ -89,4 +89,8 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	virtual void Compute(const TArray<USP_AIPlannerComponent*>& Planners) /* = 0*/;
+
+	/** Reset this formation. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void Reset();
 };

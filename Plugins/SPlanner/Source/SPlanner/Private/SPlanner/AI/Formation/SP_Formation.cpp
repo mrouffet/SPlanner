@@ -66,3 +66,8 @@ void USP_Formation::Compute(const TArray<USP_AIPlannerComponent*>& Planners)
 {
 	SP_LOG(Error, "Method must be overridden in children!")
 }
+
+void USP_Formation::Reset_Implementation()
+{
+	SavedTimeCooldown = -1.0f;
+}

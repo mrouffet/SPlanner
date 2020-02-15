@@ -74,10 +74,11 @@ public:
 	USP_LODComponent* GetLeadLOD() const;
 
 	/**
-	*	Initialize the LeadActor.
+	*	Set the LeadActor.
 	*	Must be done once at start before doing anything else.
 	*/
-	void InitLeadActor(AActor* NewLeadActor);
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void SetLeadActor(AActor* NewLeadActor);
 
 	/** Add a planner to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
@@ -90,4 +91,8 @@ public:
 	/** Change formation type. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void ChangeFormation();
+
+	/** Reset this formation set. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void Reset();
 };
