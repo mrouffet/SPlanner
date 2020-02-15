@@ -5,6 +5,8 @@
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey.h>
 #include "SP_AIBlackboardKey_Object.generated.h"
 
+class USP_AIBlackboardObject;
+
 /**
 *	Blackboard key object implementation.
 */
@@ -16,15 +18,15 @@ class USP_AIBlackboardKey_Object : public USP_AIBlackboardKey
 protected:
 	/** Handled value. */
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly)
-	UObject* Handle = nullptr;
+	USP_AIBlackboardObject* Handle = nullptr;
 
 public:
 	/** Getter of Handle. */
-	UObject* GetValue() const;
+	USP_AIBlackboardObject* GetValue() const;
 
 	/** Setter of Handle. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI|Key")
-	void SetValue(UObject* Value);
+	void SetValue(USP_AIBlackboardObject* Value);
 
 	void ResetValue(const USP_AIBlackboardKey* OriginalKey) override final;
 	USP_AIBlackboardKey* CreateInstance() override final;

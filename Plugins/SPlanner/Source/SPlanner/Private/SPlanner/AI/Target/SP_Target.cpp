@@ -149,3 +149,14 @@ void USP_Target::Clear()
 	Position = FVector::ZeroVector;
 	State = ESP_TargetState::TS_None;
 }
+
+void USP_Target::Reset(USP_AIBlackboardObject* OriginalObject)
+{
+	SP_CHECK_NULLPTR(OriginalObject)
+
+	USP_Target* OriginalTarget = Cast<USP_Target>(OriginalObject);
+	SP_CHECK(OriginalTarget, "OriginalTarget nullptr! OriginalObject [%s] is not of type USP_Target", *OriginalObject->GetName())
+
+	State = OriginalTarget->State;
+	Position = OriginalTarget->Position; // Copy largest object of union.
+}

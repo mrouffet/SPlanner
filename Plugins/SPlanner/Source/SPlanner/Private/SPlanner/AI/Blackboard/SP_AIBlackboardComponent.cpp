@@ -5,6 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardAsset.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardObject.h>
 
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Bool.h>
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Int.h>
@@ -193,7 +194,7 @@ void USP_AIBlackboardComponent::SetFName(const FName& EntryName, const FName& Va
 	NameKey->SetValue(Value);
 }
 
-UObject* USP_AIBlackboardComponent::GetObject(const FName& EntryName) const
+USP_AIBlackboardObject* USP_AIBlackboardComponent::GetObject(const FName& EntryName) const
 {
 	const USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(EntryName);
 
@@ -205,7 +206,7 @@ UObject* USP_AIBlackboardComponent::GetObject(const FName& EntryName) const
 	
 	return ObjectKey->GetValue();
 }
-void USP_AIBlackboardComponent::SetObject(const FName& EntryName, UObject* Value)
+void USP_AIBlackboardComponent::SetObject(const FName& EntryName, USP_AIBlackboardObject* Value)
 {
 	USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(EntryName);
 

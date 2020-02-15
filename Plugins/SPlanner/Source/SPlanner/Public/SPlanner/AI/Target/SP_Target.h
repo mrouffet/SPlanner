@@ -4,7 +4,7 @@
 
 #include <SPlanner/AI/Target/SP_TargetState.h>
 
-#include <UObject/Object.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardObject.h>
 #include "SP_Target.generated.h"
 
 class USP_POIComponent;
@@ -14,8 +14,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_TargetEvent, USP_Target*, Target
 /**
 *	Implementation of planner target.
 */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Target", DisplayName = "SP_Target")
-class SPLANNER_API USP_Target : public UObject
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Target", DisplayName = "SP_Target")
+class SPLANNER_API USP_Target : public USP_AIBlackboardObject
 {
 	GENERATED_BODY()
 
@@ -113,4 +113,6 @@ public:
 	/** Reset to EAITargetState::AITS_None. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Target")
 	void Clear();
+
+	void Reset(USP_AIBlackboardObject* OriginalObject) override;
 };

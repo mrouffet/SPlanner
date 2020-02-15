@@ -6,6 +6,7 @@
 #include "SP_AIBlackboardComponent.generated.h"
 
 class USP_AIBlackboardKey;
+class USP_AIBlackboardObject;
 
 /**
  *	SPlanner AI Blackboard component implementation
@@ -78,7 +79,7 @@ public:
 
 	/** Getter of Object value registered as EntryName. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
-	UObject* GetObject(const FName& EntryName) const;
+	USP_AIBlackboardObject* GetObject(const FName& EntryName) const;
 
 	/** Getter of casted Object value registered as EntryName. */
 	template <typename T>
@@ -89,7 +90,7 @@ public:
 
 	/** Setter of Object value registered as EntryName. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
-	void SetObject(const FName& EntryName, UObject* Value);
+	void SetObject(const FName& EntryName, USP_AIBlackboardObject* Value);
 
 	/** Reset the value to default (Blackboard Asset). */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
