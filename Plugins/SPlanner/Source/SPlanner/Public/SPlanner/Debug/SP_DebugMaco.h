@@ -4,7 +4,7 @@
 
 #include <SPlanner/SP_Config.h>
 
-#if SP_DEBUG
+#if SP_DEBUG_LOG
 
 #include <type_traits>
 

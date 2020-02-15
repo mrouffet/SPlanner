@@ -8,6 +8,9 @@
 
 	#define SP_DEBUG_EDITOR WITH_EDITOR
 
+	// Enable log macros.
+	#define SP_DEBUG_LOG SP_DEBUG
+
 	// Always log generated plan in console only.
 	#define SP_LOG_PLAN 0
 
@@ -24,6 +27,9 @@
 
 	#define SP_DEBUG_EDITOR 0
 
+	// Enable log macros.
+	#define SP_DEBUG_LOG SP_DEBUG
+
 	// Always log generated plan in console only: Do not require SP_DEBUG.
 	#define SP_LOG_PLAN 0
 
@@ -31,7 +37,7 @@
 	#define SP_MULTITHREAD 0
 
 	// Require SP_DEBUG for Log macros.
-	#define SP_WARNING_PLAN_GEN_FAILED SP_DEBUG && 0
+	#define SP_WARNING_PLAN_GEN_FAILED 0
 
 	#define SP_TASK_BLUEPRINT_IMPLEMENTABLE 1
 
