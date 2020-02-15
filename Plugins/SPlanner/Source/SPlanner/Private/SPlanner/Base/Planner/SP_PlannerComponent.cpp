@@ -388,6 +388,9 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 	else if(Goal)
 		Goal->OnEnd(this);
 
+	SP_RCHECK_NULLPTR(Blackboard, nullptr)
+	Blackboard->Reset();
+
 	OnInactive.Broadcast(this);
 
 	return true;

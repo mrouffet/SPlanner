@@ -19,12 +19,10 @@ protected:
 	/** BlackboardKeys by entry name. */
 	TMap<FName, USP_AIBlackboardKey*> Keys;
 
-	void InitializeComponent() override;
-	void UninitializeComponent() override;
+	void InitializeBlackboard_Implementation() override;
+	void UnInitializeBlackboard_Implementation() override;
 
 public:
-	USP_AIBlackboardComponent(const FObjectInitializer& ObjectInitializer);
-
 	/** Getter of bool value registered as EntryName. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	bool GetBool(const FName& EntryName) const;
@@ -92,4 +90,8 @@ public:
 	/** Setter of Object value registered as EntryName. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void SetObject(const FName& EntryName, UObject* Value);
+
+	/** Reset the value to default (Blackboard Asset). */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
+	void ResetValue(const FName& EntryName);
 };

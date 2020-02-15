@@ -12,4 +12,11 @@ UCLASS(Abstract, BlueprintType, Blueprintable, ClassGroup = "SPlanner|Blackboard
 class USP_AIBlackboardKey : public UObject
 {
 	GENERATED_BODY()
+
+public:
+	/**
+	*	Copy the value from Other.
+	*	Must be overridden in children.
+	*/
+	virtual void CopyValue(const USP_AIBlackboardKey* Other) /* = 0 */;
 };

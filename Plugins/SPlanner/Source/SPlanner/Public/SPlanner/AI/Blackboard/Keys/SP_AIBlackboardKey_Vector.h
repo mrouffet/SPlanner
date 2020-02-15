@@ -25,4 +25,6 @@ public:
 	/** Setter of Handle. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI|Key")
 	void SetValue(const FVector& Value);
+
+	void CopyValue(const USP_AIBlackboardKey* Other) override final;
 };

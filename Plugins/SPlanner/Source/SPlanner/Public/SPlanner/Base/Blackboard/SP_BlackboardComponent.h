@@ -26,10 +26,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_BlackboardAsset* BlackboardAsset = nullptr;
 
+	/** Initialize this blackboard. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
+	void InitializeBlackboard();
+
+	/** Initialize this blackboard. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
+	void UnInitializeBlackboard();
+
+	void InitializeComponent() override;
+	void UninitializeComponent() override;
+
 public:
 	USP_BlackboardComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Forward Getter of action set depending on Goal. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
 	USP_ActionSet* GetActionSet(USP_Goal* Goal);
+
+	/** Reset this blackboard. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
+	void Reset();
 };

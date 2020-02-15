@@ -10,6 +10,8 @@ USP_BlackboardComponent::USP_BlackboardComponent(const FObjectInitializer& Objec
 {
 	bTickInEditor = false;
 	PrimaryComponentTick.bCanEverTick = true;
+
+	bWantsInitializeComponent = true;
 }
 
 USP_ActionSet* USP_BlackboardComponent::GetActionSet(USP_Goal* Goal)
@@ -17,4 +19,30 @@ USP_ActionSet* USP_BlackboardComponent::GetActionSet(USP_Goal* Goal)
 	SP_RCHECK_NULLPTR(BlackboardAsset, nullptr)
 
 	return BlackboardAsset->GetActionSet(Goal);
+}
+
+void USP_BlackboardComponent::InitializeBlackboard_Implementation()
+{
+}
+void USP_BlackboardComponent::UnInitializeBlackboard_Implementation()
+{
+}
+
+void USP_BlackboardComponent::Reset_Implementation()
+{
+	UnInitializeBlackboard();
+	InitializeBlackboard();
+}
+
+void USP_BlackboardComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	InitializeBlackboard();
+}
+void USP_BlackboardComponent::UninitializeComponent()
+{
+	Super::UninitializeComponent();
+
+	UnInitializeBlackboard();
 }

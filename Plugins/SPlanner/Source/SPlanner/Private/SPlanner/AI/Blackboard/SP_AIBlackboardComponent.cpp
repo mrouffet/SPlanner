@@ -14,14 +14,9 @@
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Name.h>
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Object.h>
 
-USP_AIBlackboardComponent::USP_AIBlackboardComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+void USP_AIBlackboardComponent::InitializeBlackboard_Implementation()
 {
-	bWantsInitializeComponent = true;
-}
-
-void USP_AIBlackboardComponent::InitializeComponent()
-{
-	Super::InitializeComponent();
+	Super::InitializeBlackboard_Implementation();
 
 	SP_CHECK(Keys.Num() == 0, "Blackboard already init!")
 
@@ -37,9 +32,9 @@ void USP_AIBlackboardComponent::InitializeComponent()
 		Keys.Add(Entries[i].Name, Entries[i].Key);
 	}
 }
-void USP_AIBlackboardComponent::UninitializeComponent()
+void USP_AIBlackboardComponent::UnInitializeBlackboard_Implementation()
 {
-	Super::UninitializeComponent();
+	Super::UnInitializeBlackboard_Implementation();
 
 	Keys.Empty();
 }
@@ -221,4 +216,33 @@ void USP_AIBlackboardComponent::SetObject(const FName& EntryName, UObject* Value
 	SP_CHECK(ObjectKey, "BoolKey nullptr! Entry with name [%s] is not registered as an UObject!", *EntryName.ToString())
 
 	ObjectKey->SetValue(Value);
+}
+
+void USP_AIBlackboardComponent::ResetValue(const FName& EntryName)
+{
+	USP_AIBlackboardAsset* const AIBlackboardAsset = Cast<USP_AIBlackboardAsset>(BlackboardAsset);
+	SP_CHECK(AIBlackboardAsset, "AIBlackboardAsset nullptr! Blackboard asset must be of type USP_AIBlackboardAsset.")
+
+	USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(EntryName);
+
+	SP_CHECK(KeyPtr, "KeyPtr nullptr! Entry with name [%s] not registered!", *EntryName.ToString())
+	SP_CHECK_NULLPTR(*KeyPtr)
+
+	// Find original Key.
+	const TArray<FSP_AIBlackboardEntry>& Entries = AIBlackboardAsset->GetEntries();
+
+	USP_AIBlackboardKey* OriginalKey = nullptr;
+
+	for (int i = 0; i < Entries.Num(); ++i)
+	{
+		if (Entries[i].Name == EntryName)
+		{
+			OriginalKey = Entries[i].Key;
+			break;
+		}
+	}
+
+	SP_CHECK(OriginalKey, "Key with name %s not found in Blackboard %s", *EntryName.ToString(), *BlackboardAsset->GetName())
+
+	(*KeyPtr)->CopyValue(OriginalKey);
 }
