@@ -6,46 +6,48 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
+
 USP_CircleFormation::USP_CircleFormation(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	MaxNum = 10;
 }
 
-bool USP_CircleFormation::Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets)
+void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 {
-	if (!Super::Compute(LeadActor, TargetActor, Planners, Offsets))
-		return false;
+	const float AngleStep = 360.0f / Infos.PlannerInfos.Num();
 
-	FVector BaseDirection;
+	TArray<float> OffsetAngles;
+	OffsetAngles.Reserve(Infos.PlannerInfos.Num());
 
-	if (TargetActor && TargetActor != LeadActor)
-		BaseDirection = (TargetActor->GetActorLocation() - LeadActor->GetActorLocation()).GetSafeNormal();
-	else
-		BaseDirection = LeadActor->GetActorForwardVector();
+	float TotalAngleCorrection = 0.0f;
 
-	if (ConstructionType == ESP_FormationConstructionType::FCT_Dichotomy)
+	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
 	{
-		float AngleStep = 360.0f / Planners.Num();
+		SP_CCHECK_NULLPTR(Infos.PlannerInfos[i].Planner)
+		SP_CCHECK_NULLPTR(Infos.PlannerInfos[i].Planner->GetPawn())
 
-		for (int i = 0; i < Planners.Num(); ++i)
-			Offsets.Add(FRotator(0.0f, AngleStep * i, 0.0f).RotateVector(BaseDirection) * Radius);
-	}
-	else if (ConstructionType == ESP_FormationConstructionType::FCT_PointByPoint)
-	{
-		float AngleStep = 180.0f / MaxNum; // 180: simplification of (360.0f / MaxNum) / 2.0f.
-		float BaseAngle = Planners.Num() % 2 ? 0.0f : AngleStep;
+		// Desired angle.
+		float Angle = AngleStep * i;
 
-		for (int i = 0; i < Planners.Num(); ++i)
-		{
-			float Yaw = i % 2 == 0 ? AngleStep * i : -AngleStep * (i + 1);
-			Offsets.Add(FRotator(0.0f, BaseAngle + Yaw, 0.0f).RotateVector(BaseDirection) * Radius);
-		}
-	}
-	else
-	{
-		SP_LOG(Warning, "ConstructionType not supported yet!")
-		return false;
+		// Correction from planner input angle.
+		float AngleDiff = Infos.PlannerInfos[i].Angle - Angle;
+		float AngleCorrection = AngleDiff / Infos.PlannerInfos.Num(); // Correction will be spread among all planners.
+		
+		TotalAngleCorrection += AngleCorrection;
+
+		OffsetAngles.Add(Angle);
 	}
 
-	return true;
+	// Apply computed angles and total correction to offsets.
+	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
+		Infos.PlannerInfos[i].Offset = FRotator(0.0f, OffsetAngles[i] + TotalAngleCorrection, 0.0f).RotateVector(Infos.BaseDirection) * Radius;
+}
+void USP_CircleFormation::ConstructPointByPoint(FSP_FormationInfos& Infos)
+{
+	float AngleStep = 360.0f / MaxNum;
+	float BaseAngle = -AngleStep * (Infos.PlannerInfos.Num() - 1) / 2.0f;
+
+	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
+		Infos.PlannerInfos[i].Offset = FRotator(0.0f, BaseAngle + AngleStep * i, 0.0f).RotateVector(Infos.BaseDirection) * Radius;
 }

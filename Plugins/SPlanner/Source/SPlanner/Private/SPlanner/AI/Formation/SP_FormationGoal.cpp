@@ -15,7 +15,7 @@ void USP_FormationGoal::OnStart_Implementation(USP_PlannerComponent* Planner)
 	SP_CHECK(AIPlanner, "AIPlanner is nullptr! Planner must be a USP_AIPlannerComponent.")
 
 	SP_CHECK_NULLPTR(FormationSet)
-	FormationSet->Add(AIPlanner);
+	FormationSet->AddSingle(AIPlanner);
 }
 void USP_FormationGoal::OnEnd_Implementation(USP_PlannerComponent* Planner)
 {
@@ -25,5 +25,5 @@ void USP_FormationGoal::OnEnd_Implementation(USP_PlannerComponent* Planner)
 	SP_CHECK(AIPlanner, "AIPlanner is nullptr! Planner must be a USP_AIPlannerComponent.")
 
 	SP_CHECK_NULLPTR(FormationSet)
-	FormationSet->Remove(AIPlanner);
+	FormationSet->RemoveSingle(AIPlanner);
 }

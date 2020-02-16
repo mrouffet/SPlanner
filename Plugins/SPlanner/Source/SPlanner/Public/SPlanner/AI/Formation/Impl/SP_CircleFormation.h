@@ -18,8 +18,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Circle")
 	float Radius = 100.0f;
 
+	void ConstructDichotomy(FSP_FormationInfos& Infos) override;
+	void ConstructPointByPoint(FSP_FormationInfos& Infos) override;
+
 public:
 	USP_CircleFormation(const FObjectInitializer& ObjectInitializer);
-
-	bool Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets) final override;
 };

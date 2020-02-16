@@ -4,12 +4,13 @@
 
 #include <SPlanner/Miscs/Params/SP_FloatParam.h>
 
+#include <SPlanner/AI/Formation/SP_FormationInfos.h>
 #include <SPlanner/AI/Formation/SP_FormationConstructionType.h>
 
 #include <Engine/DataAsset.h>
 #include "SP_Formation.generated.h"
 
-class USP_Formation;
+class USP_FormationSet;
 
 class USP_AIPlannerComponent;
 
@@ -33,6 +34,10 @@ protected:
 	/** Maximum of AI for this shape. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	int MaxNum = 4;
+
+	/** Should use the lead actor's forward as reference dir. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Circle")
+	bool bUseLeadForwardAsReference = false;
 
 	/** Whether cooldown should be shared across all formations. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
@@ -59,6 +64,25 @@ protected:
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	FSP_FloatParam Cooldown;
+
+	/** Compute the base direction. */
+	virtual FVector ComputeBaseDirection(const FSP_FormationSetInfos& SetInfos);
+
+	/** Compute the signed angle between BaseDirection and Planner to LeadActor direction. */
+	float ComputeSignedAngle(const APawn* Pawn, const AActor* LeadActor, const FVector& BaseDirection);
+	float ComputeSignedAngle(const FVector& PawnLocation, const FVector& LeadLocation, const FVector& BaseDirection);
+
+	/**
+	*	Construct formation by dichotomy.
+	*	Must be overridden in children.
+	*/
+	virtual void ConstructDichotomy(FSP_FormationInfos& Infos);
+
+	/**
+	*	Construct formation point by point.
+	*	Must be overridden in children.
+	*/
+	virtual void ConstructPointByPoint(FSP_FormationInfos& Infos);
 
 public:
 	USP_Formation(const FObjectInitializer& ObjectInitializer);
@@ -89,12 +113,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void OnEnd(const USP_FormationSet* FormationSet);
 
-	/**
-	*	Compute the offset position for each planners.
-	*	Must be overridden in children.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	virtual bool Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets) /* = 0*/;
+	/** Compute the formation from set infos. */
+	void Compute(FSP_FormationSetInfos SetInfos);
 
 	/** Reset this formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")

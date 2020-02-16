@@ -60,6 +60,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	float RandomChangeFormationRate = 0.05f;
 
+	/**	Whether the same formation can be choose again when calling ChangeFormation(). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bCanSelectSameFormationWhenChange = false;
+
 	/** All possible formations from this set. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	TArray<USP_Formation*> Formations;
@@ -83,24 +87,39 @@ protected:
 	float DebugDrawTime = 2.5f;
 #endif
 
-	/** Update current formation. */
-	void UpdateFormation();
-
 	/** Set the formation focus to new Planner. */
 	void SetFormationFocus(USP_AIPlannerComponent* Planner);
 
 	/** Clear the formation focus of Planner. */
 	void ClearFormationFocus(USP_AIPlannerComponent* Planner);
 
+	/** Check if every planner in InPlanners are contained or not in Planners. */
+	bool CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained);
+
+	/** Init the data for InPlanners. */
+	virtual void InitPlannersData(const TArray<USP_AIPlannerComponent*>& InPlanners);
+
+	/** UnInit the data for InPlanners. */
+	virtual void UnInitPlannersData(const TArray<USP_AIPlannerComponent*>& InPlanners);
+
 	/** Find all suitable formations. */
-	virtual TArray<USP_Formation*> FindAvailableFormations() const;
+	virtual TArray<USP_Formation*> FindAvailableFormations(int PlannerNum) const;
 
 	/** Select a random formation from AvailableFormations using weights. */
 	USP_Formation* SelectRandomFormation(const TArray<USP_Formation*>& AvailableFormations) const;
 
+	/** Try to change formation for new PlannerNum. */
+	void TryChangeFormation();
+
+	/** Internal Implementation of change formation. */
+	void ChangeFormation_Internal(const TArray<USP_Formation*>& AvailableFormations);
+
 	/** Predicate to add a formation to AvailableFormations list during generation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	bool PredicateAvailable(USP_Formation* Formation) const;
+
+	/** Apply new computed offsets to Planners. */
+	void ApplyOffsets(const TArray<FVector>& Offsets);
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -127,29 +146,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void SetLeadActor(AActor* NewLeadActor);
 
-	/** Add a planner to the formation. */
+	/** Add planners to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool Add(USP_AIPlannerComponent* Planner);
+	bool Add(const TArray<USP_AIPlannerComponent*>& InPlanners);
+
+	/** Remove planners to the formation. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
+	bool Remove(const TArray<USP_AIPlannerComponent*>& InPlanners);
+
+	/** Add a planner to the formation. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	bool AddSingle(USP_AIPlannerComponent* Planner);
 
 	/** Remove a planner to the formation. */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	void Remove(USP_AIPlannerComponent* Planner);
-
-	/**
-	*	Add planners to the formation.
-	*	Warning: This won't call Add().
-	*	Only re-compute formation once.
-	*/
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool AddMultiple(const TArray<USP_AIPlannerComponent*>& InPlanners);
-
-	/**
-	*	Remove planners to the formation.
-	*	Warning: This won't call Add().
-	*	Only re-compute formation once.
-	*/
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	void RemoveMultiple(const TArray<USP_AIPlannerComponent*>& InPlanners);
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	bool RemoveSingle(USP_AIPlannerComponent* Planner);
 
 	/** Change formation type. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")

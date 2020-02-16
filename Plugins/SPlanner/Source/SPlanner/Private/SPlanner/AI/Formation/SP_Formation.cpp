@@ -7,6 +7,7 @@
 #include <SPlanner/Base/Zones/SP_LODComponent.h>
 
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 USP_Formation::USP_Formation(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -48,6 +49,86 @@ bool USP_Formation::IsAvailable(const USP_FormationSet* FormationSet) const
 	return true;
 }
 
+FVector USP_Formation::ComputeBaseDirection(const FSP_FormationSetInfos& SetInfos)
+{
+	FVector BaseDirection;
+
+	SP_RCHECK_NULLPTR(SetInfos.LeadActor, FVector())
+
+	if (SetInfos.TargetActor && SetInfos.TargetActor != SetInfos.LeadActor)
+		BaseDirection = (SetInfos.TargetActor->GetActorLocation() - SetInfos.LeadActor->GetActorLocation()).GetSafeNormal();
+	else if (bUseLeadForwardAsReference || !SetInfos.Planners.Num())
+		BaseDirection = SetInfos.LeadActor->GetActorForwardVector();
+	else
+	{
+		SP_RCHECK_NULLPTR(SetInfos.Planners[0], SetInfos.LeadActor->GetActorForwardVector())
+		SP_RCHECK_NULLPTR(SetInfos.Planners[0]->GetPawn(), SetInfos.LeadActor->GetActorForwardVector())
+
+		BaseDirection = (SetInfos.Planners[0]->GetPawn()->GetActorLocation() - SetInfos.LeadActor->GetActorLocation()).GetSafeNormal();
+	}
+
+	return BaseDirection;
+}
+float USP_Formation::ComputeSignedAngle(const APawn* Pawn, const AActor* LeadActor, const FVector& BaseDirection)
+{
+	SP_RCHECK_NULLPTR(Pawn, 0.0f)
+	SP_RCHECK_NULLPTR(LeadActor, 0.0f)
+
+	return ComputeSignedAngle(Pawn->GetActorLocation(), LeadActor->GetActorLocation(), BaseDirection);
+}
+float USP_Formation::ComputeSignedAngle(const FVector& PawnLocation, const FVector& LeadLocation, const FVector& BaseDirection)
+{
+	const FVector Dir = (PawnLocation - LeadLocation).GetSafeNormal();
+
+	const float DirDot = FVector::DotProduct(BaseDirection, Dir);
+	const float UnsignedAngle = FMath::RadiansToDegrees(FMath::Acos(DirDot));
+
+	const FVector Cross = FVector::CrossProduct(BaseDirection, Dir);
+	const float Sign = FMath::Sign(FVector::DotProduct(Cross, FVector::UpVector));
+
+	return UnsignedAngle * Sign;
+}
+
+void USP_Formation::Compute(FSP_FormationSetInfos SetInfos)
+{
+	SP_CHECK(SetInfos.Planners.Num() >= MinNum && SetInfos.Planners.Num() <= MaxNum, "Planners num not supported by formation!")
+
+	FSP_FormationInfos Infos(SetInfos, ComputeBaseDirection(SetInfos));
+
+	SetInfos.Offsets.SetNum(SetInfos.Planners.Num());
+
+	for (int i = 0; i < SetInfos.Planners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(SetInfos.Planners[i])
+
+		float Angle = ComputeSignedAngle(SetInfos.Planners[i]->GetPawn(), SetInfos.LeadActor, Infos.BaseDirection);
+		Infos.PlannerInfos.Add(FSP_PlannerFormatioInfos{ SetInfos.Planners[i], Angle, SetInfos.Offsets[i] });
+	}
+
+	Infos.PlannerInfos.Sort();
+
+	switch (ConstructionType)
+	{
+	default:
+		SP_LOG(Warning, "Construction type not supported yet!")
+	case ESP_FormationConstructionType::FCT_Dichotomy:
+		ConstructDichotomy(Infos);
+		break;
+	case ESP_FormationConstructionType::FCT_PointByPoint:
+		ConstructPointByPoint(Infos);
+		break;
+	}
+}
+
+void USP_Formation::ConstructDichotomy(FSP_FormationInfos& Infos)
+{
+	SP_LOG(Error, "Method must be overridden in children!")
+}
+void USP_Formation::ConstructPointByPoint(FSP_FormationInfos& Infos)
+{
+	SP_LOG(Error, "Method must be overridden in children!")
+}
+
 void USP_Formation::OnStart_Implementation(const USP_FormationSet* FormationSet)
 {
 	SP_CHECK_NULLPTR(FormationSet)
@@ -60,14 +141,6 @@ void USP_Formation::OnEnd_Implementation(const USP_FormationSet* FormationSet)
 {
 	SP_CHECK_NULLPTR(FormationSet)
 	SP_CHECK_NULLPTR(FormationSet->GetLeadActor())
-}
-
-bool USP_Formation::Compute(AActor* LeadActor, AActor* TargetActor, const TArray<USP_AIPlannerComponent*>& Planners, TArray<FVector>& Offsets)
-{
-	SP_RCHECK_NULLPTR(LeadActor, false)
-	SP_RCHECK(Planners.Num() >= MinNum && Planners.Num() <= MaxNum, false, "Planners num not supported by formation!")
-
-	return true;
 }
 
 void USP_Formation::Reset_Implementation()
