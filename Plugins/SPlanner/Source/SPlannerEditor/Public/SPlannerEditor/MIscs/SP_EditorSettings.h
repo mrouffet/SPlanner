@@ -28,23 +28,24 @@ ENUM_CLASS_FLAGS(ESP_EditorDebugFlag);
 
 /**
  *	SPlanner editor static settings.
+ *	These settings are locally saved in Intermediate/
  */
-UCLASS(Config = Game, DisplayName = "SPlannerEditor", Category = "SPlannerEditor")
+UCLASS(Config = Editor, DisplayName = "SPlanner", Category = "SPlannerEditor")
 class SPLANNEREDITOR_API USP_EditorSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
 protected:
 	/** Debug log flags for planner. */
-	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "ESP_EditorDebugFlag"), Category = "Debug")
+	UPROPERTY(Config, EditAnywhere, meta = (Bitmask, BitmaskEnum = "ESP_EditorDebugFlag"), Category = "Debug")
 	uint8 DebugMask = 0u;
 
 	/** Display time of planner logs. */
-	UPROPERTY(EditAnywhere, Category = "Debug")
+	UPROPERTY(Config = Game, EditAnywhere, Category = "Debug")
 	float DebugScreenDisplayTime = 10.0f;
 
 	/** The base log key for log. */
-	UPROPERTY(EditAnywhere, Category = "Debug")
+	UPROPERTY(Config = Game, EditAnywhere, Category = "Debug")
 	int DebugLogKey = 12158;
 
 public:
