@@ -4,6 +4,8 @@
 
 #include <SPlanner/Miscs/Params/SP_FloatParam.h>
 
+#include <SPlanner/AI/Formation/SP_FormationConstructionType.h>
+
 #include <Engine/DataAsset.h>
 #include "SP_Formation.generated.h"
 
@@ -20,6 +22,10 @@ class SPLANNER_API USP_Formation : public UDataAsset
 	GENERATED_BODY()
 	
 protected:
+	/** Method of construction. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	ESP_FormationConstructionType ConstructionType = ESP_FormationConstructionType::FCT_Dichotomy;
+
 	/** Minimum of AI for this shape. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	int MinNum = 1;

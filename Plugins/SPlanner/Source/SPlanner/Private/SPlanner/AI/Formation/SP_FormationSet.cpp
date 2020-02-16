@@ -204,6 +204,11 @@ void USP_FormationSet::UpdateFormation()
 		}
 #endif
 	}
+
+#if SP_DEBUG_EDITOR
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
+#endif
 }
 
 void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
