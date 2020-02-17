@@ -93,11 +93,14 @@ protected:
 	/** Select a random formation from AvailableFormations using weights. */
 	USP_Formation* SelectRandomFormation(const TArray<USP_Formation*>& AvailableFormations) const;
 
-	/** Try to change formation for new PlannerNum. */
-	void TryChangeFormation();
+	/**
+	*	Try to change formation for new PlannerNum.
+	*	return ChaneFormation result.
+	*/
+	bool TryChangeFormation(int PlannerNum);
 
 	/** Internal Implementation of change formation. */
-	void ChangeFormation_Internal(const TArray<USP_Formation*>& AvailableFormations);
+	bool ChangeFormation_Internal(const TArray<USP_Formation*>& AvailableFormations);
 
 	void UpdateFormation();
 
@@ -151,7 +154,7 @@ public:
 
 	/** Change formation type. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	void ChangeFormation();
+	bool ChangeFormation();
 
 	/** Update this formation set. */
 	void Tick(float DeltaSeconds);

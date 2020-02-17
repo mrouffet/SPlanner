@@ -95,9 +95,21 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 	// None of InPlanners must not be already contained in Planners.
 	SP_RCHECK(CheckAreContained(InPlanners, false), false, "InPlanners already contained in Planners!")
 
+	// Formation is full.
+	if(!TryChangeFormation(Planners.Num() + InPlanners.Num()))
+	{
+#if SP_DEBUG_EDITOR
+		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+			SP_LOG_SCREEN(Display, FColor::Orange, "Formation full!")
+#endif
+
+		// TODO: Handle behavior: Try to add not whole InPlanners ?
+
+		return false;
+	}
+
 	int PrevPlannersNum = Planners.Num();
 	Planners.Append(InPlanners);
-	TryChangeFormation();
 
 	// Init after formation my have change.
 	InitPlannersData(InPlanners);
@@ -109,7 +121,7 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 
 #if SP_DEBUG_EDITOR
 	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
-		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
+		SP_LOG_SCREEN(Display, FColor::Orange, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
 #endif
 
 	return true;
@@ -144,7 +156,17 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 		return true;
 	}
 
-	TryChangeFormation();
+	if (!TryChangeFormation(Planners.Num()))
+	{
+#if SP_DEBUG_EDITOR
+		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+			SP_LOG_SCREEN(Display, FColor::Orange, "Not enough planner in formation!")
+#endif
+
+		// TODO: Handle behavior.
+
+		return false;
+	}
 
 	UpdateFormation();
 
@@ -199,32 +221,37 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 	}
 }
 
-void USP_FormationSet::TryChangeFormation()
+bool USP_FormationSet::TryChangeFormation(int PlannerNum)
 {
 	// Check formation availability.
-	TArray<USP_Formation*> AvailableFormations = FindAvailableFormations(Planners.Num());
+	TArray<USP_Formation*> AvailableFormations = FindAvailableFormations(PlannerNum);
 
 	if (!CurrentFormation ||
 		AvailableFormations.Find(CurrentFormation) == INDEX_NONE ||								// Formation no longer available.
 		(RandomChangeFormationRate >= 0.0f && FMath::FRand() <= RandomChangeFormationRate))		// Random rate.
-		ChangeFormation_Internal(AvailableFormations);
+		return ChangeFormation_Internal(AvailableFormations);
+
+	return true;
 }
 
-void USP_FormationSet::ChangeFormation()
+bool USP_FormationSet::ChangeFormation()
 {
 	return ChangeFormation_Internal(FindAvailableFormations(Planners.Num()));
 }
-void USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& AvailableFormations)
+bool USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& AvailableFormations)
 {
-	SP_CHECK_NULLPTR(LeadActor)
+	SP_RCHECK_NULLPTR(LeadActor, false)
 	SP_BENCHMARK_SCOPE(ChangeFormation)
 
 	// Select new formation.
 	USP_Formation* NewFormation = SelectRandomFormation(AvailableFormations);
 
+	if (!NewFormation)
+		return false;
+
 	// Random the same formation.
 	if (CurrentFormation == NewFormation)
-		return;
+		return bCanSelectSameFormationWhenChange;
 
 	// End previous.
 	if (CurrentFormation)
@@ -239,16 +266,15 @@ void USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& Av
 	CurrentFormation = NewFormation;
 
 	// Start new.
-	if (CurrentFormation)
-	{
-		CurrentFormation->OnStart(this);
+	CurrentFormation->OnStart(this);
 
-		// Reset Focus.
-		for (int i = 0; i < Planners.Num(); ++i)
-			SetFormationFocus(Planners[i]);
-	}
+	// Reset Focus.
+	for (int i = 0; i < Planners.Num(); ++i)
+		SetFormationFocus(Planners[i]);
 
 	CurrTickTime = 0.0f;
+
+	return true;
 }
 
 void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
