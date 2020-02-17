@@ -21,6 +21,7 @@ protected:
 	bool bResetBlackboard = true;
 
 	/** All planner registered (currently using this goal). */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Goal")
 	TArray<USP_PlannerComponent*> Planners;
 
 	/**
