@@ -101,6 +101,10 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
 
+	// Not already moved to.
+	if(!bAllowMultipleMoveTo && SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
+		return false;
+
 	// New target will be set.
 	if (SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
 		return true;
@@ -115,7 +119,7 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 	SP_RCHECK_NULLPTR(Target, false)
 
 	// Check valid target and has not already moved.
-	if (!Target->IsValid() || SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
+	if (!Target->IsValid())
 		return false;
 
 	// Get Offset.

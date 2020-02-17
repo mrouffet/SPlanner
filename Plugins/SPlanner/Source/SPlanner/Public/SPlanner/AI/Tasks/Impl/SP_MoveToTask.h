@@ -55,6 +55,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	bool bCanStrafe = false;
 
+	/** Can move to again even if a previous move to has been set in plan. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	bool bAllowMultipleMoveTo = true;
+
 	/**
 	*	Whether precondition should fail if Pawn is already at goal.
 	*	Mostly use true, should use false when using Formation.

@@ -38,7 +38,7 @@ protected:
 
 	/** Can target again even if a previous target has been set in plan. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	bool bAllowRetarget = false;
+	bool bAllowReTarget = false;
 
 	/** Local offset to apply to the center. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")

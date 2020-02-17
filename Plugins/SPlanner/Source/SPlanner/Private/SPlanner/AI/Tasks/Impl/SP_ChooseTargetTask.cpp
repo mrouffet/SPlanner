@@ -30,8 +30,8 @@ bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent& Planner, con
 #endif
 
 	// Not already re-targeted.
-	if(bAllowRetarget)
-		return !SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
+	if(!bAllowReTarget && SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
+		return false;
 
 	// Try to valid LookAt.
 	if (LookAtTask)
