@@ -15,6 +15,11 @@ USP_Formation::USP_Formation(const FObjectInitializer& ObjectInitializer) : Supe
 	Cooldown.Default = 0.0f;
 }
 
+ESP_FormationFocusType USP_Formation::GetFormationFocusType() const
+{
+	return FormationFocusType;
+}
+
 int USP_Formation::GetMinNum() const
 {
 	return MinNum;
@@ -22,6 +27,11 @@ int USP_Formation::GetMinNum() const
 int USP_Formation::GetMaxNum() const
 {
 	return MaxNum;
+}
+
+float USP_Formation::GetTickFrequency() const
+{
+	return TickFrequency;
 }
 
 float USP_Formation::GetWeight(float LODLevel) const

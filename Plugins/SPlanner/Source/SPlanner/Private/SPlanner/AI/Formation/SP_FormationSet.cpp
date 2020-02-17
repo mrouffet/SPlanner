@@ -8,6 +8,7 @@
 
 #include <SPlanner/AI/Target/SP_Target.h>
 #include <SPlanner/AI/Formation/SP_Formation.h>
+#include <SPlanner/AI/Formation/SP_FormationFocusType.h>
 #include <SPlanner/AI/Controllers/SP_AIController.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
@@ -94,11 +95,12 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 	// None of InPlanners must not be already contained in Planners.
 	SP_RCHECK(CheckAreContained(InPlanners, false), false, "InPlanners already contained in Planners!")
 
-	InitPlannersData(InPlanners);
-
 	int PrevPlannersNum = Planners.Num();
 	Planners.Append(InPlanners);
 	TryChangeFormation();
+
+	// Init after formation my have change.
+	InitPlannersData(InPlanners);
 
 	UpdateFormation();
 
@@ -122,6 +124,7 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 	// Each of InPlanners must be contained in Planners.
 	SP_RCHECK(CheckAreContained(InPlanners, true), false, "InPlanners must be contained in Planners!")
 
+	// Start by uninit, InPlanners won't be longer in formation.
 	UnInitPlannersData(InPlanners);
 
 	for (int i = 0; i < InPlanners.Num(); ++i)
@@ -182,7 +185,12 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 #if SP_DEBUG_EDITOR
 		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 		{
-			float CurrDrawDebugTime = TickFrequency < 0.0f ? DebugDrawTime : TickFrequency < 0.05f ? 0.05f : TickFrequency;
+			float CurrDrawDebugTime = CurrentFormation->GetTickFrequency();
+
+			if (CurrDrawDebugTime < 0.0f)
+				CurrDrawDebugTime = DebugDrawTime;
+			else if (CurrDrawDebugTime < 0.05f) // Minimum visible draw time.
+				CurrDrawDebugTime = 0.05f;
 
 			DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offsets[i], DebugColor, false, CurrDrawDebugTime);
 			DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offsets[i], 10.0f, DebugColor, false, CurrDrawDebugTime);
@@ -232,35 +240,46 @@ void USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& Av
 
 	// Start new.
 	if (CurrentFormation)
+	{
 		CurrentFormation->OnStart(this);
+
+		// Reset Focus.
+		for (int i = 0; i < Planners.Num(); ++i)
+			SetFormationFocus(Planners[i]);
+	}
+
+	CurrTickTime = 0.0f;
 }
 
 void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
 {
 	SP_CHECK_NULLPTR(Planner)
+	SP_CHECK_NULLPTR(CurrentFormation)
 
-	switch (FormationFocus)
+	ASP_AIController* const AIController = Planner->GetController();
+	SP_CHECK_NULLPTR(AIController)
+
+	switch (CurrentFormation->GetFormationFocusType())
 	{
-	case ESP_FormationFocus::FLA_None:
+	case ESP_FormationFocusType::FFT_None:
 		break;
-	case ESP_FormationFocus::FLA_Lead:
+	case ESP_FormationFocusType::FFT_Lead:
 	{
-		ASP_AIController* const AIController = Planner->GetController();
-		SP_CHECK_NULLPTR(AIController)
-
 		AIController->SetFocus(LeadActor, EAIFocusPriority::Gameplay);
 
 		break;
 	}
-	case ESP_FormationFocus::FLA_Target:
+	case ESP_FormationFocusType::FFT_Target:
 	{
 		SP_CHECK_NULLPTR(TargetActor)
-
-		ASP_AIController* const AIController = Planner->GetController();
-		SP_CHECK_NULLPTR(AIController)
-
 		AIController->SetFocus(TargetActor, EAIFocusPriority::Gameplay);
 
+		break;
+	}
+	case ESP_FormationFocusType::FFT_Clear:
+	{
+		AIController->ClearFocus(EAIFocusPriority::Gameplay);
+		
 		break;
 	}
 	default:
@@ -271,17 +290,19 @@ void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
 void USP_FormationSet::ClearFormationFocus(USP_AIPlannerComponent* Planner)
 {
 	SP_CHECK_NULLPTR(Planner)
+	SP_CHECK_NULLPTR(CurrentFormation)
 
-	switch (FormationFocus)
+	ASP_AIController* const AIController = Planner->GetController();
+	SP_CHECK_NULLPTR(AIController)
+
+	switch (CurrentFormation->GetFormationFocusType())
 	{
-	case ESP_FormationFocus::FLA_None:
+	case ESP_FormationFocusType::FFT_None:
 		break;
-	case ESP_FormationFocus::FLA_Lead:
-	case ESP_FormationFocus::FLA_Target:
+	case ESP_FormationFocusType::FFT_Lead:
+	case ESP_FormationFocusType::FFT_Target:
+	case ESP_FormationFocusType::FFT_Clear:
 	{
-		ASP_AIController* const AIController = Planner->GetController();
-		SP_CHECK_NULLPTR(AIController)
-
 		AIController->ClearFocus(EAIFocusPriority::Gameplay);
 
 		break;
@@ -387,15 +408,17 @@ bool USP_FormationSet::PredicateAvailable_Implementation(USP_Formation* Formatio
 
 void USP_FormationSet::Tick(float DeltaSeconds)
 {
-	if (TickFrequency < 0.0f)
+	SP_CHECK_NULLPTR(CurrentFormation)
+
+	if (CurrentFormation->GetTickFrequency() < 0.0f)
 		return;
 
 	CurrTickTime += DeltaSeconds;
 
-	if (CurrTickTime < TickFrequency)
+	if (CurrTickTime < CurrentFormation->GetTickFrequency())
 		return;
 
-	CurrTickTime -= TickFrequency;
+	CurrTickTime -= CurrentFormation->GetTickFrequency();
 
 	UpdateFormation();
 }

@@ -5,6 +5,7 @@
 #include <SPlanner/Miscs/Params/SP_FloatParam.h>
 
 #include <SPlanner/AI/Formation/SP_FormationInfos.h>
+#include <SPlanner/AI/Formation/SP_FormationFocusType.h>
 #include <SPlanner/AI/Formation/SP_FormationConstructionType.h>
 
 #include <Engine/DataAsset.h>
@@ -23,6 +24,10 @@ class SPLANNER_API USP_Formation : public UDataAsset
 	GENERATED_BODY()
 	
 protected:
+	/** The formation focus to apply. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	ESP_FormationFocusType FormationFocusType = ESP_FormationFocusType::FFT_None;
+
 	/** Method of construction. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	ESP_FormationConstructionType ConstructionType = ESP_FormationConstructionType::FCT_Dichotomy;
@@ -35,13 +40,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	int MaxNum = 4;
 
-	/** Should use the lead actor's forward as reference dir. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Circle")
-	bool bUseLeadForwardAsReference = false;
-
-	/** Whether cooldown should be shared across all formations. */
+	/**
+	*	The frequency of update for this formation set.
+	*	Set < 0.0f to never update.
+	*	Set > 0.0f to update every TickFrequency.
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	bool bShareCooldown = false;
+	float TickFrequency = -1.0f;
+
+	/** Should use the lead actor's forward as reference dir. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bUseLeadForwardAsReference = false;
 
 	/**
 	*	Saved world time with cooldown.
@@ -65,6 +74,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	FSP_FloatParam Cooldown;
 
+	/** Whether cooldown should be shared across all formations. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bShareCooldown = false;
+
 	/** Compute the base direction. */
 	virtual FVector ComputeBaseDirection(const FSP_FormationSetInfos& SetInfos);
 
@@ -87,11 +100,17 @@ protected:
 public:
 	USP_Formation(const FObjectInitializer& ObjectInitializer);
 
+	/** Getter of FormationFocusType. */
+	ESP_FormationFocusType GetFormationFocusType() const;
+
 	/** Getter of MinNum. */
 	int GetMinNum() const;
 
 	/** Getter of MaxNum. */
 	int GetMaxNum() const;
+
+	/** Getter of TickFrequency. */
+	float GetTickFrequency() const;
 
 	/** Getter of Weight. */
 	float GetWeight(float LODLevel = -1.0f) const;

@@ -10,20 +10,6 @@ class USP_Formation;
 class USP_LODComponent;
 class USP_AIPlannerComponent;
 
-/** enum of formation focus action. */
-UENUM(Category = "SPlanner|AI|Formation")
-enum class ESP_FormationFocus : uint8
-{
-	/** Don't perform focus. */
-	FLA_None			UMETA(DisplayName = "None"),
-
-	/** Focus Lead actor. */
-	FLA_Lead			UMETA(DisplayName = "Lead"),
-
-	/** Focus Target actor. */
-	FLA_Target			UMETA(DisplayName = "Target"),
-};
-
 /**
  *	Base implementation of AI Formation.
  */
@@ -48,18 +34,6 @@ protected:
 	/** The entry name to offset vector in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	FName OffsetEntryName = "TargetOffset";
-
-	/** The formation focus to apply. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	ESP_FormationFocus FormationFocus = ESP_FormationFocus::FLA_None;
-
-	/**
-	*	The frequency of update for this formation set.
-	*	Set < 0.0f to never update.
-	*	Set > 0.0f to update every TickFrequency.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float TickFrequency = -1.0f;
 
 	/** The saved current update time. */
 	float CurrTickTime = 0.0f;
