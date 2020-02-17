@@ -35,14 +35,14 @@ protected:
 	*	The current targeted goal.
 	*	Editor set default value.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_Goal* Goal = nullptr;
 	
 	/**
 	*	The cached next goal.
 	*	Goal will be changed during Tick.
 	*/
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SPlanner")
 	USP_Goal* NextGoal = nullptr;
 
 

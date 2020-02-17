@@ -11,6 +11,7 @@
 #include <SPlanner/AI/Controllers/SP_AIController.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+#include <SPlanner/AI/Director/SP_AIDirector.h>
 
 #if SP_DEBUG_EDITOR
 	#include <DrawDebugHelpers.h>
@@ -86,6 +87,7 @@ void USP_FormationSet::UnInitPlannersData(const TArray<USP_AIPlannerComponent*>&
 bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
 	SP_RCHECK_NULLPTR(LeadActor, false)
+	SP_RCHECK(InPlanners.Num(), false, "Empty InPlanners array!")
 
 	SP_BENCHMARK_SCOPE(AddToFormation)
 
@@ -94,6 +96,7 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 
 	InitPlannersData(InPlanners);
 
+	int PrevPlannersNum = Planners.Num();
 	Planners.Append(InPlanners);
 	TryChangeFormation();
 
@@ -107,11 +110,15 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 
 	ApplyOffsets(Offsets);
 
+	if (PrevPlannersNum == 0)
+		ASP_AIDirector::RegisterFormationSet(this);
+
 	return true;
 }
 bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
 	SP_RCHECK_NULLPTR(LeadActor, false)
+	SP_RCHECK(InPlanners.Num(), false, "Empty InPlanners array!")
 
 	SP_BENCHMARK_SCOPE(RemoveFromFormation)
 
@@ -131,6 +138,8 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 			CurrentFormation->OnEnd(this);
 			CurrentFormation = nullptr;
 		}
+
+		ASP_AIDirector::UnRegisterFormationSet(this);
 
 		return true;
 	}
@@ -391,8 +400,14 @@ void USP_FormationSet::Reset_Implementation()
 	{
 		CurrentFormation->OnEnd(this);
 
-		CurrentFormation->Reset();
 		CurrentFormation = nullptr;
+	}
+
+	// Reset each referenced formation.
+	for (int i = 0; i < Formations.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Formations[i])
+		Formations[i]->Reset();
 	}
 
 	LeadActor = nullptr;

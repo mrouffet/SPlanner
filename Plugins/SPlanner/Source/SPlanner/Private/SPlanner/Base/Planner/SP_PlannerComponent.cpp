@@ -443,7 +443,7 @@ void USP_PlannerComponent::BeginPlay()
 
 		// Register before set active.
 		if (bAutoRegisterInDirector)
-			ASP_Director::Register(this);
+			ASP_Director::RegisterPlanner(this);
 
 		OnActive_Internal();
 	}
@@ -456,7 +456,7 @@ void USP_PlannerComponent::BeginPlay()
 
 		// Register after inactive (avoid double call).
 		if (bAutoRegisterInDirector)
-			ASP_Director::Register(this);
+			ASP_Director::RegisterPlanner(this);
 	}
 }
 void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -467,9 +467,9 @@ void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
-	// Unregister from Director.
-	if (bAutoRegisterInDirector)
-		ASP_Director::TryUnRegister(this); // Try unregister: Director can be destroyed first during scene travel or quit game.
+	// Unregister from Director. Check valid instance: Director could have been destroyed first during scene travel or quit game.
+	if (bAutoRegisterInDirector && ASP_Director::GetInstance())
+		ASP_Director::UnRegisterPlanner(this);
 }
 void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

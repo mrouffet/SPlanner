@@ -20,6 +20,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
 	bool bResetBlackboard = true;
 
+	/** All planner registered (currently using this goal). */
+	TArray<USP_PlannerComponent*> Planners;
+
 	/**
 	*	Allowed transition list from this goal to a new one.
 	*	Let empty to allow transition with all other goals.
@@ -35,14 +38,17 @@ protected:
 	TArray<USP_Goal*> BlockedTransitions;
 
 public:
+	/** Getter of bResetBlackboard. */
+	bool GetResetBlackboard() const;
+
+	/** Getter of Planners. */
+	const TArray<USP_PlannerComponent*>& GetPlanners() const;
+
 	/** Getter of AllowedTransitions. */
 	const TArray<USP_Goal*>& GetAllowedTransitions() const;
 
 	/** Getter of BlockedTransitions. */
 	const TArray<USP_Goal*>& GetBlockedTransitions() const;
-
-	/** Getter of bResetBlackboard. */
-	bool GetResetBlackboard() const;
 
 	/*
 	*	Whether this goal can transit to NewGoal.
@@ -58,4 +64,8 @@ public:
 	/** Callback method called when Planner ends this goal. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
 	void OnEnd(USP_PlannerComponent* Planner);
+
+	/** Reset this formation set. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Goal")
+	void Reset();
 };

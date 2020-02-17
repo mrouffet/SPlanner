@@ -39,202 +39,162 @@ void ASP_Director::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	SP_CHECK(Instance == this, "Bad Instance: Try to reset an other instance! An other Director actor may already be in scene.")
 
+	for (int i = 0; i < Goals.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Goals[i])
+		Goals[i]->Reset();
+	}
+
 	Instance = nullptr;
 }
 
-int ASP_Director::GetPlannerNum() const
+int ASP_Director::GetPlannerNum(bool bIncludeInactive) const
 {
-	int Num = 0;
-
-	for (auto it = GoalPlannersMap.begin(); it != GoalPlannersMap.end(); ++it)
-		Num += it->Value.Num();
-
-	return Num;
-}
-TArray<USP_PlannerComponent*> ASP_Director::QueryAllPlanners(bool bIncludeInactive) const
-{
-	TArray<USP_PlannerComponent*> Planners;
-
-	for (auto it = GoalPlannersMap.begin(); it != GoalPlannersMap.end(); ++it)
-		Planners.Append(it->Value);
+	int PlannerNum = ActivePlanners.Num();
 
 	if(bIncludeInactive)
-		Planners.Append(InactivePlanners);
+		PlannerNum += InactivePlanners.Num();
 
-	return Planners;
+	return PlannerNum;
 }
-TArray<USP_PlannerComponent*> ASP_Director::QueryAllPlanners(bool bIncludeInactive)
-{
-	// Call const implementation.
-	return static_cast<const ASP_Director*>(this)->QueryAllPlanners(bIncludeInactive);
-}
-const TArray<USP_PlannerComponent*>& ASP_Director::QueryAllPlannersWithGoal(USP_Goal* Goal, bool bIncludeInactive)
-{
-	TArray<USP_PlannerComponent*>* PlannersPtr = GoalPlannersMap.Find(Goal);
 
-	TArray<USP_PlannerComponent*>& Planners = PlannersPtr ? *PlannersPtr : GoalPlannersMap.Add(Goal, {}); // Goal not previously registered: add to map.
-	
-	if (bIncludeInactive)
+const TArray<USP_PlannerComponent*>& ASP_Director::GetActivePlanners() const
+{
+	return ActivePlanners;
+}
+const TArray<USP_PlannerComponent*>& ASP_Director::GetInactivePlanners() const
+{
+	return InactivePlanners;
+}
+TArray<USP_PlannerComponent*> ASP_Director::GetAllPlanners() const
+{
+	TArray<USP_PlannerComponent*> AllPlanners;
+	AllPlanners.Reserve(GetPlannerNum(true));
+
+	AllPlanners.Append(ActivePlanners);
+	AllPlanners.Append(InactivePlanners);
+
+	return AllPlanners;
+}
+const TArray<USP_PlannerComponent*>& ASP_Director::GetPlannersWithGoal(USP_Goal* Goal)
+{
+	static TArray<USP_PlannerComponent*> EmptyArray;
+
+	SP_RCHECK_NULLPTR(Goal, EmptyArray)
+
+	int Index = Goals.Find(Goal);
+
+	if (Index == INDEX_NONE)
 	{
-		for (int i = 0; i < InactivePlanners.Num(); ++i)
-		{
-			if (InactivePlanners[i]->GetGoal() == Goal)
-				Planners.Add(InactivePlanners[i]);
-		}
+		SP_LOG(Warning, "Goal [%s] not registered in director!", *Goal->GetName())
+		return EmptyArray;
 	}
 
-	return Planners;
+	return Goals[Index]->GetPlanners();
 }
 
 ASP_Director* ASP_Director::GetInstance()
 {
-	SP_SRCHECK(Instance, nullptr, "Instance nullptr! AIDirector actor must be put in scene.")
-
 	return Instance;
 }
 
-void ASP_Director::Register(USP_PlannerComponent* InPlanner)
+void ASP_Director::RegisterPlanner(USP_PlannerComponent* InPlanner)
 {
-	SP_SCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.")
+	SP_SCHECK(Instance, "Instance nullptr! Director actor must be put in scene.")
 
-	Instance->OnRegister_Internal(InPlanner);
+	Instance->RegisterPlanner_Internal(InPlanner);
 }
-void ASP_Director::UnRegister(USP_PlannerComponent* InPlanner)
+void ASP_Director::UnRegisterPlanner(USP_PlannerComponent* InPlanner)
 {
-	SP_SCHECK(Instance, "Instance nullptr! AIDirector actor must be put in scene.")
+	SP_SCHECK(Instance, "Instance nullptr! Director actor must be put in scene.")
 
-	Instance->OnUnRegister_Internal(InPlanner);
-}
-
-bool ASP_Director::TryRegister(USP_PlannerComponent* InPlanner)
-{
-	if(!Instance)
-		return false;
-
-	Instance->OnRegister_Internal(InPlanner);
-
-	return true; // Unreal can't assume BlueprintNativeEvent with return type. Let's assume OnRegister_Internal succeeded.
-}
-bool ASP_Director::TryUnRegister(USP_PlannerComponent* InPlanner)
-{
-	if (!Instance)
-		return false;
-
-	Instance->OnUnRegister_Internal(InPlanner);
-
-	return true; // Unreal can't assume BlueprintNativeEvent with return type. Let's assume OnUnRegister_Internal succeeded.
+	Instance->UnRegisterPlanner_Internal(InPlanner);
 }
 
-void ASP_Director::OnRegister_Internal_Implementation(USP_PlannerComponent* InPlanner)
+void ASP_Director::RegisterPlanner_Internal_Implementation(USP_PlannerComponent* InPlanner)
 {
 	SP_CHECK_NULLPTR(InPlanner)
-
-#if SP_DEBUG
-	// Check not already registered.
-	TArray<USP_PlannerComponent*>* PlannersPtr = GoalPlannersMap.Find(InPlanner->GetGoal());
-
-	if(PlannersPtr)
-		SP_CHECK(PlannersPtr->Find(InPlanner) == INDEX_NONE, "Planner [ %s ] in [ %s ] already registered with goal [ %s ]!",
-			*InPlanner->GetName(), *InPlanner->GetOwner()->GetName(), *(InPlanner->GetGoal() ? InPlanner->GetGoal()->GetName() : FString("None")))
-		
-	SP_CHECK(InactivePlanners.Find(InPlanner) == INDEX_NONE, "Planner [ %s ] in [ %s ] already registered!", *InPlanner->GetName(), *InPlanner->GetOwner()->GetName())
-#endif
+	SP_CHECK(ActivePlanners.Find(InPlanner) == INDEX_NONE || InactivePlanners.Find(InPlanner) == INDEX_NONE,
+		"Planner [%s] already registered in director!", *InPlanner->GetOwner()->GetName())
 
 	// Always register as inactive.
 	InactivePlanners.Add(InPlanner);
-	
+
 	InPlanner->OnActive.AddDynamic(this, &ASP_Director::OnRegistedPlannerActive);
 	InPlanner->OnInactive.AddDynamic(this, &ASP_Director::OnRegistedPlannerInactive);
-	InPlanner->OnGoalChange.AddDynamic(this, &ASP_Director::OnRegistedPlannerGoalChange);
 
-	OnRegister.Broadcast(InPlanner);
+	OnRegisterPlanner.Broadcast(InPlanner);
 }
-void ASP_Director::OnUnRegister_Internal_Implementation(USP_PlannerComponent* InPlanner)
+void ASP_Director::UnRegisterPlanner_Internal_Implementation(USP_PlannerComponent* InPlanner)
 {
 	SP_CHECK_NULLPTR(InPlanner)
+	SP_CHECK(ActivePlanners.Find(InPlanner) != INDEX_NONE || InactivePlanners.Find(InPlanner) != INDEX_NONE,
+		"Planner [%s] not previously registered in director!", *InPlanner->GetOwner()->GetName())
 
 	if (InPlanner->GetPlanState() == ESP_PlanState::PS_Inactive)
 	{
-		SP_CHECK(InactivePlanners.Find(InPlanner) != INDEX_NONE, "Planner [ %s ] in [ %s ] not previously registered as inactive!", *InPlanner->GetName(), *InPlanner->GetOwner()->GetName())
+		SP_CHECK(InactivePlanners.Find(InPlanner) != INDEX_NONE,
+			"Planner [%s] not previously registered as inactive in director!", *InPlanner->GetOwner()->GetName())
+
 		InactivePlanners.Remove(InPlanner);
 	}
 	else
 	{
-		TArray<USP_PlannerComponent*>* PlannersPtr = GoalPlannersMap.Find(InPlanner->GetGoal());
-		SP_CHECK_NULLPTR(PlannersPtr) // Should never be nullptr (previously added in OnRegistedPlannerActive() or OnRegistedPlannerGoalChange).
+		SP_CHECK(ActivePlanners.Find(InPlanner) != INDEX_NONE,
+			"Planner [%s] not previously registered as active in director!", *InPlanner->GetOwner()->GetName())
 
-		SP_CHECK(PlannersPtr->Find(InPlanner) != INDEX_NONE, "Planner [ %s ] in [ %s ] not previously registered with goal [ %s ]!",
-			*InPlanner->GetName(), *InPlanner->GetOwner()->GetName(), *(InPlanner->GetGoal() ? InPlanner->GetGoal()->GetName() : FString("None")))
-		PlannersPtr->Remove(InPlanner);
+		ActivePlanners.Remove(InPlanner);
 	}
 
 	InPlanner->OnActive.RemoveDynamic(this, &ASP_Director::OnRegistedPlannerActive);
 	InPlanner->OnInactive.RemoveDynamic(this, &ASP_Director::OnRegistedPlannerInactive);
-	InPlanner->OnGoalChange.RemoveDynamic(this, &ASP_Director::OnRegistedPlannerGoalChange);
 
-	OnUnRegister.Broadcast(InPlanner);
+	OnUnRegisterPlanner.Broadcast(InPlanner);
 }
 
 void ASP_Director::OnRegistedPlannerActive(USP_PlannerComponent* InPlanner)
 {
 	SP_CHECK_NULLPTR(InPlanner)
-	SP_CHECK(InactivePlanners.Find(InPlanner) != INDEX_NONE, "InPlanner not previously inactive")
-	
-	InactivePlanners.Remove(InPlanner);
+	SP_CHECK(InactivePlanners.Find(InPlanner) != INDEX_NONE, "Planner not previously as inactive")
 
-	TArray<USP_PlannerComponent*>* PlannersPtr = GoalPlannersMap.Find(InPlanner->GetGoal());
-	
-	if (PlannersPtr)
-	{
-		SP_CHECK(PlannersPtr->Find(InPlanner) == INDEX_NONE, "Planner [ %s ] in [ %s ] already registered with goal [ %s ]!",
-			*InPlanner->GetName(), *InPlanner->GetOwner()->GetName(), *(InPlanner->GetGoal() ? InPlanner->GetGoal()->GetName() : FString("None")))
-		PlannersPtr->Add(InPlanner);
-	}
-	else
-		GoalPlannersMap.Add(InPlanner->GetGoal(), { InPlanner });
+	ActivePlanners.Add(InPlanner);
+	InactivePlanners.Remove(InPlanner);
 }
 void ASP_Director::OnRegistedPlannerInactive(USP_PlannerComponent* InPlanner)
 {
 	SP_CHECK_NULLPTR(InPlanner)
-	SP_CHECK(InactivePlanners.Find(InPlanner) == INDEX_NONE, "InPlanner already registered as inactive")
+	SP_CHECK(ActivePlanners.Find(InPlanner) != INDEX_NONE, "Planner not previously as active")
 
-	TArray<USP_PlannerComponent*>* PlannersPtr = GoalPlannersMap.Find(InPlanner->GetGoal());
-
-	SP_CHECK_NULLPTR(PlannersPtr) // Should never be nullptr (previously added in OnRegistedPlannerActive or OnRegistedPlannerGoalChange).
-	SP_CHECK(PlannersPtr->Find(InPlanner) != INDEX_NONE, "Planner [ %s ] in [ %s ] not previously registered with goal [ %s ]!",
-		*InPlanner->GetName(), *InPlanner->GetOwner()->GetName(), *(InPlanner->GetGoal() ? InPlanner->GetGoal()->GetName() : FString("None")))
-	
-	PlannersPtr->Remove(InPlanner);
 	InactivePlanners.Add(InPlanner);
+	ActivePlanners.Remove(InPlanner);
 }
-void ASP_Director::OnRegistedPlannerGoalChange(USP_PlannerComponent* InPlanner, USP_Goal* OldGoal, USP_Goal* NewGoal)
+
+void ASP_Director::RegisterGoal(USP_Goal* InGoal)
 {
-	SP_CHECK_NULLPTR(InPlanner)
+	SP_SCHECK(Instance, "Instance nullptr! Director actor must be put in scene.")
 
-	// Inactive planner.
-	if(InPlanner->GetPlanState() == ESP_PlanState::PS_Inactive)
-		return;
+	Instance->RegisterGoal_Internal(InGoal);
+}
+void ASP_Director::UnRegisterGoal(USP_Goal* InGoal)
+{
+	SP_SCHECK(Instance, "Instance nullptr! Director actor must be put in scene.")
 
-	// Find previous goal registered.
-	TArray<USP_PlannerComponent*>* PlannersPtr = GoalPlannersMap.Find(OldGoal);
-	
-	SP_CHECK_NULLPTR(PlannersPtr) // Should never be nullptr (previously added in OnRegister_Internal()).
-	SP_CHECK(PlannersPtr->Find(InPlanner) != INDEX_NONE, "Planner [ %s ] in [ %s ] not previously registered with goal [ %s ]!",
-		*InPlanner->GetName(), *InPlanner->GetOwner()->GetName(), (OldGoal ? *OldGoal->GetName() : *FString("None")))
+	Instance->UnRegisterGoal_Internal(InGoal);
+}
 
-	PlannersPtr->Remove(InPlanner);
+void ASP_Director::RegisterGoal_Internal_Implementation(USP_Goal* InGoal)
+{
+	SP_CHECK_NULLPTR(InGoal)
+	SP_CHECK(Goals.Find(InGoal) == INDEX_NONE, "Goal [%s] already registered!", *InGoal->GetName())
 
-	// Register planner with new goal.
-	PlannersPtr = GoalPlannersMap.Find(NewGoal);
+	Goals.Add(InGoal);
+}
+void ASP_Director::UnRegisterGoal_Internal_Implementation(USP_Goal* InGoal)
+{
+	SP_CHECK_NULLPTR(InGoal)
+	SP_CHECK(Goals.Find(InGoal) != INDEX_NONE, "Goal [%s] not previously registered!", *InGoal->GetName())
 
-	if (PlannersPtr)
-	{
-		SP_CHECK(PlannersPtr->Find(InPlanner) == INDEX_NONE, "Planner [ %s ] in [ %s ] already registered with goal [ %s ]!",
-			*InPlanner->GetName(), *InPlanner->GetOwner()->GetName(), (NewGoal ? *NewGoal->GetName() : *FString("None")))
-		PlannersPtr->Add(InPlanner);
-	}
-	else
-		GoalPlannersMap.Add(NewGoal, { InPlanner });
+	Goals.Remove(InGoal);
 }
 
 void ASP_Director::SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAllIfNoSelected)
@@ -251,35 +211,32 @@ void ASP_Director::SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAll
 
 #if SP_DEBUG_EDITOR
 
-	TArray<USP_PlannerComponent*> AllPlanners;
-
-	for (auto it = GoalPlannersMap.begin(); it != GoalPlannersMap.end(); ++it)
+	for (int i = 0; i < ActivePlanners.Num(); ++i)
 	{
-		for (int i = 0; i < it->Value.Num(); ++i)
-		{
-			SP_CCHECK_NULLPTR(it->Value[i])
+		SP_CCHECK_NULLPTR(ActivePlanners[i])
 
-			if (it->Value[i]->IsSelected())
-			{
-				it->Value[i]->SetGoal(NewGoal, true);
-				bApplyToAllIfNoSelected = false; // Almost one is selected.
-			}
-			else if (bApplyToAllIfNoSelected)
-				AllPlanners.Add(it->Value[i]);
+		if (ActivePlanners[i]->IsSelected())
+		{
+			ActivePlanners[i]->SetGoal(NewGoal, true);
+			bApplyToAllIfNoSelected = false; // At least one is selected.
 		}
 	}
 
 	if (bApplyToAllIfNoSelected)
 	{
-		for (int i = 0; i < AllPlanners.Num(); ++i)
-			AllPlanners[i]->SetGoal(NewGoal, true);
+		for (int i = 0; i < ActivePlanners.Num(); ++i)
+		{
+			SP_CCHECK_NULLPTR(ActivePlanners[i])
+			ActivePlanners[i]->SetGoal(NewGoal, true);
+		}
 	}
 #else
 
-	TArray<USP_PlannerComponent*> AllPlanners = QueryAllPlanners();
-	
-	for (int i = 0; i < AllPlanners.Num(); ++i)
-		AllPlanners[i]->SetGoal(NewGoal, true);
+	for (int i = 0; i < ActivePlanners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(ActivePlanners[i])
+			ActivePlanners[i]->SetGoal(NewGoal, true);
+	}
 
 #endif
 
