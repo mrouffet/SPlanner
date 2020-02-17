@@ -95,18 +95,6 @@ void USP_Formation::Compute(FSP_FormationSetInfos SetInfos)
 
 	FSP_FormationInfos Infos(SetInfos, ComputeBaseDirection(SetInfos));
 
-	SetInfos.Offsets.SetNum(SetInfos.Planners.Num());
-
-	for (int i = 0; i < SetInfos.Planners.Num(); ++i)
-	{
-		SP_CCHECK_NULLPTR(SetInfos.Planners[i])
-
-		float Angle = ComputeSignedAngle(SetInfos.Planners[i]->GetPawn(), SetInfos.LeadActor, Infos.BaseDirection);
-		Infos.PlannerInfos.Add(FSP_PlannerFormatioInfos{ SetInfos.Planners[i], Angle, SetInfos.Offsets[i] });
-	}
-
-	Infos.PlannerInfos.Sort();
-
 	switch (ConstructionType)
 	{
 	default:
@@ -122,11 +110,39 @@ void USP_Formation::Compute(FSP_FormationSetInfos SetInfos)
 
 void USP_Formation::ConstructDichotomy(FSP_FormationInfos& Infos)
 {
-	SP_LOG(Error, "Method must be overridden in children!")
+	SP_CHECK_NULLPTR(Infos.LeadActor)
+	SP_CHECK(GetClass() != USP_Formation::StaticClass(), "Method must be overridden in children!")
+
+	// Compute angles.
+	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Infos.PlannerInfos[i].Planner)
+
+		float Angle = ComputeSignedAngle(Infos.PlannerInfos[i].Planner->GetPawn(), Infos.LeadActor, Infos.BaseDirection);
+
+		// Use [0, 360] interval.
+		if (Angle < 0.0f)
+			Angle += 360.0f;
+
+		Infos.PlannerInfos[i].Angle = Angle;
+	}
+
+	Infos.PlannerInfos.Sort();
 }
 void USP_Formation::ConstructPointByPoint(FSP_FormationInfos& Infos)
 {
-	SP_LOG(Error, "Method must be overridden in children!")
+	SP_CHECK_NULLPTR(Infos.LeadActor)
+	SP_CHECK(GetClass() != USP_Formation::StaticClass(), "Method must be overridden in children!")
+
+	// Compute angles.
+	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Infos.PlannerInfos[i].Planner)
+
+		Infos.PlannerInfos[i].Angle = ComputeSignedAngle(Infos.PlannerInfos[i].Planner->GetPawn(), Infos.LeadActor, Infos.BaseDirection);
+	}
+
+	Infos.PlannerInfos.Sort();
 }
 
 void USP_Formation::OnStart_Implementation(const USP_FormationSet* FormationSet)

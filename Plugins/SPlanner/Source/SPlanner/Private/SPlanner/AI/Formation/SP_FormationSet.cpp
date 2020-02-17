@@ -100,18 +100,15 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 	Planners.Append(InPlanners);
 	TryChangeFormation();
 
-	// No new formation found for total planner num.
-	SP_RCHECK(CurrentFormation, false, "No available formation found for [%d] planners!", Planners.Num() + InPlanners.Num())
-
-	TArray<FVector> Offsets;
-	Offsets.Reserve(Planners.Num());
-
-	CurrentFormation->Compute(FSP_FormationSetInfos{ Planners, Offsets, LeadActor, TargetActor });
-
-	ApplyOffsets(Offsets);
+	UpdateFormation();
 
 	if (PrevPlannersNum == 0)
 		ASP_AIDirector::RegisterFormationSet(this);
+
+#if SP_DEBUG_EDITOR
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
+#endif
 
 	return true;
 }
@@ -146,15 +143,12 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 
 	TryChangeFormation();
 
-	// No new formation found for total planner num.
-	SP_RCHECK(CurrentFormation, false, "No available formation found for [%d] planners!", Planners.Num() - InPlanners.Num())
+	UpdateFormation();
 
-	TArray<FVector> Offsets;
-	Offsets.Reserve(Planners.Num());
-
-	CurrentFormation->Compute(FSP_FormationSetInfos{ Planners, Offsets, LeadActor, TargetActor });
-
-	ApplyOffsets(Offsets);
+#if SP_DEBUG_EDITOR
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
+#endif
 
 	return true;
 }
@@ -188,16 +182,13 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 #if SP_DEBUG_EDITOR
 		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 		{
-			DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offsets[i], DebugColor, false, DebugDrawTime);
-			DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offsets[i], 10.0f, DebugColor, false, DebugDrawTime);
+			float CurrDrawDebugTime = TickFrequency < 0.0f ? DebugDrawTime : TickFrequency < 0.05f ? 0.05f : TickFrequency;
+
+			DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offsets[i], DebugColor, false, CurrDrawDebugTime);
+			DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offsets[i], 10.0f, DebugColor, false, CurrDrawDebugTime);
 		}
 #endif
 	}
-
-#if SP_DEBUG_EDITOR
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
-		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
-#endif
 }
 
 void USP_FormationSet::TryChangeFormation()
@@ -394,12 +385,38 @@ bool USP_FormationSet::PredicateAvailable_Implementation(USP_Formation* Formatio
 	return true;
 }
 
+void USP_FormationSet::Tick(float DeltaSeconds)
+{
+	if (TickFrequency < 0.0f)
+		return;
+
+	CurrTickTime += DeltaSeconds;
+
+	if (CurrTickTime < TickFrequency)
+		return;
+
+	CurrTickTime -= TickFrequency;
+
+	UpdateFormation();
+}
+void USP_FormationSet::UpdateFormation()
+{
+	// No new formation found for planner num.
+	SP_CHECK(CurrentFormation, "No available formation found for [%d] planners!", Planners.Num())
+
+	TArray<FVector> Offsets;
+	Offsets.Reserve(Planners.Num());
+
+	CurrentFormation->Compute(FSP_FormationSetInfos{ Planners, Offsets, LeadActor, TargetActor });
+
+	ApplyOffsets(Offsets);
+}
+
 void USP_FormationSet::Reset_Implementation()
 {
 	if (CurrentFormation)
 	{
 		CurrentFormation->OnEnd(this);
-
 		CurrentFormation = nullptr;
 	}
 
@@ -410,8 +427,10 @@ void USP_FormationSet::Reset_Implementation()
 		Formations[i]->Reset();
 	}
 
-	LeadActor = nullptr;
 	LeadLOD = nullptr;
+	LeadActor = nullptr;
+
+	CurrTickTime = 0.0f;
 
 	Planners.Empty();
 	Cooldowns.Empty();

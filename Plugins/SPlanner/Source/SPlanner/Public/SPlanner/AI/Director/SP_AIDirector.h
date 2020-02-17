@@ -56,8 +56,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Director|AI")
 	FSP_AIDirectorRegisterFormationSetDelegate OnFormationSetUnRegistered;
 
+
+	ASP_AIDirector(const FObjectInitializer& ObjectInitializer);
+
 	/** Getter of FormationSets. */
 	const TArray<USP_FormationSet*>& GetFormationSets() const;
+
+	void Tick(float DeltaSeconds) override;
 
 	/**
 	*	Register InFormationSet in Director instance.

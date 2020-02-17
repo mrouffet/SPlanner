@@ -42,16 +42,27 @@ protected:
 	USP_LODComponent* LeadLOD = nullptr;
 
 	/** The entry name to set main target object in Blackboard. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	FName TargetEntryName = "MainTarget";
 
 	/** The entry name to offset vector in Blackboard. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	FName OffsetEntryName = "TargetOffset";
 
 	/** The formation focus to apply. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	ESP_FormationFocus FormationFocus = ESP_FormationFocus::FLA_None;
+
+	/**
+	*	The frequency of update for this formation set.
+	*	Set < 0.0f to never update.
+	*	Set > 0.0f to update every TickFrequency.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	float TickFrequency = -1.0f;
+
+	/** The saved current update time. */
+	float CurrTickTime = 0.0f;
 
 	/**
 	*	The rate of changing formation when a new planner is joining.
@@ -84,7 +95,7 @@ protected:
 	FColor DebugColor = FColor::Green;
 
 	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
-	float DebugDrawTime = 2.5f;
+	float DebugDrawTime = 1.0f;
 #endif
 
 	/** Set the formation focus to new Planner. */
@@ -113,6 +124,8 @@ protected:
 
 	/** Internal Implementation of change formation. */
 	void ChangeFormation_Internal(const TArray<USP_Formation*>& AvailableFormations);
+
+	void UpdateFormation();
 
 	/** Predicate to add a formation to AvailableFormations list during generation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
@@ -165,6 +178,9 @@ public:
 	/** Change formation type. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void ChangeFormation();
+
+	/** Update this formation set. */
+	void Tick(float DeltaSeconds);
 
 	/** Reset this formation set. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")

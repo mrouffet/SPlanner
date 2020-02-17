@@ -15,8 +15,21 @@ USP_CircleFormation::USP_CircleFormation(const FObjectInitializer& ObjectInitial
 
 void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 {
+	Super::ConstructDichotomy(Infos);
+
 	const float AngleStep = 360.0f / Infos.PlannerInfos.Num();
 
+	if (bUseLeadForwardAsReference)
+	{
+		// Simple contruct from forward.
+		for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
+			Infos.PlannerInfos[i].Offset = FRotator(0.0f, AngleStep * i, 0.0f).RotateVector(Infos.BaseDirection) * Radius;
+
+		return;
+	}
+
+
+	// Contruct with formation adaptation angle.
 	TArray<float> OffsetAngles;
 	OffsetAngles.Reserve(Infos.PlannerInfos.Num());
 
@@ -45,6 +58,8 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 }
 void USP_CircleFormation::ConstructPointByPoint(FSP_FormationInfos& Infos)
 {
+	Super::ConstructPointByPoint(Infos);
+
 	float AngleStep = 360.0f / MaxNum;
 	float BaseAngle = -AngleStep * (Infos.PlannerInfos.Num() - 1) / 2.0f;
 

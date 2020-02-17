@@ -7,6 +7,11 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 
+ASP_AIDirector::ASP_AIDirector(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 const TArray<USP_FormationSet*>& ASP_AIDirector::GetFormationSets() const
 {
 	return FormationSets;
@@ -69,4 +74,15 @@ void ASP_AIDirector::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	// Reset Instance to nullptr.
 	Super::EndPlay(EndPlayReason);
+}
+void ASP_AIDirector::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// Update registered formations.
+	for (int i = 0; i < FormationSets.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(FormationSets[i])
+		FormationSets[i]->Tick(DeltaSeconds);
+	}
 }
