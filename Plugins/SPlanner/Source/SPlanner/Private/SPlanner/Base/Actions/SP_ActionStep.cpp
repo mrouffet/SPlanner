@@ -10,6 +10,10 @@ bool USP_ActionStep::PreCondition(const USP_PlannerComponent& Planner, const TAr
 	{
 		if (bUseRequiredStepOrder)
 		{
+			// Not enough actions in generated plan.
+			if (GeneratedPlan.Num() < PreviousRequieredSteps.Num())
+				return false;
+
 			for (int i = 0; i < PreviousRequieredSteps.Num(); ++i)
 			{
 				// PreviousRequieredSteps.Num() and GeneratedPlan.Num() can be different.
@@ -32,6 +36,5 @@ bool USP_ActionStep::PreCondition(const USP_PlannerComponent& Planner, const TAr
 }
 uint64 USP_ActionStep::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
-
 	return PlannerFlags;
 }
