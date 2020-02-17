@@ -38,6 +38,9 @@ protected:
 	/** The saved current update time. */
 	float CurrTickTime = 0.0f;
 
+	/** The saved LeadLocation to compare formation threshold. */
+	FVector SavedLeadLocation = FVector::ZeroVector;
+
 	/**
 	*	The rate of changing formation when a new planner is joining.
 	*	Set < 0.0f to never random.
@@ -120,6 +123,9 @@ protected:
 
 	/** Getter of the draw debug time depending on TickFrequency. */
 	float GetDrawDebugTime() const;
+
+	/** Draw Formation debug. */
+	void DrawDebug() const;
 
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif

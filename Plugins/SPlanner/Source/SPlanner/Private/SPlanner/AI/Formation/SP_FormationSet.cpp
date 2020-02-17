@@ -120,6 +120,8 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 		ASP_AIDirector::RegisterFormationSet(this);
 
 #if SP_DEBUG_EDITOR
+	DrawDebug();
+
 	if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 		SP_LOG_SCREEN(Display, FColor::Orange, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
 #endif
@@ -171,6 +173,8 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 	UpdateFormation();
 
 #if SP_DEBUG_EDITOR
+	DrawDebug();
+
 	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
 #endif
@@ -203,15 +207,6 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetName())
 
 		AIBlackboard->SetVector(OffsetEntryName, Offsets[i]);
-
-#if SP_DEBUG_EDITOR
-		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
-		{
-			float CurrDrawDebugTime = GetDrawDebugTime();
-			DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offsets[i], DebugColor, false, CurrDrawDebugTime);
-			DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offsets[i], 10.0f, DebugColor, false, CurrDrawDebugTime);
-		}
-#endif
 	}
 }
 
@@ -440,10 +435,31 @@ void USP_FormationSet::Tick(float DeltaSeconds)
 
 	CurrTickTime -= CurrentFormation->GetTickFrequency();
 
-	UpdateFormation();
+	// Check formation re-compute threshold.
+	if (FVector::DistSquared(SavedLeadLocation, LeadActor->GetActorLocation()) >= CurrentFormation->GetLeadSqrDistThreshold())
+	{
+#if SP_DEBUG_EDITOR
+		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+			SP_LOG(Display, "Threshold exceeded: %f out of %f",
+				FVector::DistSquared(SavedLeadLocation, LeadActor->GetActorLocation()), CurrentFormation->GetLeadSqrDistThreshold())
+#endif
+
+		UpdateFormation();
+	}
+
+	// Saved new location.
+	SavedLeadLocation = LeadActor->GetActorLocation();
+
+#if SP_DEBUG_EDITOR
+	// Force redraw if no UpdateFormation.
+	DrawDebug();
+#endif
 }
 void USP_FormationSet::UpdateFormation()
 {
+	SP_CHECK_NULLPTR(LeadActor)
+	SavedLeadLocation = LeadActor->GetActorLocation();
+
 	// No new formation found for planner num.
 	SP_CHECK(CurrentFormation, "No available formation found for [%d] planners!", Planners.Num())
 
@@ -453,11 +469,6 @@ void USP_FormationSet::UpdateFormation()
 	CurrentFormation->Compute(FSP_FormationSetInfos{ Planners, Offsets, LeadActor, TargetActor });
 
 	ApplyOffsets(Offsets);
-
-#if SP_DEBUG_EDITOR
-	if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation) && TargetActor)
-		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), TargetActor->GetActorLocation(), DebugTargetColor, false, GetDrawDebugTime());
-#endif
 }
 
 void USP_FormationSet::Reset_Implementation()
@@ -518,6 +529,38 @@ float USP_FormationSet::GetDrawDebugTime() const
 		CurrDrawDebugTime = 0.05f;
 
 	return CurrDrawDebugTime;
+}
+
+void USP_FormationSet::DrawDebug() const
+{
+	// Debug not enable.
+	if (!IsSelected() || !SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		return;
+
+	float CurrDrawDebugTime = CurrentFormation->GetTickFrequency();
+
+	if (CurrDrawDebugTime < 0.0f)
+		CurrDrawDebugTime = DebugDrawTime;
+	else if (CurrDrawDebugTime < 0.05f) // Minimum visible draw time.
+		CurrDrawDebugTime = 0.05f;
+
+	for (int i = 0; i < Planners.Num(); ++i)
+	{
+		SP_CCHECK(Planners[i], "Planners[%d] nullptr!", i)
+
+		USP_AIBlackboardComponent* const AIBlackboard = Planners[i]->GetBlackboard<USP_AIBlackboardComponent>();
+		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetOwner()->GetName())
+
+		const FVector& Offset = AIBlackboard->GetVector(OffsetEntryName);
+
+		float CurrDrawDebugTime = GetDrawDebugTime();
+		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offset, DebugColor, false, CurrDrawDebugTime);
+		DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offset, 10.0f, DebugColor, false, CurrDrawDebugTime);
+	}
+
+	// Draw to target.
+	if(TargetActor)
+		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), TargetActor->GetActorLocation(), DebugTargetColor, false, GetDrawDebugTime());
 }
 
 void USP_FormationSet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

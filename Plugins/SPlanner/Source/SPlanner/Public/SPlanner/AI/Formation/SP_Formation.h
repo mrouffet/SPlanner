@@ -45,8 +45,20 @@ protected:
 	*	Set < 0.0f to never update.
 	*	Set > 0.0f to update every TickFrequency.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	float TickFrequency = -1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Tick")
+	float TickFrequency = 0.5f;
+
+	/** The squared distance threshold before recomputing the formation. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Tick")
+	float LeadSqrDistThreshold = 10000.0f;
+
+	/** The noise to apply to angles. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Noise")
+	float AngleNoise = 20.0f;
+
+	/** The noise to apply to offset distance. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Noise")
+	float DistanceNoise = 100.0f;
 
 	/** Should use the lead actor's forward as reference dir. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
@@ -111,6 +123,9 @@ public:
 
 	/** Getter of TickFrequency. */
 	float GetTickFrequency() const;
+
+	/** Getter of LeadSqrDistThreshold. */
+	float GetLeadSqrDistThreshold() const;
 
 	/** Getter of Weight. */
 	float GetWeight(float LODLevel = -1.0f) const;

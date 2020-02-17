@@ -33,6 +33,10 @@ float USP_Formation::GetTickFrequency() const
 {
 	return TickFrequency;
 }
+float USP_Formation::GetLeadSqrDistThreshold() const
+{
+	return LeadSqrDistThreshold;
+}
 
 float USP_Formation::GetWeight(float LODLevel) const
 {

@@ -23,7 +23,12 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 	{
 		// Simple contruct from forward.
 		for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
-			Infos.PlannerInfos[i].Offset = FRotator(0.0f, AngleStep * i, 0.0f).RotateVector(Infos.BaseDirection) * Radius;
+		{
+			float CurrAngleNoise = FMath::FRandRange(-1.0f, 1.0f) * AngleNoise;
+			float CurrDistNoise = FMath::FRandRange(-1.0f, 1.0f) * DistanceNoise;
+
+			Infos.PlannerInfos[i].Offset = FRotator(0.0f, AngleStep * i + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
+		}
 
 		return;
 	}
@@ -54,7 +59,13 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 
 	// Apply computed angles and total correction to offsets.
 	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
-		Infos.PlannerInfos[i].Offset = FRotator(0.0f, OffsetAngles[i] + TotalAngleCorrection, 0.0f).RotateVector(Infos.BaseDirection) * Radius;
+	{
+		float CurrAngleNoise = FMath::FRandRange(-1.0f, 1.0f) * AngleNoise;
+		float CurrDistNoise = FMath::FRandRange(-1.0f, 1.0f) * DistanceNoise;
+
+		Infos.PlannerInfos[i].Offset =
+			FRotator(0.0f, OffsetAngles[i] + TotalAngleCorrection + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
+	}
 }
 void USP_CircleFormation::ConstructPointByPoint(FSP_FormationInfos& Infos)
 {
@@ -64,5 +75,11 @@ void USP_CircleFormation::ConstructPointByPoint(FSP_FormationInfos& Infos)
 	float BaseAngle = -AngleStep * (Infos.PlannerInfos.Num() - 1) / 2.0f;
 
 	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
-		Infos.PlannerInfos[i].Offset = FRotator(0.0f, BaseAngle + AngleStep * i, 0.0f).RotateVector(Infos.BaseDirection) * Radius;
+	{
+		float CurrAngleNoise = FMath::FRandRange(-1.0f, 1.0f) * AngleNoise;
+		float CurrDistNoise = FMath::FRandRange(-1.0f, 1.0f) * DistanceNoise;
+
+		Infos.PlannerInfos[i].Offset =
+			FRotator(0.0f, BaseAngle + AngleStep * i + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
+	}
 }
