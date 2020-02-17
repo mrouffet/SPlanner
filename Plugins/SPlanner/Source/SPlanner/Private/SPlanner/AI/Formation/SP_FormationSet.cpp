@@ -99,7 +99,7 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 	if(!TryChangeFormation(Planners.Num() + InPlanners.Num()))
 	{
 #if SP_DEBUG_EDITOR
-		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 			SP_LOG_SCREEN(Display, FColor::Orange, "Formation full!")
 #endif
 
@@ -120,7 +120,7 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 		ASP_AIDirector::RegisterFormationSet(this);
 
 #if SP_DEBUG_EDITOR
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+	if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 		SP_LOG_SCREEN(Display, FColor::Orange, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
 #endif
 
@@ -159,7 +159,7 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 	if (!TryChangeFormation(Planners.Num()))
 	{
 #if SP_DEBUG_EDITOR
-		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 			SP_LOG_SCREEN(Display, FColor::Orange, "Not enough planner in formation!")
 #endif
 
@@ -205,15 +205,9 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 		AIBlackboard->SetVector(OffsetEntryName, Offsets[i]);
 
 #if SP_DEBUG_EDITOR
-		if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
 		{
-			float CurrDrawDebugTime = CurrentFormation->GetTickFrequency();
-
-			if (CurrDrawDebugTime < 0.0f)
-				CurrDrawDebugTime = DebugDrawTime;
-			else if (CurrDrawDebugTime < 0.05f) // Minimum visible draw time.
-				CurrDrawDebugTime = 0.05f;
-
+			float CurrDrawDebugTime = GetDrawDebugTime();
 			DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offsets[i], DebugColor, false, CurrDrawDebugTime);
 			DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offsets[i], 10.0f, DebugColor, false, CurrDrawDebugTime);
 		}
@@ -251,7 +245,7 @@ bool USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& Av
 
 	// Random the same formation.
 	if (CurrentFormation == NewFormation)
-		return bCanSelectSameFormationWhenChange;
+		return bCanSelectSameFormationWhenChange || Formations.Num() == 1;
 
 	// End previous.
 	if (CurrentFormation)
@@ -459,6 +453,11 @@ void USP_FormationSet::UpdateFormation()
 	CurrentFormation->Compute(FSP_FormationSetInfos{ Planners, Offsets, LeadActor, TargetActor });
 
 	ApplyOffsets(Offsets);
+
+#if SP_DEBUG_EDITOR
+	if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation) && TargetActor)
+		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), TargetActor->GetActorLocation(), DebugTargetColor, false, GetDrawDebugTime());
+#endif
 }
 
 void USP_FormationSet::Reset_Implementation()
@@ -486,6 +485,41 @@ void USP_FormationSet::Reset_Implementation()
 }
 
 #if SP_DEBUG_EDITOR
+bool USP_FormationSet::IsSelected() const
+{
+	// Check at least one is selected.
+
+	SP_RCHECK_NULLPTR(LeadActor, false)
+
+	if(LeadActor->IsSelected())
+		return true;
+
+	if (TargetActor && TargetActor->IsSelected())
+		return true;
+
+	for (int i = 0; i < Planners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Planners[i])
+
+		if (Planners[i]->IsSelected())
+			return true;
+	}
+
+	return false;
+}
+
+float USP_FormationSet::GetDrawDebugTime() const
+{
+	float CurrDrawDebugTime = CurrentFormation->GetTickFrequency();
+
+	if (CurrDrawDebugTime < 0.0f)
+		CurrDrawDebugTime = DebugDrawTime;
+	else if (CurrDrawDebugTime < 0.05f) // Minimum visible draw time.
+		CurrDrawDebugTime = 0.05f;
+
+	return CurrDrawDebugTime;
+}
+
 void USP_FormationSet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);

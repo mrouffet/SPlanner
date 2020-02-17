@@ -69,6 +69,9 @@ protected:
 	FColor DebugColor = FColor::Green;
 
 	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
+	FColor DebugTargetColor = FColor::Purple;
+
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
 	float DebugDrawTime = 1.0f;
 #endif
 
@@ -112,6 +115,12 @@ protected:
 	void ApplyOffsets(const TArray<FVector>& Offsets);
 
 #if WITH_EDITOR
+	/** Check if at least one object of the formation is selected. */
+	bool IsSelected() const;
+
+	/** Getter of the draw debug time depending on TickFrequency. */
+	float GetDrawDebugTime() const;
+
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
