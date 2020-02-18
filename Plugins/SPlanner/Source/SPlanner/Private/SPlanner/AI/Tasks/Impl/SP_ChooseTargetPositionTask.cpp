@@ -14,12 +14,9 @@
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
-ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	// Do not use SP_TASK_TICK_SUPER macro (require Super::Tick_Internal and not Super::Tick call).
-	ESP_PlanExecutionState SuperInternalResult = Super::Tick_Internal(DeltaSeconds, Planner, UserData);
-	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
-		return SuperInternalResult;
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)

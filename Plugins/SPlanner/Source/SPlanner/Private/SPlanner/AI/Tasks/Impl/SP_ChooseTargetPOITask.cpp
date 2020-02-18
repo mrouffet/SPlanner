@@ -59,12 +59,9 @@ uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent& Planne
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	// Do not use SP_TASK_TICK_SUPER macro (require Super::Tick_Internal and not Super::Tick call).
-	ESP_PlanExecutionState SuperInternalResult = Super::Tick_Internal(DeltaSeconds, Planner, UserData);
-	if (SuperInternalResult != ESP_PlanExecutionState::PES_Succeed)
-		return SuperInternalResult;
+	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
