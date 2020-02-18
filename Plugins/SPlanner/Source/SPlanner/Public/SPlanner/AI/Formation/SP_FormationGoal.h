@@ -20,6 +20,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|AI")
 	USP_FormationSet* FormationSet = nullptr;
 
-	void OnStart_Implementation(USP_PlannerComponent* Planner) override;
-	void OnEnd_Implementation(USP_PlannerComponent* Planner) override;
+	bool OnStart_Implementation(USP_PlannerComponent* Planner) override;
+	bool OnEnd_Implementation(USP_PlannerComponent* Planner) override;
 };

@@ -5,6 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Director/SP_Director.h>
+#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
 bool USP_Goal::GetResetBlackboard() const
 {
@@ -40,25 +41,29 @@ bool USP_Goal::CanTransitTo(USP_Goal* NewGoal) const
 	return false;
 }
 
-void USP_Goal::OnStart_Implementation(USP_PlannerComponent* InPlanner)
+bool USP_Goal::OnStart_Implementation(USP_PlannerComponent* InPlanner)
 {
-	SP_CHECK_NULLPTR(InPlanner)
-	SP_CHECK(Planners.Find(InPlanner) == INDEX_NONE, "Planner [%s] already registered!", *InPlanner->GetOwner()->GetName())
+	SP_RCHECK_NULLPTR(InPlanner, false)
+	SP_RCHECK(Planners.Find(InPlanner) == INDEX_NONE, false, "Planner [%s] already registered!", *InPlanner->GetOwner()->GetName())
 
 	Planners.Add(InPlanner);
 
 	if (Planners.Num() == 1)
 		ASP_Director::RegisterGoal(this);
+
+	return true;
 }
-void USP_Goal::OnEnd_Implementation(USP_PlannerComponent* InPlanner)
+bool USP_Goal::OnEnd_Implementation(USP_PlannerComponent* InPlanner)
 {
-	SP_CHECK_NULLPTR(InPlanner)
-	SP_CHECK(Planners.Find(InPlanner) != INDEX_NONE, "Planner [%s] not previously registered!", *InPlanner->GetOwner()->GetName())
+	SP_RCHECK_NULLPTR(InPlanner, false)
+	SP_RCHECK(Planners.Find(InPlanner) != INDEX_NONE, false, "Planner [%s] not previously registered!", *InPlanner->GetOwner()->GetName())
 
 	Planners.Remove(InPlanner);
 
 	if (Planners.Num() == 0)
 		ASP_Director::UnRegisterGoal(this);
+
+	return true;
 }
 
 void USP_Goal::Reset_Implementation()

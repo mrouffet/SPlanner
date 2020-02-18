@@ -60,11 +60,11 @@ public:
 
 	/** Callback method called when Planner starts this goal. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
-	void OnStart(USP_PlannerComponent* Planner);
+	bool OnStart(USP_PlannerComponent* Planner);
 
 	/** Callback method called when Planner ends this goal. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
-	void OnEnd(USP_PlannerComponent* Planner);
+	bool OnEnd(USP_PlannerComponent* Planner);
 
 	/** Reset this formation set. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Goal")

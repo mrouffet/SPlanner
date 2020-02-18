@@ -4,26 +4,28 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-void USP_FormationGoal::OnStart_Implementation(USP_PlannerComponent* Planner)
+bool USP_FormationGoal::OnStart_Implementation(USP_PlannerComponent* Planner)
 {
-	Super::OnStart_Implementation(Planner);
+	if (!Super::OnStart_Implementation(Planner))
+		return false;
 
 	USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
-	SP_CHECK(AIPlanner, "AIPlanner is nullptr! Planner must be a USP_AIPlannerComponent.")
+	SP_RCHECK(AIPlanner, false, "AIPlanner is nullptr! Planner must be a USP_AIPlannerComponent.")
 
-	SP_CHECK_NULLPTR(FormationSet)
-	FormationSet->AddSingle(AIPlanner);
+	SP_RCHECK_NULLPTR(FormationSet, false)
+	return FormationSet->AddSingle(AIPlanner);
 }
-void USP_FormationGoal::OnEnd_Implementation(USP_PlannerComponent* Planner)
+bool USP_FormationGoal::OnEnd_Implementation(USP_PlannerComponent* Planner)
 {
-	Super::OnEnd_Implementation(Planner);
+	if (!Super::OnEnd_Implementation(Planner))
+		return false;
 
 	USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
-	SP_CHECK(AIPlanner, "AIPlanner is nullptr! Planner must be a USP_AIPlannerComponent.")
+	SP_RCHECK(AIPlanner, false, "AIPlanner is nullptr! Planner must be a USP_AIPlannerComponent.")
 
-	SP_CHECK_NULLPTR(FormationSet)
-	FormationSet->RemoveSingle(AIPlanner);
+	SP_RCHECK_NULLPTR(FormationSet, false)
+	return FormationSet->RemoveSingle(AIPlanner);
 }
