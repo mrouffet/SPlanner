@@ -89,46 +89,46 @@ public:
 	*	The POI interact zone used.
 	*	Used to add action set from interactible POIs.
 	*/
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner")
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner|AI")
 	USP_POIZoneComponent* POIZone = nullptr;
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Getter of the previous executed ActionStep in Plan. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	USP_ActionStep* GetPrevActionStep() const;
 
 	/** Getter of previous executed ActionSteps in Plan. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	TArray<USP_ActionStep*> GetPrevActionSteps() const;
 
 	/** Getter of current executed ActionStep. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	USP_ActionStep* GetCurrentActionStep() const;
 
 	/** Getter of the next ActionStep to execute in Plan. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	USP_ActionStep* GetNextActionStep() const;
 
 	/** Getter of next ActionSteps to execute in Plan*/
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	TArray<USP_ActionStep*> GetNextActionSteps() const;
 
 
 	/** Getter of cooldown for one task. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	float GetCooldown(const USP_Task* Task) const;
 
 	/** Getter of cooldown for one task. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner|AI")
 	void SetCooldown(const USP_Task* Task);
 
 	/** Helper function for cooldown check */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	bool IsInCooldown(const USP_Task* Task) const;
 
 	/** Get Controller this planner is attached to. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	ASP_AIController* GetController() const;
 
 	/** Get casted Controller this planner is attached to. */
@@ -139,7 +139,7 @@ public:
 	}
 
 	/** Get pawn controlled by this planner. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	APawn* GetPawn() const;
 
 	/** Get casted pawn controlled by this planner. */

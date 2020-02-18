@@ -121,9 +121,6 @@ protected:
 	/** Check if at least one object of the formation is selected. */
 	bool IsSelected() const;
 
-	/** Getter of the draw debug time depending on TickFrequency. */
-	float GetDrawDebugTime() const;
-
 	/** Draw Formation debug. */
 	void DrawDebug() const;
 

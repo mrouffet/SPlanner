@@ -519,18 +519,6 @@ bool USP_FormationSet::IsSelected() const
 	return false;
 }
 
-float USP_FormationSet::GetDrawDebugTime() const
-{
-	float CurrDrawDebugTime = CurrentFormation->GetTickFrequency();
-
-	if (CurrDrawDebugTime < 0.0f)
-		CurrDrawDebugTime = DebugDrawTime;
-	else if (CurrDrawDebugTime < 0.05f) // Minimum visible draw time.
-		CurrDrawDebugTime = 0.05f;
-
-	return CurrDrawDebugTime;
-}
-
 void USP_FormationSet::DrawDebug() const
 {
 	// Debug not enable.
@@ -553,14 +541,13 @@ void USP_FormationSet::DrawDebug() const
 
 		const FVector& Offset = AIBlackboard->GetVector(OffsetEntryName);
 
-		float CurrDrawDebugTime = GetDrawDebugTime();
 		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offset, DebugColor, false, CurrDrawDebugTime);
 		DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offset, 10.0f, DebugColor, false, CurrDrawDebugTime);
 	}
 
 	// Draw to target.
 	if(TargetActor)
-		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), TargetActor->GetActorLocation(), DebugTargetColor, false, GetDrawDebugTime());
+		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), TargetActor->GetActorLocation(), DebugTargetColor, false, CurrDrawDebugTime);
 }
 
 void USP_FormationSet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
