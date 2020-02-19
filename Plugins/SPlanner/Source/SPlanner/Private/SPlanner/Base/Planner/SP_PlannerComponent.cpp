@@ -27,7 +27,9 @@
 USP_PlannerComponent::USP_PlannerComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bTickInEditor = false;
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
+
+	bWantsInitializeComponent = true;
 
 	/**
 	*	Must be init in cpp file (Standard).
@@ -78,19 +80,11 @@ USP_Goal* USP_PlannerComponent::GetGoal() const
 }
 void USP_PlannerComponent::SetGoal(USP_Goal* InGoal, bool bForce)
 {
-	// Check current goal can transit to (SetGoal can be called multiple time in one frame).
-	if(bForce || !Goal || Goal->CanTransitTo(InGoal))
-		NextGoal = InGoal;
-}
-void USP_PlannerComponent::UpdateGoal()
-{
-	if (Goal == NextGoal)
+	// Same goal or current goal can transit to.
+	if (Goal == InGoal || (!bForce && Goal && !Goal->CanTransitTo(InGoal)))
 		return;
 
-	// Inactive planner.
-	if (PlanState == ESP_PlanState::PS_Inactive)
-		return;
-	else if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
+	if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
 	{
 		CancelPlan();
 
@@ -99,7 +93,11 @@ void USP_PlannerComponent::UpdateGoal()
 
 	// Set new goal after plan state change and possible cancel.
 	USP_Goal* OldGoal = Goal;
-	Goal = NextGoal;
+	Goal = InGoal;
+
+	// Inactive planner.
+	if (PlanState == ESP_PlanState::PS_Inactive)
+		return;
 
 	if (OldGoal)
 		OldGoal->OnEnd(this);
@@ -114,21 +112,25 @@ void USP_PlannerComponent::UpdateGoal()
 
 		// Start after reset.
 		Goal->OnStart(this);
+
+		// Out dated plan: Do not ask again if already / still waiting for computation.
+		if (PlanState != ESP_PlanState::PS_WaitForCompute)
+		{
+			// ConstructPlanTimer may be used for waiting other instructions (see SP_AIPlannerComponent).
+			GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
+
+			AskNewPlan();
+		}
+	}
+	else
+	{
+		// New goal nullptr: set plan to invalid and clear any construct timer.
+
+		PlanState = ESP_PlanState::PS_Invalid;
+		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
 	}
 
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
-
-	// Out dated plan: Do not ask again if already / still waiting for computation.
-	if (PlanState != ESP_PlanState::PS_WaitForCompute)
-	{
-		// ConstructPlanTimer may be used for waiting other instructions (see SP_AIPlannerComponent).
-		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
-
-		if (!Goal)
-			PlanState = ESP_PlanState::PS_Invalid;
-		else
-			AskNewPlan(true); // Instant request new plan with goal.
-	}
 }
 
 const TArray<USP_ActionStep*>& USP_PlannerComponent::GetPlan() const
@@ -403,12 +405,17 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 	PlanState = ESP_PlanState::PS_Inactive;
 
 	// Blackboard can be null while planner is waiting for possess.
-	if(Blackboard)
+	if (Blackboard)
+	{
 		Blackboard->Reset();
-	else if(bResetGoalOnInactive) // Use else: do not reset goal while waiting for possess.
-		SetGoal(nullptr);
-	else if(Goal)
-		Goal->OnEnd(this);
+
+		// End goal manually because PlanState is set to Inactive.
+		if (Goal)
+			Goal->OnEnd(this);
+		if (bResetGoalOnInactive)
+			SetGoal(nullptr);
+	}
+	// Do not reset goal while blackboard is null (waiting for possess).
 
 	OnInactive.Broadcast(this);
 
@@ -424,17 +431,13 @@ void USP_PlannerComponent::OnInactiveLOD()
 	SetEnableBehavior(false);
 }
 
-void USP_PlannerComponent::BeginPlay()
+void USP_PlannerComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	// Computed by server only while owner is replicated.
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
-
-	// Allow to change goal before beginplay (ex: ReactZone overlap).
-	if(!NextGoal)
-		NextGoal = Goal;
 
 	if (bStartActive && Blackboard) // Wait for possessed blackboard.
 	{
@@ -459,9 +462,9 @@ void USP_PlannerComponent::BeginPlay()
 			ASP_Director::RegisterPlanner(this);
 	}
 }
-void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void USP_PlannerComponent::UninitializeComponent()
 {
-	Super::EndPlay(EndPlayReason);
+	Super::UninitializeComponent();
 
 	// Computed by server only while owner is replicated.
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
@@ -470,13 +473,6 @@ void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	// Unregister from Director. Check valid instance: Director could have been destroyed first during scene travel or quit game.
 	if (bAutoRegisterInDirector && ASP_Director::GetInstance())
 		ASP_Director::UnRegisterPlanner(this);
-}
-void USP_PlannerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// Update new goal.
-	UpdateGoal();
 }
 
 #if WITH_EDITOR

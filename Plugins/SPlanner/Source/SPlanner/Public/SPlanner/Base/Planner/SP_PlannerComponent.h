@@ -32,20 +32,12 @@ class SPLANNER_API USP_PlannerComponent : public UActorComponent
 
 protected:
 	/**
-	*	The current targeted goal.
+	*	The current targeted goal used for plan generation.
 	*	Editor set default value.
 	*/
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SPlanner")
 	USP_Goal* Goal = nullptr;
 	
-	/**
-	*	The cached next goal.
-	*	Goal will be changed during Tick.
-	*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SPlanner")
-	USP_Goal* NextGoal = nullptr;
-
-
 	/** Timer handle before calling ConstructPlan(). */
 	FTimerHandle ConstructPlanTimer;
 
@@ -63,12 +55,6 @@ protected:
 	/** LOD component used  for plan generation. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_PlannerLODComponent* LOD = nullptr;
-
-	/**
-	*	Update Goal using NextGoal.
-	*	Update PlanState depending on generation.
-	*/
-	void UpdateGoal();
 
 	/**
 	*	Set new plan to execute and update PlanState.
@@ -130,9 +116,8 @@ protected:
 	UFUNCTION(Category = "SPlanner|Planner")
 	void OnInactiveLOD();
 
-	void BeginPlay() override;
-	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void InitializeComponent() override;
+	void UninitializeComponent() override;
 
 public:
 	/**
@@ -235,7 +220,6 @@ public:
 
 	/**
 	*	Setter of Goal.
-	*	Goal get cached and will be update in next Tick().
 	*	use bForce to force goal set (ie no goal transition check).
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
