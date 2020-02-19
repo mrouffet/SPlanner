@@ -17,7 +17,7 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 {
 	GENERATED_BODY()
 	
-	struct FSP_TaskInfos
+	struct FSP_MoveToTaskInfos
 	{
 #if SP_DEBUG
 		FNavPathSharedPtr DebugPath;
@@ -29,6 +29,9 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 		/** Whether goal position must be re-compute each tick. */
 		bool bIsDynamic = false;
 
+		/** The saved previous pawn speed. */
+		float PrevPawnSpeed = -1.0f;
+
 		/** Internal request execution state. */
 		ESP_PlanExecutionState ExecutionState = ESP_PlanExecutionState::PES_Running;
 	};
@@ -37,27 +40,59 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 	*	Map of RequestID, task infos.
 	*	Used to get back task infos on move completed.
 	*/
-	TMap<int, FSP_TaskInfos*> RequestIDToTaskInfos;
+	TMap<int, FSP_MoveToTaskInfos*> RequestIDToTaskInfos;
 
 protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	FName TargetEntryName = "MainTarget";
 
-	/**
-	*	The entry name to access Target object in Blackboard.
-	*	Set to "None" to not use any offset.
-	*/
+	
+	/** Whether the target should be visible (perform raycast). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	FName OffsetEntryName = "None";
+	bool bTargetVisible = false;
+
+	/** Should use pathfinding. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	bool bUsePathfinding = true;
 
 	/** Whether can strafe during move to. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	bool bCanStrafe = false;
 
+
+	/** The radius to accept the move to as completed. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	float AcceptanceRadius = 10.0f;
+
+	/**
+	*	The minimum distance from MainTarget.
+	*	Set < 0.0f to disable.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	float MinDistance = -1.0f;
+
+	/**
+	*	The maximum distance from MainTarget.
+	*	Set < 0.0f to disable.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	float MaxDistance = -1.0f;
+
+	/**
+	*	The pawn speed to set.
+	*	Set < 0.0f to disable.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	float PawnSpeed = -1.0f;
+
 	/** Can move to again even if a previous move to has been set in plan. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	bool bAllowMultipleMoveTo = true;
+
+	/** Should re-compute MoveTo on tick (only used when Target is not an actor). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	bool bIsDynamic = false;
 
 	/**
 	*	Whether precondition should fail if Pawn is already at goal.
@@ -66,13 +101,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	bool bPreconditionFailWhileAlreadyAtGoal = true;
 
-	/** The radius to accept the move to as completed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	float AcceptanceRadius = 10.0f;
-
 	/** Check if owner actor has reached its target. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|MoveTo")
-	bool HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target, const FVector& Offset) const;
+	bool HasReachedPosition(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
 
 	/**
 	*	Check if owner actor has reached its target.
@@ -86,6 +116,17 @@ protected:
 	*/
 	bool HasReachedPosition(ACharacter* Character, const FVector& TargetPosition) const;
 
+	/** Whether the target is visible from Planner's pawn. */
+	bool IsTargetVisible(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
+	
+	/** Child implementation to get pawn speed. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
+	float GetPawnSpeed(APawn* Pawn);
+
+	/** Child implementation to set pawn speed during MoveTo. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
+	void SetPawnSpeed(APawn* Pawn, float NewPawnSpeed);
+
 	uint32 GetUserDataSize() const override;
 
 	/** Callback when a movement is completed by the AI Controller. */
@@ -93,7 +134,7 @@ protected:
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 	/** Implementation of move request creation. */
-	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target, const FVector& Offset);
+	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
 
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;

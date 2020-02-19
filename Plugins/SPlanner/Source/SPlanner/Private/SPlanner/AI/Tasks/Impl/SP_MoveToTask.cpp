@@ -2,8 +2,10 @@
 
 #include <SPlanner/AI/Tasks/Impl/SP_MoveToTask.h>
 
-#include <GameFramework/Character.h>
 #include <Components/CapsuleComponent.h>
+
+#include <GameFramework/Character.h>
+#include <GameFramework/CharacterMovementComponent.h>
 
 #include <SPlanner/AI/Controllers/SP_AIController.h>
 
@@ -16,17 +18,16 @@
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 
-bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target, const FVector& Offset) const
+bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const
 {
-	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(Target, false)
 
-	APawn* Pawn = Planner->GetPawn();
+	APawn* Pawn = Planner.GetPawn();
 
 	if(ACharacter* Character = Cast<ACharacter>(Pawn))
-		return HasReachedPosition(Character, Target->GetAnyPosition() + Offset);
+		return HasReachedPosition(Character, Target->GetAnyPosition());
 
-	return HasReachedPosition(Planner->GetPawn(), Target->GetAnyPosition() + Offset);
+	return HasReachedPosition(Planner.GetPawn(), Target->GetAnyPosition());
 }
 bool USP_MoveToTask::HasReachedPosition(APawn* Pawn, const FVector& TargetPosition) const
 {
@@ -51,33 +52,81 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
-FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target, const FVector& Offset)
+bool USP_MoveToTask::IsTargetVisible(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const
+{
+	SP_RCHECK_NULLPTR(Target, false)
+
+	APawn* const AIPawn = Planner.GetPawn();
+	SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
+
+		// Avoid Self or target collisions.
+	FHitResult HitInfos;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(AIPawn);
+
+	if (AActor* TargetActor = Target->GetAnyActor())
+		Params.AddIgnoredActor(TargetActor);
+
+	if (!Planner.GetWorld()->LineTraceSingleByChannel(HitInfos,
+		AIPawn->GetActorLocation(),
+		Target->GetAnyPosition(),
+		ECollisionChannel::ECC_Visibility, Params))
+		return false;
+
+	return true;
+}
+
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
 {
 	FAIMoveRequest MoveRequest;
 
 	SP_RCHECK_NULLPTR(Target, MoveRequest)
 
-	if (Target->GetState() == ESP_TargetState::TS_Position || !FMath::IsNearlyZero(Offset.SizeSquared())) // Target position or offset.
-		MoveRequest.SetGoalLocation(Target->GetAnyPosition() + Offset);
+	if (Target->GetState() == ESP_TargetState::TS_Position) // Target position or offset.
+		MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 	else if (AActor* GoalActor = Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
 	else
 		SP_LOG(Error, "Bad Target!")
 
 	MoveRequest.SetCanStrafe(bCanStrafe);
+	MoveRequest.SetUsePathfinding(bUsePathfinding);
 	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 
 	return MoveRequest;
 }
 
+float USP_MoveToTask::GetPawnSpeed_Implementation(APawn* Pawn)
+{
+	if (ACharacter* Character = Cast<ACharacter>(Pawn))
+	{
+		UCharacterMovementComponent* const CharacterMovement = Character->GetCharacterMovement();
+		SP_RCHECK_NULLPTR(CharacterMovement, false)
+
+		return CharacterMovement->MaxWalkSpeed;
+	}
+
+	return -1.0f;
+}
+void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
+{
+	if (ACharacter* Character = Cast<ACharacter>(Pawn))
+	{
+		UCharacterMovementComponent* const CharacterMovement = Character->GetCharacterMovement();
+		SP_CHECK_NULLPTR(CharacterMovement)
+
+		CharacterMovement->MaxWalkSpeed = NewSpeed;
+	}
+}
+
 uint32 USP_MoveToTask::GetUserDataSize() const
 {
-	return sizeof(FSP_TaskInfos);
+	return sizeof(FSP_MoveToTaskInfos);
 }
 
 void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult)
 {
-	FSP_TaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
+	FSP_MoveToTaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
 	SP_CHECK_NULLPTR(Infos)
 
 	switch (ExecResult)
@@ -122,12 +171,29 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 	if (!Target->IsValid())
 		return false;
 
-	// Get Offset.
-	FVector Offset = FVector::ZeroVector;
-	if (OffsetEntryName != "None")
-		Offset = Blackboard->GetVector(OffsetEntryName);
+	FVector TargetLocation = Target->GetAnyPosition();
 
-	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(AIPlanner, Target, Offset) : true;
+	if (bTargetVisible && !IsTargetVisible(*AIPlanner, Target))
+		return false;
+
+	// Check is in range.
+	if (MinDistance > 0.0f || MaxDistance > 0.0f)
+	{
+		APawn* AIPawn = AIPlanner->GetPawn();
+		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
+
+		float TargetDistSqr = FVector::DistSquared(AIPawn->GetActorLocation(), TargetLocation);
+
+		// Min Distance range.
+		if (MinDistance > 0.0f && TargetDistSqr < MinDistance * MinDistance)
+			return !bPreconditionFailWhileAlreadyAtGoal;
+
+		// Max Distance range.
+		if (MaxDistance > 0.0f && TargetDistSqr > MaxDistance * MaxDistance)
+			return false;
+	}
+
+	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(*AIPlanner, Target) : true;
 }
 uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
@@ -143,7 +209,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_SUPER_BEGIN(Planner, UserData)
 
-	FSP_TaskInfos* const Infos = new(UserData) FSP_TaskInfos{};
+	FSP_MoveToTaskInfos* const Infos = new(UserData) FSP_MoveToTaskInfos{};
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
@@ -151,16 +217,18 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
 
-	FVector Offset = FVector::ZeroVector;
-	if(OffsetEntryName != "None")
-		Offset = Blackboard->GetVector(OffsetEntryName);
-
-	if (HasReachedPosition(&Planner, Target, Offset))
+	if (HasReachedPosition(Planner, Target))
 	{
 		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
 	}
 
+	if (bTargetVisible && !IsTargetVisible(Planner, Target))
+	{
+		SP_LOG_TASK_EXECUTE(Planner, "Move request failed: Taget not visible.")
+		Infos->ExecutionState = ESP_PlanExecutionState::PES_Failed;
+		return false;
+	}
 
 	// Use AIController pathfinding MoveTo.
 	ASP_AIController* const Controller = Planner.GetController();
@@ -168,7 +236,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 
 	// Create MoveRequest.
-	Infos->MoveRequest = CreateMoveRequest(Target, Offset);
+	Infos->MoveRequest = CreateMoveRequest(Target);
 
 	// Request movement.
 #if SP_DEBUG
@@ -198,7 +266,18 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
 
 	// Set dynamic.
-	Infos->bIsDynamic = Target->IsActor() && !FMath::IsNearlyZero(Offset.SizeSquared());
+	Infos->bIsDynamic = !Target->IsActor() && bIsDynamic;
+
+	if (PawnSpeed > 0.0f)
+	{
+		APawn* const AIPawn = Planner.GetPawn();
+		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
+
+		// Store previous value.
+		Infos->PrevPawnSpeed = GetPawnSpeed(AIPawn);
+
+		SetPawnSpeed(AIPawn, PawnSpeed);
+	}
 
 	return true;
 }
@@ -206,7 +285,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
 
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
+	FSP_MoveToTaskInfos* const Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
 
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Failed)
 	{
@@ -239,7 +318,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 		SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
-		Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition() + Blackboard->GetVector(OffsetEntryName));
+		Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 
 		ASP_AIController* const Controller = Planner.GetController();
 		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
@@ -267,7 +346,18 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_SUPER_END(Planner, UserData)
 
-	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
+	FSP_MoveToTaskInfos* Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
+
+	if (PawnSpeed > 0.0f)
+	{
+		APawn* const AIPawn = Planner.GetPawn();
+		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
+
+		// Reset to saved speed.
+		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
+	}
+
+	Infos->~FSP_MoveToTaskInfos();
 
 	return true;
 }
@@ -276,12 +366,21 @@ bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_SUPER_CANCEL(Planner, UserData)
 
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
+	FSP_MoveToTaskInfos* Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
+
+	if (PawnSpeed > 0.0f)
+	{
+		APawn* const AIPawn = Planner.GetPawn();
+		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
+
+		// Reset to saved speed.
+		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
+	}
 
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
 		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
 	
-	Infos->~FSP_TaskInfos();
+	Infos->~FSP_MoveToTaskInfos();
 
 	return true;
 }

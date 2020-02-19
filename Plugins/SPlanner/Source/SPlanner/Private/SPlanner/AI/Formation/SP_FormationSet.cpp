@@ -30,6 +30,40 @@ USP_LODComponent* USP_FormationSet::GetLeadLOD() const
 	return LeadLOD;
 }
 
+AActor* USP_FormationSet::GetTargetActor() const
+{
+	return TargetActor;
+}
+void USP_FormationSet::SetTargetActor(AActor* NewTargetActor)
+{
+	TargetActor = NewTargetActor;
+
+	if (TargetActorEntryName != "None")
+	{
+		for (int i = 0; i < Planners.Num(); ++i)
+		{
+			SP_CCHECK_NULLPTR(Planners[i])
+
+			USP_AIBlackboardComponent* const Blackboard = Planners[i]->GetBlackboard<USP_AIBlackboardComponent>();
+			SP_CCHECK_NULLPTR(Blackboard)
+
+			USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetActorEntryName);
+			SP_CCHECK_NULLPTR(Target)
+
+			Target->SetActor(TargetActor);
+		}
+	}
+
+	if (CurrentFormation && CurrentFormation->GetFormationFocusType() == ESP_FormationFocusType::FFT_Target)
+	{
+		for (int i = 0; i < Planners.Num(); ++i)
+		{
+			SP_CCHECK_NULLPTR(Planners[i])
+			SetFormationFocus(Planners[i]);
+		}
+	}
+}
+
 void USP_FormationSet::SetLeadActor(AActor* NewLeadActor)
 {
 	SP_CHECK_NULLPTR(NewLeadActor)
@@ -59,34 +93,37 @@ void USP_FormationSet::InitPlannersData(const TArray<USP_AIPlannerComponent*>& I
 {
 	for(int i = 0; i < InPlanners.Num(); ++i)
 	{
-		USP_AIPlannerComponent* Planner = InPlanners[i];
-		SP_CCHECK_NULLPTR(Planner)
+		SP_CCHECK_NULLPTR(InPlanners[i])
 
-		SetFormationFocus(Planner);
+		SetFormationFocus(InPlanners[i]);
 
-		// Set lead actor target.
-		USP_AIBlackboardComponent* const AIBlackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
-		SP_CCHECK_NULLPTR(AIBlackboard)
+		if (TargetActorEntryName != "None")
+		{
+			USP_AIBlackboardComponent* const Blackboard = InPlanners[i]->GetBlackboard<USP_AIBlackboardComponent>();
+			SP_CCHECK_NULLPTR(Blackboard)
 
-		USP_Target* const Target = AIBlackboard->GetObject<USP_Target>(TargetEntryName);
-		SP_CCHECK_NULLPTR(Target)
-		Target->SetActor(LeadActor);
+			USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetActorEntryName);
+			SP_CCHECK_NULLPTR(Target)
+
+			Target->SetActor(TargetActor);
+		}
 	}
 }
 void USP_FormationSet::UnInitPlannersData(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
 	for (int i = 0; i < InPlanners.Num(); ++i)
 	{
-		USP_AIPlannerComponent* Planner = InPlanners[i];
-		SP_CCHECK_NULLPTR(Planner)
+		SP_CCHECK_NULLPTR(InPlanners[i])
 
-		ClearFormationFocus(Planner);
+		ClearFormationFocus(InPlanners[i]);
 
-		USP_AIBlackboardComponent* const AIBlackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
+		USP_AIBlackboardComponent* const AIBlackboard = InPlanners[i]->GetBlackboard<USP_AIBlackboardComponent>();
 		SP_CCHECK_NULLPTR(AIBlackboard)
 
-		AIBlackboard->ResetValue(TargetEntryName);
-		AIBlackboard->ResetValue(OffsetEntryName);
+		AIBlackboard->ResetValue(OutputTargetEntryName);
+
+		if (TargetActorEntryName != "None")
+			AIBlackboard->ResetValue(TargetActorEntryName);
 	}
 }
 
@@ -248,7 +285,10 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 
 void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 {
+	SP_CHECK_NULLPTR(LeadActor)
 	SP_CHECK(Planners.Num() == Offsets.Num(), "Formation [%s] offsets num doen't match planner num.", *CurrentFormation->GetName())
+
+	FVector LeadLocation = LeadActor->GetActorLocation();
 
 	for (int i = 0; i < Planners.Num(); ++i)
 	{
@@ -257,7 +297,8 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 		USP_AIBlackboardComponent* const AIBlackboard = Planners[i]->GetBlackboard<USP_AIBlackboardComponent>();
 		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetName())
 
-		AIBlackboard->SetVector(OffsetEntryName, Offsets[i]);
+		USP_Target* const Target = AIBlackboard->GetObject<USP_Target>(OutputTargetEntryName);
+		Target->SetPosition(LeadLocation + Offsets[i]);
 	}
 }
 
@@ -590,10 +631,13 @@ void USP_FormationSet::DrawDebug() const
 		USP_AIBlackboardComponent* const AIBlackboard = Planners[i]->GetBlackboard<USP_AIBlackboardComponent>();
 		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetOwner()->GetName())
 
-		const FVector& Offset = AIBlackboard->GetVector(OffsetEntryName);
+		USP_Target* const Target = AIBlackboard->GetObject<USP_Target>(OutputTargetEntryName);
+		SP_CCHECK(Target, "%s Target nullptr!", *Planners[i]->GetOwner()->GetName())
 
-		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), LeadActor->GetActorLocation() + Offset, DebugColor, false, CurrDrawDebugTime);
-		DrawDebugPoint(LeadActor->GetWorld(), LeadActor->GetActorLocation() + Offset, 10.0f, DebugColor, false, CurrDrawDebugTime);
+		FVector TargetLocation = Target->GetAnyPosition();
+
+		DrawDebugLine(LeadActor->GetWorld(), LeadActor->GetActorLocation(), TargetLocation, DebugColor, false, CurrDrawDebugTime);
+		DrawDebugPoint(LeadActor->GetWorld(), TargetLocation, 10.0f, DebugColor, false, CurrDrawDebugTime);
 	}
 
 	// Draw to target.

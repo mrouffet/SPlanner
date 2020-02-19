@@ -27,13 +27,23 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_LODComponent* LeadLOD = nullptr;
 
-	/** The entry name to set main target object in Blackboard. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	FName TargetEntryName = "MainTarget";
+	/**
+	*	The targeted actor.
+	*	Used for formation rotation.
+	*/
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	AActor* TargetActor = nullptr;
 
-	/** The entry name to offset vector in Blackboard. */
+	/** The entry name to set the output position target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	FName OffsetEntryName = "TargetOffset";
+	FName OutputTargetEntryName = "MainTarget";
+
+	/**
+	*	The entry name to set the target actor in Blackboard.
+	*	Set to "None" to disable.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	FName TargetActorEntryName = "None";
 
 	/** The saved current update time. */
 	float CurrTickTime = 0.0f;
@@ -128,18 +138,18 @@ protected:
 #endif
 
 public:
-	/**
-	*	The targeted actor.
-	*	Used for formation rotation.
-	*/
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "SPlanner")
-	AActor* TargetActor = nullptr;
-
 	/** Getter of LeadActor. */
 	AActor* GetLeadActor() const;
 
 	/** Getter of LeadLOD. */
 	USP_LODComponent* GetLeadLOD() const;
+
+	/** Getter of TargetActor. */
+	AActor* GetTargetActor() const;
+
+	/** Setter of TargetActor. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	void SetTargetActor(AActor* NewTargetActor);
 
 	/**
 	*	Set the LeadActor.

@@ -84,7 +84,6 @@ AActor* USP_Target::GetAnyActor() const
 		SP_RCHECK_NULLPTR(POI, nullptr)
 		return POI->GetOwner();
 	default:
-		SP_LOG(Error, "Bad target type!")
 		break;
 	}
 
