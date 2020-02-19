@@ -2,10 +2,10 @@
 
 #include <SPlanner/AI/Tasks/Impl/SP_ChooseTargetTask.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
+#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
-
+#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const

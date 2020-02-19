@@ -62,7 +62,7 @@ uint64 USP_LookAtTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 
 bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_TASK_BEGIN_SUPER(Planner, UserData)
+	SP_TASK_SUPER_BEGIN(Planner, UserData)
 
 	if(bInstant)
 		return true;
@@ -93,7 +93,7 @@ bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 }
 ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
 
 	APawn* Pawn = Planner.GetPawn();
 	SP_SRCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
@@ -128,7 +128,7 @@ ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 }
 bool USP_LookAtTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_TASK_END_SUPER(Planner, UserData)
+	SP_TASK_SUPER_END(Planner, UserData)
 
 	if(!bInstant)
 		reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();

@@ -16,7 +16,7 @@
 
 ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_TASK_TICK_SUPER(DeltaSeconds, Planner, UserData)
+	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
