@@ -39,8 +39,13 @@ void USP_FormationSet::SetLeadActor(AActor* NewLeadActor)
 	LeadLOD = Cast<USP_LODComponent>(LeadActor->GetComponentByClass(USP_LODComponent::StaticClass()));
 }
 
-bool USP_FormationSet::CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained)
+bool USP_FormationSet::CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const
 {
+	// Quick size check.
+	if (InPlanners.Num() > Planners.Num())
+		return !bShouldBeContained;
+
+
 	for (int i = 0; i < InPlanners.Num(); ++i)
 	{
 		if ((Planners.Find(InPlanners[i]) == INDEX_NONE) == bShouldBeContained)
@@ -85,6 +90,58 @@ void USP_FormationSet::UnInitPlannersData(const TArray<USP_AIPlannerComponent*>&
 	}
 }
 
+bool USP_FormationSet::CanAdd(USP_AIPlannerComponent* Planner) const
+{
+	return CanAdd(TArray<USP_AIPlannerComponent*>{ Planner });
+}
+bool USP_FormationSet::CanAdd(const TArray<USP_AIPlannerComponent*>& InPlanners) const
+{
+	// None of InPlanners must not be already contained in Planners.
+	if (!Formations.Num() || !CheckAreContained(InPlanners, false))
+		return false;
+
+	int MaxNum = 0;
+	int NewNum = Planners.Num() + InPlanners.Num();
+
+	for (int i = 0; i < Formations.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Formations[i])
+
+		if (Formations[i]->GetMaxNum() > MaxNum)
+			MaxNum = Formations[i]->GetMaxNum();
+	}
+
+	return NewNum <= MaxNum;
+}
+
+bool USP_FormationSet::CanRemove(USP_AIPlannerComponent* Planner) const
+{
+	return CanRemove(TArray<USP_AIPlannerComponent*>{ Planner });
+}
+bool USP_FormationSet::CanRemove(const TArray<USP_AIPlannerComponent*>& InPlanners) const
+{
+	// Each of InPlanners must be contained in Planners.
+	if (!Formations.Num() || !CheckAreContained(InPlanners, true))
+		return false;
+
+	SP_RCHECK_NULLPTR(Formations[0], false)
+
+	int NewNum = Planners.Num() - InPlanners.Num();
+
+	// Formation won't longer exist.
+	if (NewNum == 0)
+		return true;
+
+	// Formations is sorted by Min.
+	return Formations[0]->GetMinNum() <= NewNum;
+}
+
+bool USP_FormationSet::Add(USP_AIPlannerComponent* Planner)
+{
+	SP_RCHECK_NULLPTR(Planner, false)
+
+	return Add(TArray<USP_AIPlannerComponent*>{ Planner });
+}
 bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
 	SP_RCHECK_NULLPTR(LeadActor, false)
@@ -127,6 +184,13 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 #endif
 
 	return true;
+}
+
+bool USP_FormationSet::Remove(USP_AIPlannerComponent* Planner)
+{
+	SP_RCHECK_NULLPTR(Planner, false)
+
+	return Remove(TArray<USP_AIPlannerComponent*>{ Planner });
 }
 bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
@@ -180,19 +244,6 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 #endif
 
 	return true;
-}
-
-bool USP_FormationSet::AddSingle(USP_AIPlannerComponent* Planner)
-{
-	SP_RCHECK_NULLPTR(Planner, false)
-
-	return Add({ Planner });
-}
-bool USP_FormationSet::RemoveSingle(USP_AIPlannerComponent* Planner)
-{
-	SP_RCHECK_NULLPTR(Planner, false)
-
-	return Remove({ Planner });
 }
 
 void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
@@ -266,7 +317,7 @@ bool USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& Av
 	return true;
 }
 
-void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
+void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner) const
 {
 	SP_CHECK_NULLPTR(Planner)
 	SP_CHECK_NULLPTR(CurrentFormation)
@@ -302,7 +353,7 @@ void USP_FormationSet::SetFormationFocus(USP_AIPlannerComponent* Planner)
 		break;
 	}
 }
-void USP_FormationSet::ClearFormationFocus(USP_AIPlannerComponent* Planner)
+void USP_FormationSet::ClearFormationFocus(USP_AIPlannerComponent* Planner) const
 {
 	SP_CHECK_NULLPTR(Planner)
 	SP_CHECK_NULLPTR(CurrentFormation)

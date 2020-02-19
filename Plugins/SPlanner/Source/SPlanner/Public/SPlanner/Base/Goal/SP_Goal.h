@@ -25,18 +25,44 @@ protected:
 	TArray<USP_PlannerComponent*> Planners;
 
 	/**
-	*	Allowed transition list from this goal to a new one.
+	*	Allowed input transition list (from old goal to this).
 	*	Let empty to allow transition with all other goals.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	TArray<USP_Goal*> AllowedTransitions;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|In")
+	TArray<USP_Goal*> AllowedInTransitions;
 
 	/**
-	*	Blocked transition list from this goal to a new one.
+	*	Blocked input transition list (from old goal to this).
 	*	Only used if AllowedTransitions is empty.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	TArray<USP_Goal*> BlockedTransitions;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|In")
+	TArray<USP_Goal*> BlockedInTransitions;
+
+	/**
+	*	Allowed output transition list (from this goal to a new one).
+	*	Let empty to allow transition with all other goals.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|Out")
+	TArray<USP_Goal*> AllowedOutTransitions;
+
+	/**
+	*	Blocked output transition list (from this goal to a new one).
+	*	Only used if AllowedTransitions is empty.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|Out")
+	TArray<USP_Goal*> BlockedOutTransitions;
+
+	/** Whether Planner can start this goal. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "SPlanner|Goal|In")
+	bool CanStart(USP_PlannerComponent* Planner) const;
+
+	/** Whether Planner can leave this goal. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "SPlanner|Goal|Out")
+	bool CanLeave(USP_PlannerComponent* Planner) const;
+
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 public:
 	/** Getter of bResetBlackboard. */
@@ -45,28 +71,22 @@ public:
 	/** Getter of Planners. */
 	const TArray<USP_PlannerComponent*>& GetPlanners() const;
 
-	/** Getter of AllowedTransitions. */
-	const TArray<USP_Goal*>& GetAllowedTransitions() const;
-
-	/** Getter of BlockedTransitions. */
-	const TArray<USP_Goal*>& GetBlockedTransitions() const;
-
-	/*
-	*	Whether this goal can transit to NewGoal.
-	*	return this not a sub-goal of NewGoal and transition allowed.
-	*/
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Goal")
-	bool CanTransitTo(USP_Goal* NewGoal) const;
-
 	/** Callback method called when Planner starts this goal. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
-	bool OnStart(USP_PlannerComponent* Planner);
+	void OnStart(USP_PlannerComponent* Planner);
 
 	/** Callback method called when Planner ends this goal. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
-	bool OnEnd(USP_PlannerComponent* Planner);
+	void OnEnd(USP_PlannerComponent* Planner);
 
 	/** Reset this formation set. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Goal")
 	void Reset();
+
+	/**
+	*	Whether Planner can transit from OldGoal to NewGoal.
+	*	Use bForce to avoid In and Out transition check.
+	*/
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Goal")
+	static bool CanTransitTo(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal, bool bForce = false);
 };

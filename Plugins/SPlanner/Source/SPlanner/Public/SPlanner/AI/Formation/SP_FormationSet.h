@@ -79,13 +79,13 @@ protected:
 #endif
 
 	/** Set the formation focus to new Planner. */
-	void SetFormationFocus(USP_AIPlannerComponent* Planner);
+	void SetFormationFocus(USP_AIPlannerComponent* Planner) const;
 
 	/** Clear the formation focus of Planner. */
-	void ClearFormationFocus(USP_AIPlannerComponent* Planner);
+	void ClearFormationFocus(USP_AIPlannerComponent* Planner) const;
 
 	/** Check if every planner in InPlanners are contained or not in Planners. */
-	bool CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained);
+	bool CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const;
 
 	/** Init the data for InPlanners. */
 	virtual void InitPlannersData(const TArray<USP_AIPlannerComponent*>& InPlanners);
@@ -148,21 +148,36 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	void SetLeadActor(AActor* NewLeadActor);
 
+
+	/** Whether Planner can be added to the formation. */
+	bool CanAdd(USP_AIPlannerComponent* Planner) const;
+
+	/** Whether InPlanners can be added to the formation (enough places and not already in this formation). */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	bool CanAdd(const TArray<USP_AIPlannerComponent*>& InPlanners) const;
+
+	/** Whether Planner can be removed to the formation. */
+	bool CanRemove(USP_AIPlannerComponent* Planner) const;
+
+	/** Whether InPlanners can be removed from the formation (still enough planner and contained in this formation). */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
+	bool CanRemove(const TArray<USP_AIPlannerComponent*>& InPlanners) const;
+
+	
+	/** Add one planner to the formation. */
+	bool Add(USP_AIPlannerComponent* Planner);
+
 	/** Add planners to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	bool Add(const TArray<USP_AIPlannerComponent*>& InPlanners);
+
+	/** Remove one planner to the formation. */
+	bool Remove(USP_AIPlannerComponent* Planner);
 
 	/** Remove planners to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
 	bool Remove(const TArray<USP_AIPlannerComponent*>& InPlanners);
 
-	/** Add a planner to the formation. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool AddSingle(USP_AIPlannerComponent* Planner);
-
-	/** Remove a planner to the formation. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool RemoveSingle(USP_AIPlannerComponent* Planner);
 
 	/** Change formation type. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
