@@ -67,7 +67,7 @@ bool USP_MoveToTask::IsTargetVisible(const USP_AIPlannerComponent& Planner, cons
 	if (AActor* TargetActor = Target->GetAnyActor())
 		Params.AddIgnoredActor(TargetActor);
 
-	if (!Planner.GetWorld()->LineTraceSingleByChannel(HitInfos,
+	if (Planner.GetWorld()->LineTraceSingleByChannel(HitInfos,
 		AIPawn->GetActorLocation(),
 		Target->GetAnyPosition(),
 		ECollisionChannel::ECC_Visibility, Params))
@@ -82,7 +82,7 @@ FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
 
 	SP_RCHECK_NULLPTR(Target, MoveRequest)
 
-	if (Target->GetState() == ESP_TargetState::TS_Position) // Target position or offset.
+	if (Target->GetState() == ESP_TargetState::TS_Position || !bIsDynamic) // Target position or non dynamic.
 		MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 	else if (AActor* GoalActor = Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
@@ -265,8 +265,8 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
 
-	// Set dynamic.
-	Infos->bIsDynamic = !Target->IsActor() && bIsDynamic;
+	// Set dynamic: Target actor is already managed by UE.
+	Infos->bIsDynamic = bIsDynamic && !Target->IsActor();
 
 	if (PawnSpeed > 0.0f)
 	{

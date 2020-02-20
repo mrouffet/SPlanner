@@ -92,7 +92,7 @@ protected:
 
 	/** Should re-compute MoveTo on tick (only used when Target is not an actor). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	bool bIsDynamic = false;
+	bool bIsDynamic = true;
 
 	/**
 	*	Whether precondition should fail if Pawn is already at goal.
