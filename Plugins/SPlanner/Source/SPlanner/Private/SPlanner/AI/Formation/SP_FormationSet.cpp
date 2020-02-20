@@ -250,6 +250,11 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 	{
 		if (CurrentFormation)
 		{
+#if SP_DEBUG_EDITOR
+			if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+				SP_LOG_SCREEN(Display, FColor::Orange, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
+#endif
+
 			CurrentFormation->OnEnd(this);
 			CurrentFormation = nullptr;
 		}
@@ -276,8 +281,8 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 #if SP_DEBUG_EDITOR
 	DrawDebug();
 
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
-		SP_LOG_SCREEN(Display, FColor::Purple, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
+	if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+		SP_LOG_SCREEN(Display, FColor::Orange, "%s: %d", *CurrentFormation->GetName(), Planners.Num())
 #endif
 
 	return true;
@@ -298,6 +303,7 @@ void USP_FormationSet::ApplyOffsets(const TArray<FVector>& Offsets)
 		SP_CCHECK(AIBlackboard, "%s AIBlackboard nullptr!", *Planners[i]->GetName())
 
 		USP_Target* const Target = AIBlackboard->GetObject<USP_Target>(OutputTargetEntryName);
+		SP_CCHECK(Target, "%s Target nullptr!", *Planners[i]->GetName())
 		Target->SetPosition(LeadLocation + Offsets[i]);
 	}
 }
