@@ -10,6 +10,9 @@ USP_LODComponent::USP_LODComponent(const FObjectInitializer& ObjectInitializer) 
 	SphereRadius = 10000.0f;
 
 	Tags.Add("SP_Player");
+
+	// LOD overlap only with pawns by default.
+	SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
 }
 
 bool USP_LODComponent::IsInRange() const
