@@ -38,9 +38,10 @@ void USP_BlackboardComponent::InitializeComponent()
 
 	InitializeBlackboard();
 }
-void USP_BlackboardComponent::UninitializeComponent()
+void USP_BlackboardComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::UninitializeComponent();
+	Super::EndPlay(EndPlayReason);
 
+	// BlueprintNativeEvent called in UnInitializeComponent cause crashes in Editor.
 	UnInitializeBlackboard();
 }

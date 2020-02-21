@@ -35,7 +35,7 @@ protected:
 	void UnInitializeBlackboard();
 
 	void InitializeComponent() override;
-	void UninitializeComponent() override;
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	USP_BlackboardComponent(const FObjectInitializer& ObjectInitializer);
