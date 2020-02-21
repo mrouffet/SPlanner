@@ -98,6 +98,15 @@ TArray<USP_ActionStep*> USP_AIPlannerComponent::GetNextActionSteps() const
 	return Result;
 }
 
+uint8* USP_AIPlannerComponent::GetTaskUserData()
+{
+	return TaskUserData.GetData();
+}
+const uint8* USP_AIPlannerComponent::GetTaskUserData() const
+{
+	return TaskUserData.GetData();
+}
+
 float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, -1.0f)
@@ -123,6 +132,11 @@ bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 	SP_RCHECK_NULLPTR(Task, false)
 
 	return GetCooldown(Task) > 0.0f;
+}
+
+void USP_AIPlannerComponent::Notify(ESP_AIPlannerNotify Notify)
+{
+	OnNotify.Broadcast(this, Notify);
 }
 
 ASP_AIController* USP_AIPlannerComponent::GetController() const

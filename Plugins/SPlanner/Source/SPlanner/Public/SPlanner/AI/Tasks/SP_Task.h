@@ -7,6 +7,8 @@
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 
 #include <SPlanner/AI/Tasks/SP_TaskMacro.h>
+#include <SPlanner/AI/Tasks/SP_TaskNotification.h>
+#include <SPlanner/AI/Planner/SP_AIPlannerNotify.h>
 
 #include <SPlanner/Base/Actions/SP_ActionStep.h>
 #include "SP_Task.generated.h"
@@ -26,16 +28,18 @@ protected:
 	/** Info for this task. */
 	struct FSP_TaskInfos
 	{
+		ESP_PlanExecutionState T_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+
 		float T_TimeOutTime = -1.0f;
 		float T_CurrTimeOut = 0.0f;
 	};
 
 	/** The cooldown of this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Cooldown")
 	FSP_FloatParam Cooldown;
 
 	/** Should use cooldown even if the task has failed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Cooldown")
 	bool bUseCooldownOnFailed = true;
 
 	/**
@@ -44,6 +48,24 @@ protected:
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
 	FSP_FloatParam TimeOut;
+
+	/**
+	*	Maks of notify reaction.
+	*	The task will either success or failed when a notify in mask will be throw, depending on bSuccessOnNotify.
+	*/
+	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "ESP_AIPlannerNotify"), Category = "SPlanner|Task|Notify")
+	uint8 NotifyMask = 0u;
+
+	/** How the task should react to notifications. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Notify")
+	ESP_TaskNotification NotifyAction = ESP_TaskNotification::TNA_TimeOut;
+
+	/** Callback method bound to planner. */
+	UFUNCTION(Category = "SPlanner|Action|Task")
+	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify);
+
+	/** Init the Notify callback and base execution state. */
+	void InitNotify(USP_AIPlannerComponent& Planner, uint8* UserData);
 
 	/**
 	*	Construct the UserData.

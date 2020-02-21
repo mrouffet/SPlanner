@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <SPlanner/AI/Planner/SP_AIPlannerNotify.h>
+
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 #include "SP_AIPlannerComponent.generated.h"
 
@@ -11,6 +13,8 @@ class USP_POIZoneComponent;
 
 class APawn;
 class ASP_AIController;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIPlannerNotifyDelegate, USP_AIPlannerComponent*, Planner, ESP_AIPlannerNotify, Notify);
 
 /**
 *	Planner behavior.
@@ -85,6 +89,9 @@ protected:
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|AI")
+	FSP_AIPlannerNotifyDelegate OnNotify;
+
 	/**
 	*	The POI interact zone used.
 	*	Used to add action set from interactible POIs.
@@ -114,6 +121,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	TArray<USP_ActionStep*> GetNextActionSteps() const;
 
+	/** Getter of Task user data. */
+	uint8* GetTaskUserData();
+
+	/** const Getter of Task user data. */
+	const uint8* GetTaskUserData() const;
 
 	/** Getter of cooldown for one task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
@@ -126,6 +138,10 @@ public:
 	/** Helper function for cooldown check */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	bool IsInCooldown(const USP_Task* Task) const;
+
+	/** Notify by calling OnNotify(). */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner|AI")
+	void Notify(ESP_AIPlannerNotify Notify);
 
 	/** Get Controller this planner is attached to. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")

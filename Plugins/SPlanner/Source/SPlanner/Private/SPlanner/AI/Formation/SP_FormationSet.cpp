@@ -545,9 +545,6 @@ void USP_FormationSet::Tick(float DeltaSeconds)
 		UpdateFormation();
 	}
 
-	// Saved new location.
-	SavedLeadLocation = LeadActor->GetActorLocation();
-
 #if SP_DEBUG_EDITOR
 	// Force redraw if no UpdateFormation.
 	DrawDebug();
@@ -567,6 +564,14 @@ void USP_FormationSet::UpdateFormation()
 	CurrentFormation->Compute(FSP_FormationSetInfos{ Planners, Offsets, LeadActor, TargetActor });
 
 	ApplyOffsets(Offsets);
+
+
+	// Notify planners.
+	for (int i = 0; i < Planners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Planners[i])
+		Planners[i]->Notify(ESP_AIPlannerNotify::NP_FormationChange);
+	}
 }
 
 void USP_FormationSet::Reset_Implementation()
