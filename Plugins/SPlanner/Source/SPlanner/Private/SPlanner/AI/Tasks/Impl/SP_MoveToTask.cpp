@@ -124,6 +124,15 @@ uint32 USP_MoveToTask::GetUserDataSize() const
 	return sizeof(FSP_MoveToTaskInfos);
 }
 
+void USP_MoveToTask::ConstructUserData(uint8* UserData)
+{
+	new(UserData) FSP_MoveToTaskInfos{};
+}
+void USP_MoveToTask::DestructUserData(uint8* UserData)
+{
+	reinterpret_cast<FSP_MoveToTaskInfos*>(UserData)->~FSP_MoveToTaskInfos();
+}
+
 void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult)
 {
 	FSP_MoveToTaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
@@ -132,18 +141,18 @@ void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPat
 	switch (ExecResult)
 	{
 	case EPathFollowingResult::Type::Success:
-		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		break;
 	default:
-		Infos->ExecutionState = ESP_PlanExecutionState::PES_Failed;
+		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Failed;
 		break;
 	}
 
 	RequestIDToTaskInfos.Remove(RequestID);
 
 	// Unbind completed event.
-	SP_CHECK_NULLPTR(Infos->Controller)
-	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
+	SP_CHECK_NULLPTR(Infos->MT_Controller)
+	Infos->MT_Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
 bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
@@ -209,7 +218,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
 	SP_TASK_SUPER_BEGIN(Planner, UserData)
 
-	FSP_MoveToTaskInfos* const Infos = new(UserData) FSP_MoveToTaskInfos{};
+	FSP_MoveToTaskInfos* const Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
@@ -219,14 +228,14 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 	if (HasReachedPosition(Planner, Target))
 	{
-		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
 	}
 
 	if (bTargetVisible && !IsTargetVisible(Planner, Target))
 	{
 		SP_LOG_TASK_EXECUTE(Planner, "Move request failed: Taget not visible.")
-		Infos->ExecutionState = ESP_PlanExecutionState::PES_Failed;
+		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Failed;
 		return false;
 	}
 
@@ -236,13 +245,13 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 
 	// Create MoveRequest.
-	Infos->MoveRequest = CreateMoveRequest(Target);
+	Infos->MT_MoveRequest = CreateMoveRequest(Target);
 
 	// Request movement.
 #if SP_DEBUG
-	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
+	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest, &Infos->MT_DebugPath);
 #else
-	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
+	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest);
 #endif
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
@@ -252,21 +261,21 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
 	}
 
 	SP_LOG_TASK_EXECUTE(Planner, "Pathfinding: %s", *Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
-	Infos->Controller = Controller;
+	Infos->MT_Controller = Controller;
 	Controller->ReceiveMoveCompleted.AddDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
 
 	// Set dynamic: Target actor is already managed by UE.
-	Infos->bIsDynamic = bIsDynamic && !Target->IsActor();
+	Infos->MT_bIsDynamic = bIsDynamic && !Target->IsActor();
 
 	if (PawnSpeed > 0.0f)
 	{
@@ -274,7 +283,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Store previous value.
-		Infos->PrevPawnSpeed = GetPawnSpeed(AIPawn);
+		Infos->MT_PrevPawnSpeed = GetPawnSpeed(AIPawn);
 
 		SetPawnSpeed(AIPawn, PawnSpeed);
 	}
@@ -287,12 +296,12 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 	FSP_MoveToTaskInfos* const Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
 
-	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Failed)
+	if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Failed)
 	{
 		SP_LOG_TASK_TICK(Planner, "Failed")
 		return ESP_PlanExecutionState::PES_Failed;
 	}
-	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
+	else if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Succeed)
 	{
 		const AAIController* const Controller = Cast<AAIController>(Planner.GetOwner());
 		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
@@ -310,7 +319,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 	}
 
 	// TODO: Clean later.
-	if (Infos->bIsDynamic)
+	if (Infos->MT_bIsDynamic)
 	{
 		USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 		SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
@@ -318,16 +327,16 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 		SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
-		Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition());
+		Infos->MT_MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 
 		ASP_AIController* const Controller = Planner.GetController();
 		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
 		// Request movement.
 		#if SP_DEBUG
-			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
+			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest, &Infos->MT_DebugPath);
 		#else
-			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
+			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest);
 		#endif
 
 		if (Request.Code == EPathFollowingRequestResult::Failed)
@@ -344,8 +353,6 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 }
 bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_TASK_SUPER_END(Planner, UserData)
-
 	FSP_MoveToTaskInfos* Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
 
 	if (PawnSpeed > 0.0f)
@@ -354,18 +361,17 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Reset to saved speed.
-		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
+		SetPawnSpeed(AIPawn, Infos->MT_PrevPawnSpeed);
 	}
 
-	Infos->~FSP_MoveToTaskInfos();
+	// Destroy Infos after.
+	SP_TASK_SUPER_END(Planner, UserData)
 
 	return true;
 }
 
 bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
-	SP_TASK_SUPER_CANCEL(Planner, UserData)
-
 	FSP_MoveToTaskInfos* Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
 
 	if (PawnSpeed > 0.0f)
@@ -374,13 +380,14 @@ bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Reset to saved speed.
-		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
+		SetPawnSpeed(AIPawn, Infos->MT_PrevPawnSpeed);
 	}
 
-	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
-		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
-	
-	Infos->~FSP_MoveToTaskInfos();
+	if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Running)
+		Infos->MT_Controller->StopMovement(); // Call ReceiveMoveCompleted.
+
+	// Destroy Infos after.
+	SP_TASK_SUPER_CANCEL(Planner, UserData)
 
 	return true;
 }

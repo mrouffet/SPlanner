@@ -15,7 +15,8 @@ class SPLANNER_API USP_LookAtTask : public USP_Task
 {
 	GENERATED_BODY()
 	
-	struct FSP_TaskInfos
+protected:
+	struct FSP_LookAtTaskInfos : public FSP_TaskInfos
 	{
 		FRotator Start;
 		FRotator End;
@@ -23,7 +24,6 @@ class SPLANNER_API USP_LookAtTask : public USP_Task
 		float Alpha = 0.0f;
 	};
 
-protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	FName TargetEntryName = "None";
@@ -50,6 +50,9 @@ protected:
 
 	FRotator ComputeTargetRotation(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
 
+	void ConstructUserData(uint8* UserData) override;
+	void DestructUserData(uint8* UserData) override;
+
 public:
 	uint32 GetUserDataSize() const override;
 
@@ -59,5 +62,4 @@ public:
 
 	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
 };

@@ -33,8 +33,18 @@ bool USP_Task::PreCondition(const USP_PlannerComponent& Planner, const TArray<US
 	return true;
 }
 
+void USP_Task::ConstructUserData(uint8* UserData)
+{
+}
+void USP_Task::DestructUserData(uint8* UserData)
+{
+}
+
 bool USP_Task::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
+	ConstructUserData(UserData);
+
+
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskBegin(&Planner);
 #endif
@@ -51,6 +61,8 @@ ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent
 }
 bool USP_Task::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
+	DestructUserData(UserData);
+
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskEnd(&Planner);
 #endif
@@ -60,6 +72,8 @@ bool USP_Task::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 bool USP_Task::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 {
+	DestructUserData(UserData);
+
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskCancel(&Planner);
 #endif

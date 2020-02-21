@@ -31,6 +31,18 @@ protected:
 	bool bUseCooldownOnFailed = true;
 
 	/**
+	*	Construct the UserData.
+	*	Children UserData struct must inherit from parent UserData struct.
+	*/
+	virtual void ConstructUserData(uint8* UserData);
+
+	/**
+	*	Destruct the UserData.
+	*	Children UserData struct must inherit from parent UserData struct.
+	*/
+	virtual void DestructUserData(uint8* UserData);
+
+	/**
 	*	Blueprint event called by Begin().
 	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
 	*/
@@ -69,6 +81,7 @@ public:
 
 	/** Getter of user data size to reserve. */
 	virtual uint32 GetUserDataSize() const;
+
 
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 

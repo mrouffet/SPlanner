@@ -15,15 +15,18 @@ class SPLANNER_API USP_TaskChain : public USP_Task
 {
 	GENERATED_BODY()
 
-	struct FSP_TaskInfos
+protected:
+	struct FSP_ChainTaskInfos : public FSP_TaskInfos
 	{
-		int Index = 0;
+		int TC_Index = 0;
 	};
 
-protected:
 	/** The handled tasks. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Chain")
 	TArray<USP_Task*> Tasks;
+
+	void ConstructUserData(uint8* UserData) override;
+	void DestructUserData(uint8* UserData) override;
 
 public:
 	uint32 GetUserDataSize() const override;

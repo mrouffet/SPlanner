@@ -17,23 +17,24 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 {
 	GENERATED_BODY()
 	
-	struct FSP_MoveToTaskInfos
+protected:
+	struct FSP_MoveToTaskInfos : FSP_TaskInfos
 	{
 #if SP_DEBUG
-		FNavPathSharedPtr DebugPath;
+		FNavPathSharedPtr MT_DebugPath;
 #endif
 
-		FAIMoveRequest MoveRequest;
-		AAIController* Controller = nullptr;
+		FAIMoveRequest MT_MoveRequest;
+		AAIController* MT_Controller = nullptr;
 
 		/** Whether goal position must be re-compute each tick. */
-		bool bIsDynamic = false;
+		bool MT_bIsDynamic = false;
 
 		/** The saved previous pawn speed. */
-		float PrevPawnSpeed = -1.0f;
+		float MT_PrevPawnSpeed = -1.0f;
 
 		/** Internal request execution state. */
-		ESP_PlanExecutionState ExecutionState = ESP_PlanExecutionState::PES_Running;
+		ESP_PlanExecutionState MT_ExecutionState = ESP_PlanExecutionState::PES_Running;
 	};
 
 	/**
@@ -42,7 +43,6 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 	*/
 	TMap<int, FSP_MoveToTaskInfos*> RequestIDToTaskInfos;
 
-protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	FName TargetEntryName = "MainTarget";
@@ -135,6 +135,9 @@ protected:
 
 	/** Implementation of move request creation. */
 	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
+
+	void ConstructUserData(uint8* UserData) override;
+	void DestructUserData(uint8* UserData) override;
 
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
