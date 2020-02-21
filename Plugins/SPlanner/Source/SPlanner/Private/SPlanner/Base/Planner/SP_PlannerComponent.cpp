@@ -56,6 +56,13 @@ void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
 		OnInactive_Internal();
 }
 
+float USP_PlannerComponent::GetLODLevel() const
+{
+	if (LOD && LOD->IsInRange())
+		return LOD->GetLevel();
+
+	return -1.0f;
+}
 void USP_PlannerComponent::SetLOD(USP_PlannerLODComponent* NewLOD)
 {
 	if (LOD)

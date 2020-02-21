@@ -109,7 +109,7 @@ void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
 {
 	SP_CHECK_NULLPTR(Task)
 
-	float Cooldown = Task->GetCooldown(LOD ? LOD->GetLevel() : -1.0f);
+	float Cooldown = Task->GetCooldown(GetLODLevel());
 
 	// Never save task without cooldown.
 	if(Cooldown <= 0.0f)

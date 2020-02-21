@@ -208,6 +208,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner")
 	void SetEnableBehavior(bool bEnable);
 
+	/** Getter of LOD level. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner")
+	float GetLODLevel() const;
+
 	/**
 	*	Setter of LOD.
 	*	Bind OnActiveLOD / OnInactiveLOD events.
