@@ -199,14 +199,6 @@ void ASP_Director::SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAll
 {
 	SP_CHECK_NULLPTR(NewGoal)
 
-#if !SP_DEBUG
-	// The method is not defined using WITH_EDITOR to be able to call it in BP as debug.
-
-	SP_LOG(Warning, "This method should only be called in debug (require SP_DEBUG)!")
-	return;
-
-#else
-
 #if SP_DEBUG_EDITOR
 
 	for (int i = 0; i < ActivePlanners.Num(); ++i)
@@ -238,8 +230,5 @@ void ASP_Director::SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAll
 
 #endif
 
-
 	SP_LOG_SCREEN(Display, FColor::Magenta, "Set Goal: %s", *NewGoal->GetName())
-
-#endif
 }

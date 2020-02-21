@@ -2,6 +2,8 @@
 
 #include <SPlanner/AI/Controllers/SP_AIController.h>
 
+#include <TimerManager.h>
+
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Zones/SP_ReactZoneComponent.h>
@@ -36,6 +38,32 @@ void ASP_AIController::SetEnableBehavior(bool bEnable)
 	Planner->SetEnableBehavior(bEnable);
 
 	SetActorTickEnabled(bEnable);
+}
+
+bool ASP_AIController::IsFrozen() const
+{
+	// Planner behavior must be enabled (otherwise planner is inactive and not frozen).
+
+	return !IsActorTickEnabled() && !Planner->IsComponentTickEnabled() && Planner->IsBehaviorEnabled();
+}
+void ASP_AIController::Freeze(float Time)
+{
+	SP_CHECK_NULLPTR(Planner)
+
+	SetActorTickEnabled(false);
+	Planner->SetComponentTickEnabled(false);
+
+	if (Time > 0.0f)
+		GetWorld()->GetTimerManager().SetTimer(FrozenTimer, this, &ASP_AIController::UnFreeze, Time, false);
+}
+void ASP_AIController::UnFreeze()
+{
+	SP_CHECK(IsFrozen(), "Try to UnFreeze a non-frozen planner.")
+
+	GetWorld()->GetTimerManager().ClearTimer(FrozenTimer);
+
+	SetActorTickEnabled(true);
+	Planner->SetComponentTickEnabled(true);
 }
 
 void ASP_AIController::OnAskPlan_Implementation(USP_PlannerComponent* InPlanner)

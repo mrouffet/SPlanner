@@ -20,6 +20,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	USP_AIPlannerComponent* Planner = nullptr;
 
+	/** Timer used by Freeze(). */
+	FTimerHandle FrozenTimer;
+
 	/** Callback function called when a new plan is asked. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Controller")
 	void OnAskPlan(USP_PlannerComponent* InPlanner);
@@ -47,4 +50,24 @@ public:
 	/** Enable or disable Planner behavior. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
 	void SetEnableBehavior(bool bEnable);
+
+	/** Whether the planner behavior is frozen. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Controller")
+	bool IsFrozen() const;
+
+	/**
+	*	Freeze the planner behavior for Time.
+	*	Freeze behavior do not cancel the current plan.
+	*	Plan will continue on UnFreeze().
+	*	Use Time < 0.0f for infinite time (wait for UnFreeze call).
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
+	virtual void Freeze(float Time = -1.0f);
+
+	/**
+	*	Unfreeze the planner behavior.
+	*	Resume the previous computed plan.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
+	virtual void UnFreeze();
 };

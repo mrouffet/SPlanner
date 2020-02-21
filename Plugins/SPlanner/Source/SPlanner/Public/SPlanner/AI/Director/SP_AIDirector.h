@@ -77,4 +77,20 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
 	static void UnRegisterFormationSet(USP_FormationSet* InFormationSet);
+
+	/**
+	*	Freeze all selected planner in editor.
+	*	In editor, only selected planner will be frozen (or all planner if no selected and bApplyToAllIfNoSelected).
+	*	In non SP_DEBUG build, every registered planner will be frozen.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
+	void FreezeAllSelectedPlanner(float Time = -1.0f, bool bApplyToAllIfNoSelected = true);
+
+	/**
+	*	UnFreeze all selected planner in editor.
+	*	In editor, only selected planner will be unfrozen (or all planner if no selected and bApplyToAllIfNoSelected).
+	*	In non SP_DEBUG build, every registered planner will be unfrozen.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
+	void UnFreezeAllSelectedPlanner(bool bApplyToAllIfNoSelected = true);
 };

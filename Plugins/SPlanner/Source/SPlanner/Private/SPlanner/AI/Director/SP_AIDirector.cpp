@@ -4,6 +4,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/AI/Controllers/SP_AIController.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 
@@ -62,6 +63,115 @@ void ASP_AIDirector::UnRegisterFormationSet_Internal_Implementation(USP_Formatio
 
 	FormationSets.Remove(InFormationSet);
 	OnFormationSetUnRegistered.Broadcast(InFormationSet);
+}
+
+void ASP_AIDirector::FreezeAllSelectedPlanner(float Time, bool bApplyToAllIfNoSelected)
+{
+#if SP_DEBUG_EDITOR
+
+	for (int i = 0; i < ActivePlanners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(ActivePlanners[i])
+
+		if (ActivePlanners[i]->IsSelected())
+		{
+			USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(ActivePlanners[i]);
+			SP_CCHECK_NULLPTR(AIPlanner)
+
+			ASP_AIController* const AIController = AIPlanner->GetController();
+			SP_CCHECK_NULLPTR(AIController)
+
+			AIController->Freeze(Time);
+
+			bApplyToAllIfNoSelected = false; // At least one is selected.
+		}
+	}
+
+	if (bApplyToAllIfNoSelected)
+	{
+		for (int i = 0; i < ActivePlanners.Num(); ++i)
+		{
+			SP_CCHECK_NULLPTR(ActivePlanners[i])
+
+			if (USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(ActivePlanners[i]))
+			{
+				ASP_AIController* const AIController = AIPlanner->GetController();
+				SP_CCHECK_NULLPTR(AIController)
+
+				AIController->Freeze(Time);
+			}
+		}
+	}
+#else
+
+	for (int i = 0; i < ActivePlanners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(ActivePlanners[i])
+
+		if (USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(ActivePlanners[i]))
+		{
+			ASP_AIController* const AIController = AIPlanner->GetController();
+			SP_CCHECK_NULLPTR(AIController)
+
+			AIController->Freeze(Time);
+		}
+	}
+
+#endif
+}
+void ASP_AIDirector::UnFreezeAllSelectedPlanner(bool bApplyToAllIfNoSelected)
+{
+#if SP_DEBUG_EDITOR
+
+	for (int i = 0; i < ActivePlanners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(ActivePlanners[i])
+
+		if (ActivePlanners[i]->IsSelected())
+		{
+			USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(ActivePlanners[i]);
+			SP_CCHECK_NULLPTR(AIPlanner)
+
+			ASP_AIController* const AIController = AIPlanner->GetController();
+			SP_CCHECK_NULLPTR(AIController)
+
+			AIController->UnFreeze();
+
+			bApplyToAllIfNoSelected = false; // At least one is selected.
+		}
+	}
+
+	if (bApplyToAllIfNoSelected)
+	{
+		for (int i = 0; i < ActivePlanners.Num(); ++i)
+		{
+			SP_CCHECK_NULLPTR(ActivePlanners[i])
+
+			if (USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(ActivePlanners[i]))
+			{
+				ASP_AIController* const AIController = AIPlanner->GetController();
+				SP_CCHECK_NULLPTR(AIController)
+
+				AIController->UnFreeze();
+			}
+		}
+	}
+#else
+
+	for (int i = 0; i < ActivePlanners.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(ActivePlanners[i])
+
+		if (USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(ActivePlanners[i]))
+		{
+			ASP_AIController* const AIController = AIPlanner->GetController();
+			SP_CCHECK_NULLPTR(AIController)
+
+			AIController->UnFreeze();
+		}
+	}
+
+#endif
 }
 
 void ASP_AIDirector::EndPlay(const EEndPlayReason::Type EndPlayReason)

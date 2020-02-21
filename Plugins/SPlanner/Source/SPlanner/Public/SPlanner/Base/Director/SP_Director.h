@@ -143,9 +143,8 @@ public:
 
 	/**
 	*	Set goal to all selected planner in editor.
-	*	In editor, only selected planner will be set.
-	*	In SP_DEBUG build, every registered planner will be set.
-	*	Does nothing in non SP_DEBUG.
+	*	In editor, only selected planner will be set (or all planner if no selected and bApplyToAllIfNoSelected).
+	*	In non SP_DEBUG build, every registered planner will be set.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
 	void SetAllSelectedPlannerGoal(USP_Goal* NewGoal, bool bApplyToAllIfNoSelected = true);
