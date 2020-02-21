@@ -74,11 +74,6 @@
 
 #else
 
-#define SP_TASK_SUPER_BEGIN(...)
-#define SP_TASK_SUPER_TICK(...)
-#define SP_TASK_SUPER_END(...)
-#define SP_TASK_SUPER_CANCEL(...)
-
 #define SP_IF_TASK_EXECUTE(...)
 #define SP_IF_TASK_TICK(...)
 
