@@ -21,7 +21,15 @@ class SPLANNER_API USP_Task : public USP_ActionStep
 {
 	GENERATED_BODY()
 
+
 protected:
+	/** Info for this task. */
+	struct FSP_TaskInfos
+	{
+		float T_TimeOutTime = -1.0f;
+		float T_CurrTimeOut = 0.0f;
+	};
+
 	/** The cooldown of this task. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
 	FSP_FloatParam Cooldown;
@@ -29,6 +37,13 @@ protected:
 	/** Should use cooldown even if the task has failed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
 	bool bUseCooldownOnFailed = true;
+
+	/**
+	*	The time this task can be in Running before failing.
+	*	Set <= 0.0f to never time out.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task")
+	FSP_FloatParam TimeOut;
 
 	/**
 	*	Construct the UserData.

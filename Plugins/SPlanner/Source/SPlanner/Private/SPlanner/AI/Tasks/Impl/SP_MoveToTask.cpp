@@ -364,6 +364,9 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SetPawnSpeed(AIPawn, Infos->MT_PrevPawnSpeed);
 	}
 
+	if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Running)
+		Infos->MT_Controller->StopMovement(); // Call ReceiveMoveCompleted.
+
 	// Destroy Infos after.
 	SP_TASK_SUPER_END(Planner, UserData)
 
