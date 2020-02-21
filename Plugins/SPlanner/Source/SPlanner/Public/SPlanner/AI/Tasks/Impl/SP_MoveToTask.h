@@ -30,6 +30,8 @@ protected:
 		/** Whether goal position must be re-compute each tick. */
 		bool MT_bIsDynamic = false;
 
+		float MT_DynamicTime = 0.0f;
+
 		/** The saved previous pawn speed. */
 		float MT_PrevPawnSpeed = -1.0f;
 
@@ -93,6 +95,13 @@ protected:
 	/** Should re-compute MoveTo on tick (only used when Target is not an actor). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	bool bIsDynamic = true;
+
+	/**
+	*	The frequency of update while bIsDynamic it true.
+	*	Use < 0.0f for every tick.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo", meta=(EditCondition="bIsDynamic"))
+	float DynamicUpdateFrequency = -1.0f;
 
 	/**
 	*	Whether precondition should fail if Pawn is already at goal.

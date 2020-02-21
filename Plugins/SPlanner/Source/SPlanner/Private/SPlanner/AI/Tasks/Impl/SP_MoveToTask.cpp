@@ -82,7 +82,8 @@ FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
 
 	SP_RCHECK_NULLPTR(Target, MoveRequest)
 
-	if (Target->GetState() == ESP_TargetState::TS_Position || !bIsDynamic) // Target position or non dynamic.
+	 // Target position or non dynamic or frequency update.
+	if (Target->GetState() == ESP_TargetState::TS_Position || !bIsDynamic || DynamicUpdateFrequency > 0.0f)
 		MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 	else if (AActor* GoalActor = Target->GetAnyActor())
 		MoveRequest.SetGoalActor(GoalActor);
@@ -274,8 +275,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
 
-	// Set dynamic: Target actor is already managed by UE.
-	Infos->MT_bIsDynamic = bIsDynamic && !Target->IsActor();
+	Infos->MT_bIsDynamic = bIsDynamic && DynamicUpdateFrequency > 0.0f;
 
 	if (PawnSpeed > 0.0f)
 	{
@@ -321,31 +321,36 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 	// TODO: Clean later.
 	if (Infos->MT_bIsDynamic)
 	{
-		USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
-		SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
+		Infos->MT_DynamicTime += DeltaSeconds;
 
-		USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
-		SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
-
-		Infos->MT_MoveRequest.SetGoalLocation(Target->GetAnyPosition());
-
-		ASP_AIController* const Controller = Planner.GetController();
-		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
-
-		// Request movement.
-		#if SP_DEBUG
-			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest, &Infos->MT_DebugPath);
-		#else
-			FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest);
-		#endif
-
-		if (Request.Code == EPathFollowingRequestResult::Failed)
+		if (DynamicUpdateFrequency <= 0.0f || Infos->MT_DynamicTime >= DynamicUpdateFrequency)
 		{
-			SP_LOG_TASK_EXECUTE(Planner, "Move request failed!")
-			return ESP_PlanExecutionState::PES_Failed;
+			USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+			SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
+
+			USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
+			SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
+
+			Infos->MT_MoveRequest.SetGoalLocation(Target->GetAnyPosition());
+
+			ASP_AIController* const Controller = Planner.GetController();
+			SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
+
+			// Request movement.
+			#if SP_DEBUG
+				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest, &Infos->MT_DebugPath);
+			#else
+				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest);
+			#endif
+
+			if (Request.Code == EPathFollowingRequestResult::Failed)
+			{
+				SP_LOG_TASK_EXECUTE(Planner, "Move request failed!")
+				return ESP_PlanExecutionState::PES_Failed;
+			}
+			else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
+				return ESP_PlanExecutionState::PES_Succeed;
 		}
-		else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
-			return ESP_PlanExecutionState::PES_Succeed;
 	}
 	//
 
