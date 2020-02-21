@@ -31,18 +31,9 @@ FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent& Pla
 	return Rotator;
 }
 
-uint32 USP_LookAtTask::GetUserDataSize() const
+USP_TaskInfosBase* USP_LookAtTask::InstantiateInfos()
 {
-	return sizeof(FSP_LookAtTaskInfos);
-}
-
-void USP_LookAtTask::ConstructUserData(uint8* UserData)
-{
-	new(UserData) FSP_LookAtTaskInfos();
-}
-void USP_LookAtTask::DestructUserData(uint8* UserData)
-{
-	reinterpret_cast<FSP_LookAtTaskInfos*>(UserData)->~FSP_LookAtTaskInfos();
+	return NewObject<USP_LookAtTaskInfos>();
 }
 
 bool USP_LookAtTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
@@ -69,12 +60,12 @@ uint64 USP_LookAtTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
+bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	SP_TASK_SUPER_BEGIN(Planner, UserData)
+	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
-	// Construct before any return for correct destruction in End().
-	FSP_LookAtTaskInfos* const Infos = reinterpret_cast<FSP_LookAtTaskInfos*>(UserData);
+	USP_LookAtTaskInfos* const Infos = Cast<USP_LookAtTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_LookAtTaskInfos")
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
@@ -97,14 +88,15 @@ bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 	return true;
 }
-ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
+	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
 	APawn* Pawn = Planner.GetPawn();
 	SP_SRCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
 
-	FSP_LookAtTaskInfos* const Infos = reinterpret_cast<FSP_LookAtTaskInfos*>(UserData);
+	USP_LookAtTaskInfos* const Infos = Cast<USP_LookAtTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_LookAtTaskInfos")
 
 	if(bInstant)
 	{

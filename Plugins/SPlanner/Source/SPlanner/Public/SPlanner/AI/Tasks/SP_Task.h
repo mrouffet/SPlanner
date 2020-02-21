@@ -7,6 +7,7 @@
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 
 #include <SPlanner/AI/Tasks/SP_TaskMacro.h>
+#include <SPlanner/AI/Tasks/SP_TaskInfosBase.h>
 #include <SPlanner/AI/Tasks/SP_TaskNotification.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerNotify.h>
 
@@ -23,16 +24,9 @@ class SPLANNER_API USP_Task : public USP_ActionStep
 {
 	GENERATED_BODY()
 
-
 protected:
-	/** Info for this task. */
-	struct FSP_TaskInfos
-	{
-		ESP_PlanExecutionState T_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
-
-		float T_TimeOutTime = -1.0f;
-		float T_CurrTimeOut = 0.0f;
-	};
+	// Allow TaskChain to call OnNotify().
+	friend class USP_TaskChain;
 
 	/** The cooldown of this task. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Cooldown")
@@ -62,22 +56,10 @@ protected:
 
 	/** Callback method bound to planner. */
 	UFUNCTION(Category = "SPlanner|Action|Task")
-	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify);
+	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos);
 
 	/** Init the Notify callback and base execution state. */
-	void InitNotify(USP_AIPlannerComponent& Planner, uint8* UserData);
-
-	/**
-	*	Construct the UserData.
-	*	Children UserData struct must inherit from parent UserData struct.
-	*/
-	virtual void ConstructUserData(uint8* UserData);
-
-	/**
-	*	Destruct the UserData.
-	*	Children UserData struct must inherit from parent UserData struct.
-	*/
-	virtual void DestructUserData(uint8* UserData);
+	void InitNotify(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos);
 
 	/**
 	*	Blueprint event called by Begin().
@@ -116,9 +98,8 @@ public:
 	/** Getter of Cooldown. */
 	float GetCooldown(float LODLevel = -1.0f) const;
 
-	/** Getter of user data size to reserve. */
-	virtual uint32 GetUserDataSize() const;
-
+	/** Instantiate the TaskInfos for this task. */
+	virtual USP_TaskInfosBase* InstantiateInfos();
 
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 
@@ -126,23 +107,39 @@ public:
 	*	The begin implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData);
+	virtual bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
 
 	/**
 	*	The tick implementation of the task.
 	*	This is executed by the PlannerComponent (main thread).
 	*/
-	virtual ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData);
+	virtual ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
 
 	/**
 	*	The end implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual bool End(USP_AIPlannerComponent& Planner, uint8* UserData);
+	virtual bool End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
 
 	/**
 	*	The cancel implementation of the task.
 	*	This is executed by the SP_PlannerComponent (main thread).
 	*/
-	virtual bool Cancel(USP_AIPlannerComponent& Planner, uint8* UserData);
+	virtual bool Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
+};
+
+
+/** Task info implementation for USP_Task. */
+UCLASS(ClassGroup = "SPlanner|Action|Task")
+class USP_TaskInfos : public USP_TaskInfosBase
+{
+	GENERATED_BODY()
+
+	// Only accessible by USP_Task.
+	friend USP_Task;
+
+	ESP_PlanExecutionState BaseExecutionState = ESP_PlanExecutionState::PES_Succeed;
+
+	float TimeOutTime = -1.0f;
+	float CurrTimeOut = 0.0f;
 };

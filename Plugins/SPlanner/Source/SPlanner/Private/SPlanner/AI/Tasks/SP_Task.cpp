@@ -24,22 +24,23 @@ float USP_Task::GetCooldown(float LODLevel) const
 	return Cooldown.Get(LODLevel);
 }
 
-void USP_Task::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify)
+void USP_Task::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos)
 {
 	SP_CHECK_NULLPTR(Planner)
 
 	if (!SP_IS_FLAG_SET(NotifyMask, Notify))
 		return;
 
-	FSP_TaskInfos* Infos = reinterpret_cast<FSP_TaskInfos*>(Planner->GetTaskUserData());
+	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
+	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
 
 	switch (NotifyAction)
 	{
 	case ESP_TaskNotification::TNA_TimeOut:
-		Infos->T_ExecutionState = ESP_PlanExecutionState::PES_Failed;
+		Infos->BaseExecutionState = ESP_PlanExecutionState::PES_Failed;
 		break;
 	case ESP_TaskNotification::TNA_WaitForNotify:
-		Infos->T_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->BaseExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		break;
 	default:
 		SP_LOG(Warning, "TaskNotification not supported yet!")
@@ -47,21 +48,20 @@ void USP_Task::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Not
 	}
 }
 
-void USP_Task::InitNotify(USP_AIPlannerComponent& Planner, uint8* UserData)
+void USP_Task::InitNotify(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
 {
+	// Always bind to allow OnNotify() override.
+	Planner.OnNotifyTask.AddDynamic(this, &USP_Task::OnNotify);
+
 	if (!NotifyMask)
 		return;
 
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
-
-	Planner.OnNotify.AddDynamic(this, &USP_Task::OnNotify);
-
 	switch (NotifyAction)
 	{
 	case ESP_TaskNotification::TNA_TimeOut:
 		break;
 	case ESP_TaskNotification::TNA_WaitForNotify:
-		Infos->T_ExecutionState = ESP_PlanExecutionState::PES_Running;
+		TaskInfos->BaseExecutionState = ESP_PlanExecutionState::PES_Running;
 		break;
 	default:
 		SP_LOG(Warning, "TaskNotification not supported yet!")
@@ -69,9 +69,9 @@ void USP_Task::InitNotify(USP_AIPlannerComponent& Planner, uint8* UserData)
 	}
 }
 
-uint32 USP_Task::GetUserDataSize() const
+USP_TaskInfosBase* USP_Task::InstantiateInfos()
 {
-	return sizeof(FSP_TaskInfos);
+	return NewObject<USP_TaskInfos>();
 }
 
 bool USP_Task::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
@@ -83,29 +83,19 @@ bool USP_Task::PreCondition(const USP_PlannerComponent& Planner, const TArray<US
 	return true;
 }
 
-void USP_Task::ConstructUserData(uint8* UserData)
+bool USP_Task::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	new(UserData) FSP_TaskInfos();
-}
-void USP_Task::DestructUserData(uint8* UserData)
-{
-	reinterpret_cast<FSP_TaskInfos*>(UserData)->~FSP_TaskInfos();
-}
-
-bool USP_Task::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
-{
-	ConstructUserData(UserData);
+	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
 
 	// Time Out.
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
-
 	float TimeOutTime = TimeOut.Get(Planner.GetLODLevel());
 
 	if (TimeOutTime > 0.0f)
-		Infos->T_TimeOutTime = TimeOutTime;
+		Infos->TimeOutTime = TimeOutTime;
 
 
-	InitNotify(Planner, UserData);
+	InitNotify(Planner, Infos);
 
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
 	return K2_OnTaskBegin(&Planner);
@@ -113,34 +103,33 @@ bool USP_Task::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 	return true;
 }
-ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(UserData);
+	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
 
 	// Time Out.
-	if (Infos->T_TimeOutTime > 0.0f)
+	if (Infos->TimeOutTime > 0.0f)
 	{
-		Infos->T_CurrTimeOut += DeltaSeconds;
+		Infos->CurrTimeOut += DeltaSeconds;
 
-		if (Infos->T_CurrTimeOut >= Infos->T_TimeOutTime)
+		if (Infos->CurrTimeOut >= Infos->TimeOutTime)
 			return ESP_PlanExecutionState::PES_Failed;
 	}
 
 
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskTick(DeltaSeconds, &Planner);
+	ESP_PlanExecutionState BPExecutionState = K2_OnTaskTick(DeltaSeconds, &Planner);
+	
+	if (BPExecutionState != ESP_PlanExecutionState::PES_Succeed)
+		return BPExecutionState;
 #endif
 
-	return Infos->T_ExecutionState;
+	return Infos->BaseExecutionState;
 }
-bool USP_Task::End(USP_AIPlannerComponent& Planner, uint8* UserData)
+bool USP_Task::End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	DestructUserData(UserData);
-
-
-	// Notify.
-	if (NotifyMask)
-		Planner.OnNotify.RemoveDynamic(this, &USP_Task::OnNotify);
+	Planner.OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
 
 
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
@@ -150,14 +139,9 @@ bool USP_Task::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 	return true;
 }
 
-bool USP_Task::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
+bool USP_Task::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	DestructUserData(UserData);
-
-
-	// Notify.
-	if (NotifyMask)
-		Planner.OnNotify.RemoveDynamic(this, &USP_Task::OnNotify);
+	Planner.OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
 
 
 #if SP_TASK_BLUEPRINT_IMPLEMENTABLE
@@ -173,9 +157,7 @@ bool USP_Task::K2_OnTaskBegin_Implementation(USP_AIPlannerComponent* Planner)
 }
 ESP_PlanExecutionState USP_Task::K2_OnTaskTick_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner)
 {
-	FSP_TaskInfos* const Infos = reinterpret_cast<FSP_TaskInfos*>(Planner->GetTaskUserData());
-
-	return Infos->T_ExecutionState;
+	return ESP_PlanExecutionState::PES_Succeed;
 }
 bool USP_Task::K2_OnTaskEnd_Implementation(USP_AIPlannerComponent* Planner)
 {

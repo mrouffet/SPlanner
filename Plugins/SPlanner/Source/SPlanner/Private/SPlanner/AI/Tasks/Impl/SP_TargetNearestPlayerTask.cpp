@@ -46,9 +46,9 @@ uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent& Pl
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
+	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)

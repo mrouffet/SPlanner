@@ -13,14 +13,7 @@ class SPLANNER_API USP_IdleTask : public USP_Task
 {
 	GENERATED_BODY()
 	
-
 protected:
-	struct FSP_IdleTaskInfos : public FSP_TaskInfos
-	{
-		float IT_WaitTime = -1.0f;
-		float IT_CurrTime = 0.0f;
-	};
-
 	/** The minimum idle time. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
 	float MinTime = 0.5f;
@@ -29,12 +22,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
 	float MaxTime = 3.0f;
 
-	void ConstructUserData(uint8* UserData) override;
-	void DestructUserData(uint8* UserData) override;
-
 public:
-	uint32 GetUserDataSize() const override;
+	USP_TaskInfosBase* InstantiateInfos() override;
 
-	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+};
+
+
+/** Task info implementation for USP_IdleTask. */
+UCLASS(ClassGroup = "SPlanner|Action|Task")
+class USP_IdleTaskInfos : public USP_TaskInfos
+{
+	GENERATED_BODY()
+
+	// Only accessible by USP_IdleTask.
+	friend USP_IdleTask;
+
+	float WaitTime = -1.0f;
+	float CurrTime = 0.0f;
 };

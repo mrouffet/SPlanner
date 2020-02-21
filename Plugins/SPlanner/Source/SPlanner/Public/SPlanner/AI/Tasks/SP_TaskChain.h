@@ -16,20 +16,14 @@ class SPLANNER_API USP_TaskChain : public USP_Task
 	GENERATED_BODY()
 
 protected:
-	struct FSP_ChainTaskInfos : public FSP_TaskInfos
-	{
-		int TC_Index = 0;
-	};
-
 	/** The handled tasks. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Chain")
 	TArray<USP_Task*> Tasks;
 
-	void ConstructUserData(uint8* UserData) override;
-	void DestructUserData(uint8* UserData) override;
+	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos) override;
 
 public:
-	uint32 GetUserDataSize() const override;
+	USP_TaskInfosBase* InstantiateInfos() override;
 
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
@@ -37,9 +31,29 @@ public:
 	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
 
-	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	
-	bool Cancel(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+
+	bool Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+};
+
+
+/** Task info implementation for USP_Task. */
+UCLASS(ClassGroup = "SPlanner|Action|Task")
+class USP_TaskChainInfos : public USP_TaskInfos
+{
+	GENERATED_BODY()
+
+	// Only accessible by USP_TaskChain.
+	friend USP_TaskChain;
+
+	int Index = 0;
+
+	/**
+	*	Current executed task infos.
+	*	Must be UPROPERTY() to avoid garbage collection.
+	*/
+	UPROPERTY()
+	USP_TaskInfosBase* TaskInfos = nullptr;
 };

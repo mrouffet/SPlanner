@@ -59,9 +59,9 @@ uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent& Planne
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
+	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)

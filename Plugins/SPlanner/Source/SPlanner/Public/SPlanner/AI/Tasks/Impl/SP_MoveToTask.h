@@ -8,6 +8,7 @@
 #include "SP_MoveToTask.generated.h"
 
 class USP_Target;
+class USP_MoveToTaskInfos;
 
 /**
  *	MoveTo implementation.
@@ -18,32 +19,11 @@ class SPLANNER_API USP_MoveToTask : public USP_Task
 	GENERATED_BODY()
 	
 protected:
-	struct FSP_MoveToTaskInfos : FSP_TaskInfos
-	{
-#if SP_DEBUG
-		FNavPathSharedPtr MT_DebugPath;
-#endif
-
-		FAIMoveRequest MT_MoveRequest;
-		AAIController* MT_Controller = nullptr;
-
-		/** Whether goal position must be re-compute each tick. */
-		bool MT_bIsDynamic = false;
-
-		float MT_DynamicTime = 0.0f;
-
-		/** The saved previous pawn speed. */
-		float MT_PrevPawnSpeed = -1.0f;
-
-		/** Internal request execution state. */
-		ESP_PlanExecutionState MT_ExecutionState = ESP_PlanExecutionState::PES_Running;
-	};
-
 	/**
 	*	Map of RequestID, task infos.
 	*	Used to get back task infos on move completed.
 	*/
-	TMap<int, FSP_MoveToTaskInfos*> RequestIDToTaskInfos;
+	TMap<int, USP_MoveToTaskInfos*> RequestIDToTaskInfos;
 
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
@@ -136,8 +116,6 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
 	void SetPawnSpeed(APawn* Pawn, float NewPawnSpeed);
 
-	uint32 GetUserDataSize() const override;
-
 	/** Callback when a movement is completed by the AI Controller. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
@@ -145,16 +123,43 @@ protected:
 	/** Implementation of move request creation. */
 	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
 
-	void ConstructUserData(uint8* UserData) override;
-	void DestructUserData(uint8* UserData) override;
+	USP_TaskInfosBase* InstantiateInfos() override;
 
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
 
-	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	bool End(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
 
-	bool Cancel(USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+};
+
+/** Task info implementation for USP_MoveToTask. */
+UCLASS(ClassGroup = "SPlanner|Action|Task")
+class USP_MoveToTaskInfos : public USP_TaskInfos
+{
+	GENERATED_BODY()
+
+	// Only accessible by USP_MoveToTask.
+	friend USP_MoveToTask;
+
+#if SP_DEBUG
+	FNavPathSharedPtr DebugPath;
+#endif
+
+	FAIMoveRequest MoveRequest;
+	AAIController* Controller = nullptr;
+
+	/** Whether goal position must be re-compute each tick. */
+	bool bIsDynamic = false;
+
+	float DynamicTime = 0.0f;
+
+	/** The saved previous pawn speed. */
+	float PrevPawnSpeed = -1.0f;
+
+	/** Internal request execution state. */
+	ESP_PlanExecutionState ExecutionState = ESP_PlanExecutionState::PES_Running;
 };

@@ -16,14 +16,6 @@ class SPLANNER_API USP_LookAtTask : public USP_Task
 	GENERATED_BODY()
 	
 protected:
-	struct FSP_LookAtTaskInfos : public FSP_TaskInfos
-	{
-		FRotator Start;
-		FRotator End;
-
-		float Alpha = 0.0f;
-	};
-
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	FName TargetEntryName = "None";
@@ -50,16 +42,29 @@ protected:
 
 	FRotator ComputeTargetRotation(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
 
-	void ConstructUserData(uint8* UserData) override;
-	void DestructUserData(uint8* UserData) override;
-
 public:
-	uint32 GetUserDataSize() const override;
+	USP_TaskInfosBase* InstantiateInfos() override;
 
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
 
 
-	bool Begin(USP_AIPlannerComponent& Planner, uint8* UserData) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData) override;
+	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
+};
+
+
+/** Task info implementation for USP_LookAtTask. */
+UCLASS(ClassGroup = "SPlanner|Action|Task")
+class USP_LookAtTaskInfos : public USP_TaskInfos
+{
+	GENERATED_BODY()
+
+	// Only accessible by USP_LookAtTask.
+	friend USP_LookAtTask;
+
+	FRotator Start;
+	FRotator End;
+
+	float Alpha = 0.0f;
 };

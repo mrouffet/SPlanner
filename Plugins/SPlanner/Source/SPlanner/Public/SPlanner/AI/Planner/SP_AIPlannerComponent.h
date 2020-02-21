@@ -14,7 +14,10 @@ class USP_POIZoneComponent;
 class APawn;
 class ASP_AIController;
 
+class USP_TaskInfosBase;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIPlannerNotifyDelegate, USP_AIPlannerComponent*, Planner, ESP_AIPlannerNotify, Notify);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_AIPlannerTaskNotifyDelegate, USP_AIPlannerComponent*, Planner, ESP_AIPlannerNotify, Notify, USP_TaskInfosBase*, InTaskInfos);
 
 /**
 *	Planner behavior.
@@ -38,8 +41,12 @@ protected:
 	*/
 	TMap<const USP_Task*, float> Cooldowns;
 
-	/** Allocated memory for user data during task execution. */
-	TArray<uint8> TaskUserData;
+	/**
+	*	Current executed task infos.
+	*	Must be UPROPERTY() to avoid garbage collection.
+	*/
+	UPROPERTY()
+	USP_TaskInfosBase* TaskInfos;
 
 	/**
 	*	Begin the next task of the Plan.
@@ -89,8 +96,13 @@ protected:
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	/** Callback thrown when planner receive a Notify(). */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner|AI")
 	FSP_AIPlannerNotifyDelegate OnNotify;
+
+	/** Callback thrown when planner receive a Notify(). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|AI")
+	FSP_AIPlannerTaskNotifyDelegate OnNotifyTask;
 
 	/**
 	*	The POI interact zone used.
@@ -120,12 +132,6 @@ public:
 	/** Getter of next ActionSteps to execute in Plan*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	TArray<USP_ActionStep*> GetNextActionSteps() const;
-
-	/** Getter of Task user data. */
-	uint8* GetTaskUserData();
-
-	/** const Getter of Task user data. */
-	const uint8* GetTaskUserData() const;
 
 	/** Getter of cooldown for one task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")

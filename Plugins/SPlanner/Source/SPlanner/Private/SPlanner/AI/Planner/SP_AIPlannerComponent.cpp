@@ -98,15 +98,6 @@ TArray<USP_ActionStep*> USP_AIPlannerComponent::GetNextActionSteps() const
 	return Result;
 }
 
-uint8* USP_AIPlannerComponent::GetTaskUserData()
-{
-	return TaskUserData.GetData();
-}
-const uint8* USP_AIPlannerComponent::GetTaskUserData() const
-{
-	return TaskUserData.GetData();
-}
-
 float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
 {
 	SP_RCHECK_NULLPTR(Task, -1.0f)
@@ -137,6 +128,7 @@ bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
 void USP_AIPlannerComponent::Notify(ESP_AIPlannerNotify Notify)
 {
 	OnNotify.Broadcast(this, Notify);
+	OnNotifyTask.Broadcast(this, Notify, TaskInfos);
 }
 
 ASP_AIController* USP_AIPlannerComponent::GetController() const
@@ -182,12 +174,10 @@ bool USP_AIPlannerComponent::BeginNextTask()
 	USP_Task* CurrentTask = Cast<USP_Task>(GetCurrentActionStep());
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
-	// Reserve user data.
-	if (uint32 UserDataSize = CurrentTask->GetUserDataSize())
-		TaskUserData.Reserve(UserDataSize);
+	TaskInfos = CurrentTask->InstantiateInfos();
 
 	// Can't begin task, Plan got invalid: ask a new one.
-	if (!CurrentTask->Begin(*this, TaskUserData.GetData()))
+	if (!CurrentTask->Begin(*this, TaskInfos))
 	{
 		if (CurrentTask->GetUseCooldownOnFailed())
 			SetCooldown(CurrentTask);
@@ -216,7 +206,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	USP_Task* CurrentTask = Cast<USP_Task>(GetCurrentActionStep());
 	SP_CHECK_NULLPTR(CurrentTask)
 
-	ESP_PlanExecutionState TickResult = CurrentTask->Tick(DeltaTime, *this, TaskUserData.GetData());
+	ESP_PlanExecutionState TickResult = CurrentTask->Tick(DeltaTime, *this, TaskInfos);
 
 	// Process task result.
 	if (TickResult == ESP_PlanExecutionState::PES_Running)
@@ -247,7 +237,7 @@ bool USP_AIPlannerComponent::EndTask(USP_Task* Task)
 
 	SP_RCHECK_NULLPTR(Task, false)
 
-	return Task->End(*this, TaskUserData.GetData());
+	return Task->End(*this, TaskInfos);
 }
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr) const
@@ -365,9 +355,9 @@ bool USP_AIPlannerComponent::CancelPlan()
 	SP_RCHECK_NULLPTR(CurrentTask, false)
 
 #if SP_DEBUG
-	SP_RCHECK(CurrentTask->Cancel(*this, TaskUserData.GetData()), false, "%s.Cancel() failed!", *CurrentTask->GetName())
+	SP_RCHECK(CurrentTask->Cancel(*this, TaskInfos), false, "%s.Cancel() failed!", *CurrentTask->GetName())
 #else
-	CurrentTask->Cancel(*this, TaskUserData.GetData());
+	CurrentTask->Cancel(*this, TaskInfos);
 #endif
 
 	return true;

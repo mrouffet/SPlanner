@@ -120,40 +120,31 @@ void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
 	}
 }
 
-uint32 USP_MoveToTask::GetUserDataSize() const
+USP_TaskInfosBase* USP_MoveToTask::InstantiateInfos()
 {
-	return sizeof(FSP_MoveToTaskInfos);
-}
-
-void USP_MoveToTask::ConstructUserData(uint8* UserData)
-{
-	new(UserData) FSP_MoveToTaskInfos{};
-}
-void USP_MoveToTask::DestructUserData(uint8* UserData)
-{
-	reinterpret_cast<FSP_MoveToTaskInfos*>(UserData)->~FSP_MoveToTaskInfos();
+	return NewObject<USP_MoveToTaskInfos>();
 }
 
 void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult)
 {
-	FSP_MoveToTaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
+	USP_MoveToTaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
 	SP_CHECK_NULLPTR(Infos)
 
 	switch (ExecResult)
 	{
 	case EPathFollowingResult::Type::Success:
-		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		break;
 	default:
-		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Failed;
+		Infos->ExecutionState = ESP_PlanExecutionState::PES_Failed;
 		break;
 	}
 
 	RequestIDToTaskInfos.Remove(RequestID);
 
 	// Unbind completed event.
-	SP_CHECK_NULLPTR(Infos->MT_Controller)
-	Infos->MT_Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
+	SP_CHECK_NULLPTR(Infos->Controller)
+	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
 bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
@@ -215,11 +206,12 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
+bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	SP_TASK_SUPER_BEGIN(Planner, UserData)
+	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
-	FSP_MoveToTaskInfos* const Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
+	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
 
 	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
@@ -229,14 +221,14 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 	if (HasReachedPosition(Planner, Target))
 	{
-		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
 	}
 
 	if (bTargetVisible && !IsTargetVisible(Planner, Target))
 	{
 		SP_LOG_TASK_EXECUTE(Planner, "Move request failed: Taget not visible.")
-		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Failed;
+			Infos->ExecutionState = ESP_PlanExecutionState::PES_Failed;
 		return false;
 	}
 
@@ -246,13 +238,13 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 
 
 	// Create MoveRequest.
-	Infos->MT_MoveRequest = CreateMoveRequest(Target);
+	Infos->MoveRequest = CreateMoveRequest(Target);
 
 	// Request movement.
 #if SP_DEBUG
-	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest, &Infos->MT_DebugPath);
+	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
 #else
-	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest);
+	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
 #endif
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
@@ -262,20 +254,20 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 	}
 	else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		Infos->MT_ExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		return true;
 	}
 
 	SP_LOG_TASK_EXECUTE(Planner, "Pathfinding: %s", *Target->GetAnyPosition().ToString())
 
 	// Bind completed event.
-	Infos->MT_Controller = Controller;
+	Infos->Controller = Controller;
 	Controller->ReceiveMoveCompleted.AddDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
 
-	Infos->MT_bIsDynamic = bIsDynamic && DynamicUpdateFrequency > 0.0f;
+	Infos->bIsDynamic = bIsDynamic && DynamicUpdateFrequency > 0.0f;
 
 	if (PawnSpeed > 0.0f)
 	{
@@ -283,25 +275,26 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Store previous value.
-		Infos->MT_PrevPawnSpeed = GetPawnSpeed(AIPawn);
+		Infos->PrevPawnSpeed = GetPawnSpeed(AIPawn);
 
 		SetPawnSpeed(AIPawn, PawnSpeed);
 	}
 
 	return true;
 }
-ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, uint8* UserData)
+ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, UserData)
+	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
-	FSP_MoveToTaskInfos* const Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
+	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
 
-	if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Failed)
+	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Failed)
 	{
 		SP_LOG_TASK_TICK(Planner, "Failed")
-		return ESP_PlanExecutionState::PES_Failed;
+			return ESP_PlanExecutionState::PES_Failed;
 	}
-	else if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Succeed)
+	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
 	{
 		const AAIController* const Controller = Cast<AAIController>(Planner.GetOwner());
 		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
@@ -319,11 +312,11 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 	}
 
 	// TODO: Clean later.
-	if (Infos->MT_bIsDynamic)
+	if (Infos->bIsDynamic)
 	{
-		Infos->MT_DynamicTime += DeltaSeconds;
+		Infos->DynamicTime += DeltaSeconds;
 
-		if (DynamicUpdateFrequency <= 0.0f || Infos->MT_DynamicTime >= DynamicUpdateFrequency)
+		if (DynamicUpdateFrequency <= 0.0f || Infos->DynamicTime >= DynamicUpdateFrequency)
 		{
 			USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
 			SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
@@ -331,16 +324,16 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 			USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 			SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
-			Infos->MT_MoveRequest.SetGoalLocation(Target->GetAnyPosition());
+			Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 
 			ASP_AIController* const Controller = Planner.GetController();
 			SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
 			// Request movement.
 			#if SP_DEBUG
-				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest, &Infos->MT_DebugPath);
+				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
 			#else
-				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MT_MoveRequest);
+				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
 			#endif
 
 			if (Request.Code == EPathFollowingRequestResult::Failed)
@@ -356,9 +349,12 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
+bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	FSP_MoveToTaskInfos* Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
+	SP_TASK_SUPER_END(Planner, TaskInfos)
+
+	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
 
 	if (PawnSpeed > 0.0f)
 	{
@@ -366,21 +362,21 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Reset to saved speed.
-		SetPawnSpeed(AIPawn, Infos->MT_PrevPawnSpeed);
+		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
 	}
 
-	if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Running)
-		Infos->MT_Controller->StopMovement(); // Call ReceiveMoveCompleted.
-
-	// Destroy Infos after.
-	SP_TASK_SUPER_END(Planner, UserData)
+	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
+		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
 
 	return true;
 }
 
-bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
+bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
-	FSP_MoveToTaskInfos* Infos = reinterpret_cast<FSP_MoveToTaskInfos*>(UserData);
+	SP_TASK_SUPER_CANCEL(Planner, TaskInfos)
+
+	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
 
 	if (PawnSpeed > 0.0f)
 	{
@@ -388,14 +384,11 @@ bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, uint8* UserData)
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Reset to saved speed.
-		SetPawnSpeed(AIPawn, Infos->MT_PrevPawnSpeed);
+		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
 	}
 
-	if (Infos->MT_ExecutionState == ESP_PlanExecutionState::PES_Running)
-		Infos->MT_Controller->StopMovement(); // Call ReceiveMoveCompleted.
-
-	// Destroy Infos after.
-	SP_TASK_SUPER_CANCEL(Planner, UserData)
+	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
+		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
 
 	return true;
 }
