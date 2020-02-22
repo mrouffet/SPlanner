@@ -46,24 +46,24 @@ uint64 USP_TargetNearestPlayerTask::PostCondition(const USP_PlannerComponent& Pl
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
-	AGameStateBase* GameState = Planner.GetWorld()->GetGameState();
+	AGameStateBase* GameState = Planner->GetWorld()->GetGameState();
 
 	SP_RCHECK_NULLPTR(GameState, ESP_PlanExecutionState::PES_Failed)
 
 	float CurrSqrDist = FLT_MAX;
 	APawn* NearestPlayer = nullptr;
 
-	FVector PlannerLocation = Planner.GetOwner()->GetActorLocation();
+	FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
 
 	for(int i = 0; i < GameState->PlayerArray.Num(); ++i)
 	{
@@ -73,7 +73,7 @@ ESP_PlanExecutionState USP_TargetNearestPlayerTask::Tick(float DeltaSeconds, USP
 		APawn* const Player = GameState->PlayerArray[i]->GetPawn();
 
 		// must validate predicate.
-		if (!Predicate(&Planner, Player))
+		if (!Predicate(Planner, Player))
 			continue;
 
 		float SqrDist = FVector::DistSquared(PlannerLocation, Player->GetActorLocation());

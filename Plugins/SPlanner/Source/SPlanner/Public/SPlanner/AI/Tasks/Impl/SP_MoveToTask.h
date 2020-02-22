@@ -91,7 +91,7 @@ protected:
 	bool bPreconditionFailWhileAlreadyAtGoal = true;
 
 	/** Check if owner actor has reached its target. */
-	bool HasReachedPosition(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
+	bool HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const;
 
 	/**
 	*	Check if owner actor has reached its target.
@@ -106,7 +106,7 @@ protected:
 	bool HasReachedPosition(ACharacter* Character, const FVector& TargetPosition) const;
 
 	/** Whether the target is visible from Planner's pawn. */
-	bool IsTargetVisible(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
+	bool IsTargetVisible(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const;
 	
 	/** Child implementation to get pawn speed. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
@@ -125,19 +125,17 @@ protected:
 
 	USP_TaskInfosBase* InstantiateInfos() override;
 
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
-
-	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-	bool End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-
-	bool Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
 };
 
 /** Task info implementation for USP_MoveToTask. */
-UCLASS(ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
 class USP_MoveToTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()

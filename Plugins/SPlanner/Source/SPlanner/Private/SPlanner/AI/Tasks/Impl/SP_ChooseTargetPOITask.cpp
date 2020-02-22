@@ -59,17 +59,17 @@ uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent& Planne
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
-	APawn* const Pawn = Planner.GetPawn();
+	APawn* const Pawn = Planner->GetPawn();
 	SP_RCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
 
 	FCollisionQueryParams QParams;
@@ -78,7 +78,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 	FVector Start = Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset);
 
 	TArray<FHitResult> HitInfos;
-	Planner.GetWorld()->SweepMultiByChannel(
+	Planner->GetWorld()->SweepMultiByChannel(
 		HitInfos,
 		Start,
 		Start + FVector(0.0f, 0.0f, 0.1f),
@@ -106,7 +106,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 				continue;
 
 			// Match overridden predicate.
-			if(Predicate(&Planner, POI))
+			if(Predicate(Planner, POI))
 				POIs.Add(POI);
 		}
 	}
@@ -115,7 +115,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOITask::Tick(float DeltaSeconds, USP_AIP
 	if(POIs.Num() == 0)
 		return ESP_PlanExecutionState::PES_Failed;
 
-	USP_POIComponent* TargetPOI = ChoosePOI(&Planner, POIs);
+	USP_POIComponent* TargetPOI = ChoosePOI(Planner, POIs);
 	
 	Target->SetPOI(TargetPOI);
 

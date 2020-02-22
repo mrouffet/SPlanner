@@ -32,68 +32,59 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-USP_ActionStep* USP_AIPlannerComponent::GetPrevActionStep() const
+USP_Task* USP_AIPlannerComponent::GetPrevTask() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
-
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), nullptr, "Index out of range!")
 
 	// No previous action.
 	if(CurrentPlanIndex <= 0)
 		return nullptr;
 
-	return Plan[CurrentPlanIndex - 1];
+	return Cast<USP_Task>(Plan[CurrentPlanIndex - 1]);
 }
-TArray<USP_ActionStep*> USP_AIPlannerComponent::GetPrevActionSteps() const
+TArray<USP_Task*> USP_AIPlannerComponent::GetPrevTasks() const
 {
-	TArray<USP_ActionStep*> Result;
+	TArray<USP_Task*> Result;
 
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, Result, "Invalid plan: performing unsafe operation!")
-
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), Result, "Index out of range!")
-	
-	// Plan started.
-	if (CurrentPlanIndex != -1)
-		Result.Append(Plan.GetData(), CurrentPlanIndex);
+
+	Result.Append(reinterpret_cast<USP_Task* const*>(Plan.GetData()), CurrentPlanIndex);
 
 	return Result;
 }
-USP_ActionStep* USP_AIPlannerComponent::GetCurrentActionStep() const
+USP_Task* USP_AIPlannerComponent::GetCurrentTask() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
-
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), nullptr, "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
 
-	return Plan[CurrentPlanIndex];
+	return Cast<USP_Task>(Plan[CurrentPlanIndex]);
 }
-USP_ActionStep* USP_AIPlannerComponent::GetNextActionStep() const
+USP_Task* USP_AIPlannerComponent::GetNextTask() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
-
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), nullptr, "Index out of range!")
 
 	// No other action left.
 	if(CurrentPlanIndex + 1 >= Plan.Num())
 		return nullptr;
 
-	return Plan[CurrentPlanIndex + 1];
+	return Cast<USP_Task>(Plan[CurrentPlanIndex + 1]);
 }
-TArray<USP_ActionStep*> USP_AIPlannerComponent::GetNextActionSteps() const
+TArray<USP_Task*> USP_AIPlannerComponent::GetNextTasks() const
 {
-	TArray<USP_ActionStep*> Result;
+	TArray<USP_Task*> Result;
 
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, Result, "Invalid plan: performing unsafe operation!")
-
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), Result, "Index out of range!")
 
-	// Plan started.
-	if (CurrentPlanIndex != -1)
-		Result.Append(Plan.GetData() + CurrentPlanIndex + 1, Plan.Num() - CurrentPlanIndex - 1);
+	Result.Append(reinterpret_cast<USP_Task* const*>(Plan.GetData()) + CurrentPlanIndex + 1, Plan.Num() - CurrentPlanIndex - 1);
 
 	return Result;
 }
@@ -147,74 +138,29 @@ APawn* USP_AIPlannerComponent::GetPawn() const
 	return nullptr;
 }
 
-bool USP_AIPlannerComponent::BeginNextTask()
-{
-	SP_BENCHMARK_SCOPE(AIPC_BeginNextTask)
-
-	// index == Plan.Num() will be checked to ask new plan.
-	SP_RCHECK(CurrentPlanIndex + 1 >= 0 && CurrentPlanIndex + 1 <= Plan.Num(), false, "Index [%d] out of range [0, %d]!", (CurrentPlanIndex + 1), Plan.Num())
-
-	++CurrentPlanIndex;
-	
-#if SP_DEBUG_EDITOR
-	// Update debug keys.
-	if(IsSelectedInEditor())
-		USP_EditorSettings::IncrementTaskExecuteLogKey();
-#endif
-
-	// No other task left.
-	if (CurrentPlanIndex == Plan.Num())
-	{
-		PlanState = ESP_PlanState::PS_Finished;
-
-		AskNewPlan();
-		return false;
-	}
-
-	USP_Task* CurrentTask = Cast<USP_Task>(GetCurrentActionStep());
-	SP_RCHECK_NULLPTR(CurrentTask, false)
-
-	TaskInfos = CurrentTask->InstantiateInfos();
-
-	// Can't begin task, Plan got invalid: ask a new one.
-	if (!CurrentTask->Begin(*this, TaskInfos))
-	{
-		if (CurrentTask->GetUseCooldownOnFailed())
-			SetCooldown(CurrentTask);
-			
-		PlanState = ESP_PlanState::PS_Invalid;
-
-		AskNewPlan();
-
-		return false;
-	}
-
-	return true;
-}
 void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 {
 	SP_BENCHMARK_SCOPE(AIPC_ExecuteTask)
 
-	// Execute first task begin on main thread.
-	if (CurrentPlanIndex == -1)
-	{
-		// Try to begin first task.
-		if (!BeginNextTask())
-			return;
-	}
-
-	USP_Task* CurrentTask = Cast<USP_Task>(GetCurrentActionStep());
+	USP_Task* CurrentTask = GetCurrentTask();
 	SP_CHECK_NULLPTR(CurrentTask)
+
+	if(!TaskInfos)
+		TaskInfos = CurrentTask->InstantiateInfos();
 
 	ESP_PlanExecutionState TickResult = CurrentTask->Tick(DeltaTime, *this, TaskInfos);
 
-	// Process task result.
+	// Wait for either fail or success.
 	if (TickResult == ESP_PlanExecutionState::PES_Running)
 		return;
 
-	// Always end task (Tick succeed or failed).
-	if (!EndTask(CurrentTask) || TickResult == ESP_PlanExecutionState::PES_Failed)
+	// Reset task infos.
+	TaskInfos = nullptr;
+
+	// Process task result.
+	if (TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
+		// Set cooldown.
 		if (CurrentTask->GetUseCooldownOnFailed())
 			SetCooldown(CurrentTask);
 
@@ -223,21 +169,19 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 
 		AskNewPlan();
 	}
-	else
+	else // Succeed.
 	{
-		// Task succeed.
+		// Set cooldown.
 		SetCooldown(CurrentTask);
 
-		BeginNextTask();
+		// No other task left.
+		if (++CurrentPlanIndex == Plan.Num())
+		{
+			PlanState = ESP_PlanState::PS_Finished;
+
+			AskNewPlan();
+		}
 	}
-}
-bool USP_AIPlannerComponent::EndTask(USP_Task* Task)
-{
-	SP_BENCHMARK_SCOPE(AIPC_EndTask)
-
-	SP_RCHECK_NULLPTR(Task, false)
-
-	return Task->End(*this, TaskInfos);
 }
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr) const
@@ -310,7 +254,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 
 void USP_AIPlannerComponent::AskNewPlan(bool bInstantRequest)
 {
-	CurrentPlanIndex = -1;
+	CurrentPlanIndex = 0;
 
 	Super::AskNewPlan(bInstantRequest);
 }
@@ -346,19 +290,20 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 }
 bool USP_AIPlannerComponent::CancelPlan()
 {
-	if (!Super::CancelPlan() || CurrentPlanIndex == -1) // Plan not started.
+	if (!Super::CancelPlan())
 		return false;
 
-	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), false, "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
+	// Task started.
+	if (TaskInfos)
+	{
+		SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), false, "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
 
-	USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
-	SP_RCHECK_NULLPTR(CurrentTask, false)
+		USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
+		SP_RCHECK_NULLPTR(CurrentTask, false)
 
-#if SP_DEBUG
-	SP_RCHECK(CurrentTask->Cancel(*this, TaskInfos), false, "%s.Cancel() failed!", *CurrentTask->GetName())
-#else
-	CurrentTask->Cancel(*this, TaskInfos);
-#endif
+		CurrentTask->Cancel(*this, TaskInfos);
+		TaskInfos = nullptr;
+	}
 
 	return true;
 }

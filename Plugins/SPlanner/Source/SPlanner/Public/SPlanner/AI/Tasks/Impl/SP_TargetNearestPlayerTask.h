@@ -25,9 +25,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
 	bool Predicate(USP_AIPlannerComponent* Planner, APawn* Player) const;
 
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
-
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
 };

@@ -33,7 +33,7 @@ protected:
 	*	The current index in plan executed.
 	*	Avoid Plan.PopFront().
 	*/
-	int CurrentPlanIndex = -1;
+	int CurrentPlanIndex = 0;
 
 	/**
 	*	Cooldown time of all tasks of this planner.
@@ -49,24 +49,11 @@ protected:
 	USP_TaskInfosBase* TaskInfos;
 
 	/**
-	*	Begin the next task of the Plan.
-	*	Use CurrentPlanIndex and Plan.
-	*	Return Task.Begin().
-	*/
-	bool BeginNextTask();
-
-	/**
 	*	Execute the current task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
 	*	Called on main thread.
 	*/
 	void ExecuteTask(float DeltaTime);
-
-	/**
-	*	End the task of the Plan.
-	*	return Task.End().
-	*/
-	bool EndTask(USP_Task* Task);
 
 	FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr = nullptr) const override;
 
@@ -113,25 +100,25 @@ public:
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
 
-	/** Getter of the previous executed ActionStep in Plan. */
+	/** Getter of the previous executed Task in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_ActionStep* GetPrevActionStep() const;
+	USP_Task* GetPrevTask() const;
 
-	/** Getter of previous executed ActionSteps in Plan. */
+	/** Getter of previous executed Tasks in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	TArray<USP_ActionStep*> GetPrevActionSteps() const;
+	TArray<USP_Task*> GetPrevTasks() const;
 
-	/** Getter of current executed ActionStep. */
+	/** Getter of current executed Task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_ActionStep* GetCurrentActionStep() const;
+	USP_Task* GetCurrentTask() const;
 
-	/** Getter of the next ActionStep to execute in Plan. */
+	/** Getter of the next Task to execute in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_ActionStep* GetNextActionStep() const;
+	USP_Task* GetNextTask() const;
 
-	/** Getter of next ActionSteps to execute in Plan*/
+	/** Getter of next Tasks to execute in Plan*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	TArray<USP_ActionStep*> GetNextActionSteps() const;
+	TArray<USP_Task*> GetNextTasks() const;
 
 	/** Getter of cooldown for one task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")

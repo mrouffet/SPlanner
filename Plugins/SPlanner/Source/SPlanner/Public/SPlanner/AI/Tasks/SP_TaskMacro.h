@@ -12,7 +12,7 @@
 *	Should always be called in children Begin() override.
 */
 #define SP_TASK_SUPER_BEGIN(...)\
-	if (!Super::Begin(__VA_ARGS__))\
+	if (!Super::Begin_Internal_Implementation(__VA_ARGS__))\
 		return false;
 
 /**
@@ -20,7 +20,7 @@
 *	Should always be called in children Tick() override.
 */
 #define SP_TASK_SUPER_TICK(...)\
-	ESP_PlanExecutionState SuperState = Super::Tick(__VA_ARGS__);\
+	ESP_PlanExecutionState SuperState = Super::Tick_Internal_Implementation(__VA_ARGS__);\
 	if (SuperState != ESP_PlanExecutionState::PES_Succeed)\
 		return SuperState;
 
@@ -29,17 +29,8 @@
 *	Should always be called in children End() override.
 */
 #define SP_TASK_SUPER_END(...)\
-	if (!Super::End(__VA_ARGS__))\
+	if (!Super::End_Internal_Implementation(__VA_ARGS__))\
 		return false;
-
-/**
-*	Helper macro to call Cancel() parent implementation.
-*	Should always be called in children Cancel() override.
-*/
-#define SP_TASK_SUPER_CANCEL(...)\
-	if (!Super::Cancel(__VA_ARGS__))\
-		return false;
-
 
 #if SP_DEBUG_EDITOR
 
@@ -49,13 +40,13 @@
 *	Helper macro to check whether task execute debug is shown.
 */
 #define SP_IF_TASK_EXECUTE(CheckSelected)\
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_TaskExecute) && CheckSelected.IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_TaskExecute) && CheckSelected->IsSelectedInEditor())
 
 /**
 *	Helper macro to check whether task execute debug is shown.
 */
 #define SP_IF_TASK_TICK(CheckSelected)\
-	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_TaskTick) && CheckSelected.IsSelectedInEditor())
+	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_TaskTick) && CheckSelected->IsSelectedInEditor())
 
 
 /**

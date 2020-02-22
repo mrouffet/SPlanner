@@ -9,7 +9,7 @@ USP_TaskInfosBase* USP_IdleTask::InstantiateInfos()
 	return NewObject<USP_IdleTaskInfos>();
 }
 
-bool USP_IdleTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_IdleTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
@@ -22,7 +22,7 @@ bool USP_IdleTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* Tas
 
 	return true;
 }
-ESP_PlanExecutionState USP_IdleTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_IdleTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 

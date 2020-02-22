@@ -59,35 +59,28 @@ protected:
 	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos);
 
 	/** Init the Notify callback and base execution state. */
-	void InitNotify(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos);
+	void InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 	/**
-	*	Blueprint event called by Begin().
-	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	The begin internal implementation of the task.
+	*	Called by Begin().
 	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskBegin", Category = "SPlanner|Action|Task")
-	bool K2_OnTaskBegin(USP_AIPlannerComponent* Planner);
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Begin", Category = "SPlanner|Action|Task")
+	bool Begin_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos);
 
 	/**
-	*	Blueprint event called by Tick().
-	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	The tick internal implementation of the task.
+	*	Called by Tick().
 	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskTick", Category = "SPlanner|Action|Task")
-	ESP_PlanExecutionState K2_OnTaskTick(float DeltaSeconds, USP_AIPlannerComponent* Planner);
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Tick", Category = "SPlanner|Action|Task")
+	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos);
 
 	/**
-	*	Blueprint event called by End().
-	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
+	*	The end implementation of the task.
+	*	Called by End().
 	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskEnd", Category = "SPlanner|Action|Task")
-	bool K2_OnTaskEnd(USP_AIPlannerComponent* Planner);
-
-	/**
-	*	Blueprint event called by End().
-	*	Require SP_TASK_BLUEPRINT_IMPLEMENTABLE (see SP_Config.h)
-	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName= "OnTaskCancel", Category = "SPlanner|Action|Task")
-	bool K2_OnTaskCancel(USP_AIPlannerComponent* Planner);
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "End", Category = "SPlanner|Action|Task")
+	bool End_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos);
 
 public:
 	USP_Task(const FObjectInitializer& ObjectInitializer);
@@ -104,33 +97,22 @@ public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 
 	/**
-	*	The begin implementation of the task.
-	*	This is executed by the SP_PlannerComponent (main thread).
-	*/
-	virtual bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
-
-	/**
 	*	The tick implementation of the task.
+	*	Call Begin_Internal(), Tick_Internal() and End_Internal().
 	*	This is executed by the PlannerComponent (main thread).
 	*/
-	virtual ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
 
 	/**
-	*	The end implementation of the task.
-	*	This is executed by the SP_PlannerComponent (main thread).
+	*	Cancel the task.
+	*	Call End_Internal().
 	*/
-	virtual bool End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
-
-	/**
-	*	The cancel implementation of the task.
-	*	This is executed by the SP_PlannerComponent (main thread).
-	*/
-	virtual bool Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
+	void Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
 };
 
 
 /** Task info implementation for USP_Task. */
-UCLASS(ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
 class USP_TaskInfos : public USP_TaskInfosBase
 {
 	GENERATED_BODY()
@@ -140,6 +122,15 @@ class USP_TaskInfos : public USP_TaskInfosBase
 
 	ESP_PlanExecutionState BaseExecutionState = ESP_PlanExecutionState::PES_Succeed;
 
-	float TimeOutTime = -1.0f;
 	float CurrTimeOut = 0.0f;
+	float TimeOutTime = -1.0f;
+
+public:
+	/** Whether the task has begun. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Task")
+	bool bHasBegun = false;
+
+	/** Whether the task has been cancelled. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Task")
+	bool bForcedEnd = false;
 };

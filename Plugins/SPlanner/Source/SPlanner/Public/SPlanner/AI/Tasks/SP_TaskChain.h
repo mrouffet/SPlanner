@@ -22,6 +22,10 @@ protected:
 
 	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos) override;
 
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+
 public:
 	USP_TaskInfosBase* InstantiateInfos() override;
 
@@ -30,17 +34,11 @@ public:
 
 	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
-
-	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-	bool End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-
-	bool Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
 };
 
 
-/** Task info implementation for USP_Task. */
-UCLASS(ClassGroup = "SPlanner|Action|Task")
+/** Task info implementation for USP_TaskChain. */
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
 class USP_TaskChainInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()
@@ -50,10 +48,11 @@ class USP_TaskChainInfos : public USP_TaskInfos
 
 	int Index = 0;
 
+public:
 	/**
 	*	Current executed task infos.
 	*	Must be UPROPERTY() to avoid garbage collection.
 	*/
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner|Task|Chain")
 	USP_TaskInfosBase* TaskInfos = nullptr;
 };

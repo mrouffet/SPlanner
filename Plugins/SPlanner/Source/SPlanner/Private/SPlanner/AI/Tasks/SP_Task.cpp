@@ -47,11 +47,12 @@ void USP_Task::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Not
 		break;
 	}
 }
-
-void USP_Task::InitNotify(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
+void USP_Task::InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
+	SP_CHECK_NULLPTR(Planner)
+
 	// Always bind to allow OnNotify() override.
-	Planner.OnNotifyTask.AddDynamic(this, &USP_Task::OnNotify);
+	Planner->OnNotifyTask.AddDynamic(this, &USP_Task::OnNotify);
 
 	if (!NotifyMask)
 		return;
@@ -83,13 +84,54 @@ bool USP_Task::PreCondition(const USP_PlannerComponent& Planner, const TArray<US
 	return true;
 }
 
-bool USP_Task::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
 {
+	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
+
+	// Begin Task.
+	if (!Infos->bHasBegun && !Begin_Internal(&Planner, TaskInfos))
+	{
+		// Begin has failed.
+		End_Internal(&Planner, TaskInfos); // Call End to uninit.
+
+		return ESP_PlanExecutionState::PES_Failed;
+	}
+
+	ESP_PlanExecutionState InternalState = Tick_Internal(DeltaSeconds, &Planner, TaskInfos);
+
+	// Wait for success or failure.
+	if (InternalState == ESP_PlanExecutionState::PES_Running)
+		return InternalState;
+	
+	// End Task.
+	if (!End_Internal(&Planner, TaskInfos))
+		return ESP_PlanExecutionState::PES_Failed; // End has failed.
+
+	// Return either tick has succeeded or failed.
+	return InternalState;
+}
+void USP_Task::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+{
+	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
+	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
+
+	if (Infos->bHasBegun)
+	{
+		Infos->bForcedEnd = true;
+		End_Internal(&Planner, TaskInfos);
+	}
+}
+
+bool USP_Task::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+{
+	SP_RCHECK_NULLPTR(Planner, false)
+
 	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
 	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
 
 	// Time Out.
-	float TimeOutTime = TimeOut.Get(Planner.GetLODLevel());
+	float TimeOutTime = TimeOut.Get(Planner->GetLODLevel());
 
 	if (TimeOutTime > 0.0f)
 		Infos->TimeOutTime = TimeOutTime;
@@ -97,14 +139,14 @@ bool USP_Task::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInf
 
 	InitNotify(Planner, Infos);
 
-#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskBegin(&Planner);
-#endif
+	Infos->bHasBegun = true;
 
 	return true;
 }
-ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_Task::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
+	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
+
 	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
 	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
 
@@ -118,53 +160,13 @@ ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent
 	}
 
 
-#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	ESP_PlanExecutionState BPExecutionState = K2_OnTaskTick(DeltaSeconds, &Planner);
-	
-	if (BPExecutionState != ESP_PlanExecutionState::PES_Succeed)
-		return BPExecutionState;
-#endif
-
 	return Infos->BaseExecutionState;
 }
-bool USP_Task::End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_Task::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
-	Planner.OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
+	SP_RCHECK_NULLPTR(Planner, false)
 
+	Planner->OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
 
-#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskEnd(&Planner);
-#endif
-
-	return true;
-}
-
-bool USP_Task::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
-{
-	Planner.OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
-
-
-#if SP_TASK_BLUEPRINT_IMPLEMENTABLE
-	return K2_OnTaskCancel(&Planner);
-#endif
-
-	return true;
-}
-
-bool USP_Task::K2_OnTaskBegin_Implementation(USP_AIPlannerComponent* Planner)
-{
-	return true;
-}
-ESP_PlanExecutionState USP_Task::K2_OnTaskTick_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner)
-{
-	return ESP_PlanExecutionState::PES_Succeed;
-}
-bool USP_Task::K2_OnTaskEnd_Implementation(USP_AIPlannerComponent* Planner)
-{
-	return true;
-}
-
-bool USP_Task::K2_OnTaskCancel_Implementation(USP_AIPlannerComponent* Planner)
-{
 	return true;
 }

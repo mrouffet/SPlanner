@@ -11,9 +11,11 @@
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
-FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const
+FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {
-	APawn* Pawn = Planner.GetPawn();
+	SP_SRCHECK_NULLPTR(Planner, FRotator())
+
+	APawn* Pawn = Planner->GetPawn();
 	SP_SRCHECK_NULLPTR(Pawn, FRotator())
 	SP_SRCHECK_NULLPTR(Target, FRotator())
 
@@ -60,20 +62,20 @@ uint64 USP_LookAtTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_LookAtTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
 	USP_LookAtTaskInfos* const Infos = Cast<USP_LookAtTaskInfos>(TaskInfos);
 	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_LookAtTaskInfos")
 
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
 
-	APawn* Pawn = Planner.GetPawn();
+	APawn* Pawn = Planner->GetPawn();
 	SP_SRCHECK_NULLPTR(Pawn, false)
 
 	Infos->Start = Pawn->GetActorRotation();
@@ -88,11 +90,11 @@ bool USP_LookAtTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* T
 
 	return true;
 }
-ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_LookAtTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
-	APawn* Pawn = Planner.GetPawn();
+	APawn* Pawn = Planner->GetPawn();
 	SP_SRCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
 
 	USP_LookAtTaskInfos* const Infos = Cast<USP_LookAtTaskInfos>(TaskInfos);
@@ -104,7 +106,7 @@ ESP_PlanExecutionState USP_LookAtTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
 
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

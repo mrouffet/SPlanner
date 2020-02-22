@@ -40,22 +40,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bFreezeRoll = true;
 
-	FRotator ComputeTargetRotation(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const;
+	FRotator ComputeTargetRotation(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const;
+
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
 
 public:
 	USP_TaskInfosBase* InstantiateInfos() override;
 
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
-
-
-	bool Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos) override;
 };
 
 
 /** Task info implementation for USP_LookAtTask. */
-UCLASS(ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
 class USP_LookAtTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()

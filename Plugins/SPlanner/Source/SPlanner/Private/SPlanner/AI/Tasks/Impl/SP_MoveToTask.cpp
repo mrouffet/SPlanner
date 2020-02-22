@@ -18,16 +18,17 @@
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 
-bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const
+bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {
+	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(Target, false)
 
-	APawn* Pawn = Planner.GetPawn();
+	APawn* Pawn = Planner->GetPawn();
 
 	if(ACharacter* Character = Cast<ACharacter>(Pawn))
 		return HasReachedPosition(Character, Target->GetAnyPosition());
 
-	return HasReachedPosition(Planner.GetPawn(), Target->GetAnyPosition());
+	return HasReachedPosition(Planner->GetPawn(), Target->GetAnyPosition());
 }
 bool USP_MoveToTask::HasReachedPosition(APawn* Pawn, const FVector& TargetPosition) const
 {
@@ -52,11 +53,12 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
-bool USP_MoveToTask::IsTargetVisible(const USP_AIPlannerComponent& Planner, const USP_Target* Target) const
+bool USP_MoveToTask::IsTargetVisible(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {
+	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(Target, false)
 
-	APawn* const AIPawn = Planner.GetPawn();
+	APawn* const AIPawn = Planner->GetPawn();
 	SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Avoid Self or target collisions.
@@ -67,7 +69,7 @@ bool USP_MoveToTask::IsTargetVisible(const USP_AIPlannerComponent& Planner, cons
 	if (AActor* TargetActor = Target->GetAnyActor())
 		Params.AddIgnoredActor(TargetActor);
 
-	if (Planner.GetWorld()->LineTraceSingleByChannel(HitInfos,
+	if (Planner->GetWorld()->LineTraceSingleByChannel(HitInfos,
 		AIPawn->GetActorLocation(),
 		Target->GetAnyPosition(),
 		ECollisionChannel::ECC_Visibility, Params))
@@ -174,7 +176,7 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	FVector TargetLocation = Target->GetAnyPosition();
 
-	if (bTargetVisible && !IsTargetVisible(*AIPlanner, Target))
+	if (bTargetVisible && !IsTargetVisible(AIPlanner, Target))
 		return false;
 
 	// Check is in range.
@@ -194,7 +196,7 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 			return false;
 	}
 
-	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(*AIPlanner, Target) : true;
+	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(AIPlanner, Target) : true;
 }
 uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
 {
@@ -206,14 +208,14 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
 	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
 	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
 
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -228,12 +230,11 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* T
 	if (bTargetVisible && !IsTargetVisible(Planner, Target))
 	{
 		SP_LOG_TASK_EXECUTE(Planner, "Move request failed: Taget not visible.")
-			Infos->ExecutionState = ESP_PlanExecutionState::PES_Failed;
 		return false;
 	}
 
 	// Use AIController pathfinding MoveTo.
-	ASP_AIController* const Controller = Planner.GetController();
+	ASP_AIController* const Controller = Planner->GetController();
 	SP_RCHECK_NULLPTR(Controller, false)
 
 
@@ -271,7 +272,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* T
 
 	if (PawnSpeed > 0.0f)
 	{
-		APawn* const AIPawn = Planner.GetPawn();
+		APawn* const AIPawn = Planner->GetPawn();
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Store previous value.
@@ -282,7 +283,7 @@ bool USP_MoveToTask::Begin(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* T
 
 	return true;
 }
-ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_MoveToTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
@@ -292,11 +293,11 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Failed)
 	{
 		SP_LOG_TASK_TICK(Planner, "Failed")
-			return ESP_PlanExecutionState::PES_Failed;
+		return ESP_PlanExecutionState::PES_Failed;
 	}
 	else if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Succeed)
 	{
-		const AAIController* const Controller = Cast<AAIController>(Planner.GetOwner());
+		const AAIController* const Controller = Cast<AAIController>(Planner->GetOwner());
 		SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
 		const ACharacter* const Character = Cast<ACharacter>(Controller->GetPawn());
@@ -318,7 +319,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 		if (DynamicUpdateFrequency <= 0.0f || Infos->DynamicTime >= DynamicUpdateFrequency)
 		{
-			USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+			USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 			SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 			USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -326,7 +327,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 			Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition());
 
-			ASP_AIController* const Controller = Planner.GetController();
+			ASP_AIController* const Controller = Planner->GetController();
 			SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
 			// Request movement.
@@ -349,7 +350,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick(float DeltaSeconds, USP_AIPlannerCom
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
 {
 	SP_TASK_SUPER_END(Planner, TaskInfos)
 
@@ -358,36 +359,14 @@ bool USP_MoveToTask::End(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* Tas
 
 	if (PawnSpeed > 0.0f)
 	{
-		APawn* const AIPawn = Planner.GetPawn();
+		APawn* const AIPawn = Planner->GetPawn();
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
 
 		// Reset to saved speed.
 		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
 	}
 
-	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
-		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
-
-	return true;
-}
-
-bool USP_MoveToTask::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos)
-{
-	SP_TASK_SUPER_CANCEL(Planner, TaskInfos)
-
-	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
-	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
-
-	if (PawnSpeed > 0.0f)
-	{
-		APawn* const AIPawn = Planner.GetPawn();
-		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
-
-		// Reset to saved speed.
-		SetPawnSpeed(AIPawn, Infos->PrevPawnSpeed);
-	}
-
-	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running)
+	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running && Infos->Controller)
 		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
 
 	return true;
