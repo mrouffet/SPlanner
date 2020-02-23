@@ -42,6 +42,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
 	bool bCanStrafe = false;
 
+	/** Should stop movement while task get cancelled. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
+	bool bStopMovementOnCancel = true;
 
 	/** The radius to accept the move to as completed. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
@@ -154,6 +157,8 @@ class USP_MoveToTaskInfos : public USP_TaskInfos
 	bool bIsDynamic = false;
 
 	float DynamicTime = 0.0f;
+
+	int MoveId = -1;
 
 	/** The saved previous pawn speed. */
 	float PrevPawnSpeed = -1.0f;

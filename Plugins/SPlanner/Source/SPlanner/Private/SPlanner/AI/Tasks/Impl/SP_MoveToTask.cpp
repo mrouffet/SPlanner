@@ -267,6 +267,7 @@ bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Plann
 
 	// Save RequestID and task infos.
 	RequestIDToTaskInfos.Add(Request.MoveId, Infos);
+	Infos->MoveId = Request.MoveId;
 
 	Infos->bIsDynamic = bIsDynamic && DynamicUpdateFrequency > 0.0f;
 
@@ -344,6 +345,14 @@ ESP_PlanExecutionState USP_MoveToTask::Tick_Internal_Implementation(float DeltaS
 			}
 			else if (Request.Code == EPathFollowingRequestResult::AlreadyAtGoal)
 				return ESP_PlanExecutionState::PES_Succeed;
+
+			if (Request.MoveId != Infos->MoveId)
+			{
+				RequestIDToTaskInfos.Remove(Infos->MoveId);
+
+				Infos->MoveId = Request.MoveId;
+				RequestIDToTaskInfos.Add(Request.MoveId, Infos);
+			}
 		}
 	}
 	//
@@ -367,7 +376,18 @@ bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner
 	}
 
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running && Infos->Controller)
-		Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
+	{
+		if(bStopMovementOnCancel)
+			Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
+		else
+		{
+			// Unbind completed event manually.
+			RequestIDToTaskInfos.Remove(Infos->MoveId);
+
+			SP_RCHECK_NULLPTR(Infos->Controller, false)
+			Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
+		}
+	}
 
 	return true;
 }
