@@ -13,8 +13,6 @@ public class SPlanner : ModuleRules
 			new string[]
 			{
 				"Core",
-
-				"SPlannerEditor"
 			}
 		);
 
@@ -28,5 +26,10 @@ public class SPlanner : ModuleRules
 				"AIModule",
 			}
 		);
+
+
+		// Editor only.
+		if (Target.Type == TargetType.Editor)
+			PublicDependencyModuleNames.Add("SPlannerEditor");
 	}
 }
