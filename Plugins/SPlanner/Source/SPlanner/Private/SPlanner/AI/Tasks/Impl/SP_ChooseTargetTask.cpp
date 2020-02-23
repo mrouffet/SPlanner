@@ -29,22 +29,25 @@ bool USP_ChooseTargetTask::Predicate_Implementation(const USP_AIPlannerComponent
 	SP_RCHECK_NULLPTR(Pawn, false)
 
 	FVector FOVCenter = Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset);
-	FVector FOVHalfDimensions = Pawn->GetActorRotation().RotateVector(HalfDimensions);
+	FVector FOVMinHalfDimensions = Pawn->GetActorRotation().RotateVector(MinHalfDimensions);
+	FVector FOVMaxHalfDimensions = Pawn->GetActorRotation().RotateVector(MaxHalfDimensions);
 
 	FVector FOVToTarget = Actor->GetActorLocation() - FOVCenter;
 
 	// Out of X bound.
-	if (HalfDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) > FOVHalfDimensions.X)
+	if((MinHalfDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) < FOVMinHalfDimensions.X) ||
+		(MaxHalfDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) > FOVMaxHalfDimensions.X))
 		return false;
 
 	// Out of Y bound.
-	if (HalfDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) > FOVHalfDimensions.Y)
+	if ((MinHalfDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) < FOVMinHalfDimensions.Y) ||
+		(MaxHalfDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) > FOVMaxHalfDimensions.Y))
 		return false;
 
 	// Out of Z bound.
-	if (HalfDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) > FOVHalfDimensions.Z)
+	if ((MinHalfDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) < FOVMinHalfDimensions.Z) ||
+		(MaxHalfDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) > FOVMaxHalfDimensions.Z))
 		return false;
-
 
 	if (bTargetVisible)
 	{
@@ -163,16 +166,24 @@ void USP_ChooseTargetTask::DrawDebug(const USP_AIPlannerComponent* Planner, cons
 
 	SP_IF_TASK_EXECUTE(Planner)
 	{
-		DrawDebugBox(Pawn->GetWorld(),
-			FOVCenter,
-			HalfDimensions * 2.0f,
-			DebugColor, false,
-			DebugDrawTime);
+		if(MinHalfDimensions.X > 0.0f && MinHalfDimensions.Y > 0.0f && MinHalfDimensions.Z > 0.0f)
+			DrawDebugBox(Pawn->GetWorld(),
+				FOVCenter,
+				MinHalfDimensions * 2.0f,
+				MinFOVDebugColor, false,
+				DebugDrawTime);
+
+		if (MaxHalfDimensions.X > 0.0f && MaxHalfDimensions.Y > 0.0f && MaxHalfDimensions.Z > 0.0f)
+			DrawDebugBox(Pawn->GetWorld(),
+				FOVCenter,
+				MaxHalfDimensions * 2.0f,
+				MaxFOVDebugColor, false,
+				DebugDrawTime);
 
 		DrawDebugLine(Pawn->GetWorld(),
 			FOVCenter,
 			TargetLocation,
-			DebugColor, false,
+			LineDebugColor, false,
 			DebugDrawTime);
 	}
 }

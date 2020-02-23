@@ -49,11 +49,18 @@ protected:
 	FVector LocalOffset = FVector::ZeroVector;
 
 	/**
-	*	Dimensions of field of view.
+	*	Dimensions of minimum field of view.
 	*	Set < 0.0f for unlimited bound.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	FVector HalfDimensions = FVector(-1.0f, -1.0f, -1.0f);
+	FVector MinHalfDimensions = FVector(-1.0f, -1.0f, -1.0f);
+
+	/**
+	*	Dimensions of maximum field of view.
+	*	Set < 0.0f for unlimited bound.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	FVector MaxHalfDimensions = FVector(-1.0f, -1.0f, -1.0f);
 
 	/** Predicate to validate to choose an Actor. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Action|Task|Target")
@@ -65,7 +72,13 @@ protected:
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
-	FColor DebugColor = FColor::Yellow;
+	FColor MinFOVDebugColor = FColor::Orange;
+
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
+	FColor MaxFOVDebugColor = FColor::Yellow;
+
+	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
+	FColor LineDebugColor = FColor::Yellow;
 
 	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
 	float DebugDrawTime = 2.0f;
