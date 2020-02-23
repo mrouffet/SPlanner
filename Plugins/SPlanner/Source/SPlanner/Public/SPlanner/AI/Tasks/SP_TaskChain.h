@@ -20,14 +20,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Chain")
 	TArray<USP_Task*> Tasks;
 
-	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos) override;
+	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos) override;
 
-	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
-	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	USP_TaskInfosBase* InstantiateInfos() override;
+	USP_TaskInfos* InstantiateInfos() override;
 
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
@@ -54,5 +54,5 @@ public:
 	*	Must be UPROPERTY() to avoid garbage collection.
 	*/
 	UPROPERTY(BlueprintReadOnly, Category = "SPlanner|Task|Chain")
-	USP_TaskInfosBase* TaskInfos = nullptr;
+	USP_TaskInfos* TaskInfos = nullptr;
 };

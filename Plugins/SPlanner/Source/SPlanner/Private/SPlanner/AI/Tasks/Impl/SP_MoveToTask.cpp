@@ -122,7 +122,7 @@ void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
 	}
 }
 
-USP_TaskInfosBase* USP_MoveToTask::InstantiateInfos()
+USP_TaskInfos* USP_MoveToTask::InstantiateInfos()
 {
 	return NewObject<USP_MoveToTaskInfos>();
 }
@@ -208,7 +208,7 @@ uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
@@ -284,7 +284,7 @@ bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Plann
 
 	return true;
 }
-ESP_PlanExecutionState USP_MoveToTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_MoveToTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
@@ -359,7 +359,7 @@ ESP_PlanExecutionState USP_MoveToTask::Tick_Internal_Implementation(float DeltaS
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_END(Planner, TaskInfos)
 

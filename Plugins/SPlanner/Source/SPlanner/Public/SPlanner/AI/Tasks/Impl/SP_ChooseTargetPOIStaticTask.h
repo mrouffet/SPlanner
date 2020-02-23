@@ -18,7 +18,7 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Task|Target|POI|Static")
 	TArray<USP_POIComponent*> POIs;
 
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
 	/** Register a POI into POIs*/

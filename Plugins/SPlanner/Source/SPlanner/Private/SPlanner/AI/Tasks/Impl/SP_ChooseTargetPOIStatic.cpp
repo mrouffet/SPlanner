@@ -22,7 +22,7 @@ void USP_ChooseTargetPOIStaticTask::UnRegister(USP_POIComponent* POI)
 	POIs.Remove(POI);
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPOIStaticTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_ChooseTargetPOIStaticTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 

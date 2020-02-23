@@ -22,17 +22,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
 	float MaxTime = 3.0f;
 
-	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	USP_TaskInfosBase* InstantiateInfos() override;
+	USP_TaskInfos* InstantiateInfos() override;
 };
 
 
 /** Task info implementation for USP_IdleTask. */
 UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
-class USP_IdleTaskInfos : public USP_TaskInfos
+class SPLANNER_API USP_IdleTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()
 

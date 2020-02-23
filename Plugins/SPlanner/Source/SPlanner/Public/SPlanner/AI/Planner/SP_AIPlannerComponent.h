@@ -14,10 +14,10 @@ class USP_POIZoneComponent;
 class APawn;
 class ASP_AIController;
 
-class USP_TaskInfosBase;
+class USP_TaskInfos;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIPlannerNotifyDelegate, USP_AIPlannerComponent*, Planner, ESP_AIPlannerNotify, Notify);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_AIPlannerTaskNotifyDelegate, USP_AIPlannerComponent*, Planner, ESP_AIPlannerNotify, Notify, USP_TaskInfosBase*, InTaskInfos);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_AIPlannerTaskNotifyDelegate, USP_AIPlannerComponent*, Planner, ESP_AIPlannerNotify, Notify, USP_TaskInfos*, InTaskInfos);
 
 /**
 *	Planner behavior.
@@ -46,7 +46,7 @@ protected:
 	*	Must be UPROPERTY() to avoid garbage collection.
 	*/
 	UPROPERTY()
-	USP_TaskInfosBase* TaskInfos;
+	USP_TaskInfos* TaskInfos;
 
 	/**
 	*	Execute the current task of the Plan.

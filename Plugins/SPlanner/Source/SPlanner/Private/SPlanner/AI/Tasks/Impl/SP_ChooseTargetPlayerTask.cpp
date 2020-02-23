@@ -22,7 +22,7 @@ uint64 USP_ChooseTargetPlayerTask::PostCondition(const USP_PlannerComponent& Pla
 	return PlannerFlags;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPlayerTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_ChooseTargetPlayerTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 

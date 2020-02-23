@@ -4,12 +4,12 @@
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-USP_TaskInfosBase* USP_TaskChain::InstantiateInfos()
+USP_TaskInfos* USP_TaskChain::InstantiateInfos()
 {
 	return NewObject<USP_TaskChainInfos>();
 }
 
-void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos)
+void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
 {
 	Super::OnNotify(Planner, Notify, TaskInfos);
 
@@ -54,7 +54,7 @@ uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent& Planner, uint64 
 	return PlannerFlags;
 }
 
-bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
@@ -68,7 +68,7 @@ bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planne
 
 	return true;
 }
-ESP_PlanExecutionState USP_TaskChain::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_TaskChain::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
@@ -96,7 +96,7 @@ ESP_PlanExecutionState USP_TaskChain::Tick_Internal_Implementation(float DeltaSe
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_TaskChain::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_TaskChain::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_END(Planner, TaskInfos)
 

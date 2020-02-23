@@ -16,7 +16,7 @@ USP_ChooseTargetPositionTask::USP_ChooseTargetPositionTask(const FObjectInitiali
 	HalfDimensions = FVector(100.0f, 100.0f, 100.0f);
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 

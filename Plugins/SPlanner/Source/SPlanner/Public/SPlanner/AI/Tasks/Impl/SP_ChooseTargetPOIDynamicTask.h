@@ -30,7 +30,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
 	bool PredicatePOI(const USP_AIPlannerComponent* Planner, const USP_POIComponent* POI) const;
 
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
 	USP_ChooseTargetPOIDynamicTask(const FObjectInitializer& ObjectInitializer);

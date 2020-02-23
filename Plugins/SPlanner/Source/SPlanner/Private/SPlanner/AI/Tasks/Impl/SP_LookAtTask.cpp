@@ -33,7 +33,7 @@ FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent* Pla
 	return Rotator;
 }
 
-USP_TaskInfosBase* USP_LookAtTask::InstantiateInfos()
+USP_TaskInfos* USP_LookAtTask::InstantiateInfos()
 {
 	return NewObject<USP_LookAtTaskInfos>();
 }
@@ -62,7 +62,7 @@ uint64 USP_LookAtTask::PostCondition(const USP_PlannerComponent& Planner, uint64
 	return PlannerFlags;
 }
 
-bool USP_LookAtTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+bool USP_LookAtTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
@@ -90,7 +90,7 @@ bool USP_LookAtTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Plann
 
 	return true;
 }
-ESP_PlanExecutionState USP_LookAtTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_LookAtTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 

@@ -23,7 +23,7 @@ bool USP_ChooseTargetPOIDynamicTask::PredicatePOI_Implementation(const USP_AIPla
 	return bIgnorePOIActorType ? POIActorTypes.Find(POIActorClass) == INDEX_NONE : POIActorTypes.Find(POIActorClass) != INDEX_NONE;
 }
 
-ESP_PlanExecutionState USP_ChooseTargetPOIDynamicTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos)
+ESP_PlanExecutionState USP_ChooseTargetPOIDynamicTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 

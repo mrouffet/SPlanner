@@ -126,11 +126,11 @@ protected:
 	/** Implementation of move request creation. */
 	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
 
-	USP_TaskInfosBase* InstantiateInfos() override;
+	USP_TaskInfos* InstantiateInfos() override;
 
-	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
-	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos) override;
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
@@ -139,7 +139,7 @@ public:
 
 /** Task info implementation for USP_MoveToTask. */
 UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
-class USP_MoveToTaskInfos : public USP_TaskInfos
+class SPLANNER_API USP_MoveToTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()
 

@@ -7,7 +7,6 @@
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 
 #include <SPlanner/AI/Tasks/SP_TaskMacro.h>
-#include <SPlanner/AI/Tasks/SP_TaskInfosBase.h>
 #include <SPlanner/AI/Tasks/SP_TaskNotification.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerNotify.h>
 
@@ -15,6 +14,8 @@
 #include "SP_Task.generated.h"
 
 class USP_AIPlannerComponent;
+
+class USP_TaskInfos;
 
 /**
  *	AI Planner task base.
@@ -56,7 +57,7 @@ protected:
 
 	/** Callback method bound to planner. */
 	UFUNCTION(Category = "SPlanner|Action|Task")
-	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfosBase* TaskInfos);
+	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos);
 
 	/** Init the Notify callback and base execution state. */
 	void InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
@@ -66,21 +67,21 @@ protected:
 	*	Called by Begin().
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName = "Begin", Category = "SPlanner|Action|Task")
-	bool Begin_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos);
+	bool Begin_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 	/**
 	*	The tick internal implementation of the task.
 	*	Called by Tick().
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName = "Tick", Category = "SPlanner|Action|Task")
-	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos);
+	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 	/**
 	*	The end implementation of the task.
 	*	Called by End().
 	*/
 	UFUNCTION(BlueprintNativeEvent, DisplayName = "End", Category = "SPlanner|Action|Task")
-	bool End_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfosBase* TaskInfos);
+	bool End_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 public:
 	USP_Task(const FObjectInitializer& ObjectInitializer);
@@ -92,7 +93,7 @@ public:
 	float GetCooldown(float LODLevel = -1.0f) const;
 
 	/** Instantiate the TaskInfos for this task. */
-	virtual USP_TaskInfosBase* InstantiateInfos();
+	virtual USP_TaskInfos* InstantiateInfos();
 
 	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
 
@@ -101,19 +102,19 @@ public:
 	*	Call Begin_Internal(), Tick_Internal() and End_Internal().
 	*	This is executed by the PlannerComponent (main thread).
 	*/
-	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
+	ESP_PlanExecutionState Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos);
 
 	/**
 	*	Cancel the task.
 	*	Call End_Internal().
 	*/
-	void Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfosBase* TaskInfos);
+	void Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos);
 };
 
 
 /** Task info implementation for USP_Task. */
 UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
-class USP_TaskInfos : public USP_TaskInfosBase
+class SPLANNER_API USP_TaskInfos : public UObject
 {
 	GENERATED_BODY()
 
