@@ -7,6 +7,7 @@
 #include <Engine/DataAsset.h>
 #include "SP_ActionStep.generated.h"
 
+class USP_PlanGenInfos;
 class USP_PlannerComponent;
 
 /**
@@ -36,12 +37,22 @@ public:
 	*	Must return true to be added to the plan during generation.
 	*	Called on external thread.
 	*/
-	virtual bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const;
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action")
+	bool PreCondition(const USP_PlannerComponent* Planner, const TArray<USP_ActionStep*>& GeneratedPlan, const USP_PlanGenInfos* PlanGenInfos) const;
 
 	/**
 	*	The post-condition of the step.
-	*	Return new planner flags to check for next pre-conditions during plan generation.
+	*	Must return true to be added to the plan during generation.
 	*	Called on external thread.
 	*/
-	virtual uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const;
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action")
+	bool PostCondition(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const;
+
+	/**
+	*	Reset the previous added post-conditions.
+	*	Return value is used for parent debug check only.
+	*	Called on external thread.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action")
+	bool ResetPostCondition(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const;
 };

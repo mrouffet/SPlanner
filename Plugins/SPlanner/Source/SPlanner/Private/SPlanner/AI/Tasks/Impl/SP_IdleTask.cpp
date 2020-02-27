@@ -4,9 +4,9 @@
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-USP_TaskInfos* USP_IdleTask::InstantiateInfos()
+USP_IdleTask::USP_IdleTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	return NewObject<USP_IdleTaskInfos>();
+	TaskInfosClass = USP_IdleTaskInfos::StaticClass();
 }
 
 bool USP_IdleTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)

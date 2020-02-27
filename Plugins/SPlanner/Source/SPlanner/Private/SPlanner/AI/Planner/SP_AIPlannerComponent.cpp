@@ -16,6 +16,7 @@
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
 
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Tasks/SP_Task.h>
@@ -30,6 +31,8 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 {
 	// Execute task in tick or check cooldowns.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	PlanGenInfosClass = USP_AIPlanGenInfos::StaticClass();
 }
 
 USP_Task* USP_AIPlannerComponent::GetPrevTask() const
@@ -259,9 +262,15 @@ void USP_AIPlannerComponent::AskNewPlan(bool bInstantRequest)
 	Super::AskNewPlan(bInstantRequest);
 }
 
-bool USP_AIPlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const
+bool USP_AIPlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions,
+	TArray<USP_ActionStep*>& OutPlan,
+	USP_PlanGenInfos* PlanGenInfos,
+	uint8 MaxDepth,
+	float LODLevel) const
 {
-	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ *this, PlannerActions, OutPlan, MaxDepth, LODLevel });
+	SP_RCHECK(Cast<USP_AIPlanGenInfos>(PlanGenInfos), false, "AI PlanGenInfos nullptr! PlanGenInfos must be a USP_AIPlanGenInfos!")
+
+	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ this, PlannerActions, OutPlan, PlanGenInfos, MaxDepth, LODLevel });
 }
 
 void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)

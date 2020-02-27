@@ -5,15 +5,16 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Actions/SP_ActionStep.h>
+#include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
 
 bool SP_Planner::LinearConstruct(FSP_LinearConstructInfos Infos)
 {
 	SP_BENCHMARK_SCOPE(SP_LinearConstruct)
 
-	return LinearConstruct_Internal(Infos, 0u, 0u);
+	return LinearConstruct_Internal(Infos, 0u);
 }
 
-bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8 CurrDepth, uint64 PlannerFlags)
+bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8 CurrDepth)
 {
 	if (CurrDepth > Infos.MaxDepth)
 		return false;
@@ -25,8 +26,9 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 		// Make copy because of future Remove.
 		FSP_PlannerAction Action = Actions[i];
 
-		// invalid pre-condition.
-		if (!Action.Handle->Step->PreCondition(Infos.Planner, Infos.OutPlan, PlannerFlags))
+		// invalid pre-condition or post condition.
+		if (!Action.Handle->Step->PreCondition(Infos.Planner, Infos.OutPlan, Infos.PlanGenInfos) ||
+			!Action.Handle->Step->PostCondition(Infos.Planner, Infos.PlanGenInfos))
 			continue;
 
 		// Add steps to current plan.
@@ -66,7 +68,7 @@ bool SP_Planner::LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8
 				return true;
 		}
 		// Check if plan with this action can be achieved.
-		else if (LinearConstruct_Internal(Infos, CurrDepth + 1u, Action.Handle->Step->PostCondition(Infos.Planner, PlannerFlags)))
+		else if (LinearConstruct_Internal(Infos, CurrDepth + 1u))
 			return true;
 
 		// Plan generation failed, remove this action from plan.

@@ -8,7 +8,7 @@
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
@@ -127,33 +127,54 @@ AActor* USP_ChooseTargetTask::Choose_Implementation(const USP_AIPlannerComponent
 	}
 }
 
-bool USP_ChooseTargetTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_ChooseTargetTask::PreCondition_Implementation(const USP_PlannerComponent* Planner,
+	const TArray<USP_ActionStep*>& GeneratedPlan,
+	const USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlanGenInfos)
 
 #if SP_DEBUG
 	// Check valid blackboard entry.
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
 #endif
 
+	const USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+
 	// Not already re-targeted.
-	if(!bAllowReTarget && SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
+	if(!bAllowReTarget && AIPlanGenInfos->IsBlackboardFlagSet(TargetEntryName, ESP_AIBBPlanGenFlags::PG_Dirty))
 		return false;
 
 	return true;
 }
-uint64 USP_ChooseTargetTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_ChooseTargetTask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
 
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty);
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetPosition);
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	return PlannerFlags;
+	AIPlanGenInfos->AddBlackboardFlags(TargetEntryName,
+		ESP_AIBBPlanGenFlags::PG_Dirty,
+		ESP_AIBBPlanGenFlags::PG_TargetPosition);
+
+	return true;
+}
+bool USP_ChooseTargetTask::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
+
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
+
+	AIPlanGenInfos->RemoveBlackboardFlags(TargetEntryName,
+		ESP_AIBBPlanGenFlags::PG_Dirty,
+		ESP_AIBBPlanGenFlags::PG_TargetPosition);
+
+	return true;
 }
 
 #if SP_DEBUG_EDITOR

@@ -4,9 +4,9 @@
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-USP_TaskInfos* USP_TaskChain::InstantiateInfos()
+USP_TaskChain::USP_TaskChain(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	return NewObject<USP_TaskChainInfos>();
+	TaskInfosClass = USP_TaskChainInfos::StaticClass();
 }
 
 void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
@@ -19,9 +19,51 @@ void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotif
 	Tasks[Infos->Index]->OnNotify(Planner, Notify, Infos->TaskInfos);
 }
 
-bool USP_TaskChain::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_TaskChain::PreCondition_Implementation(const USP_PlannerComponent* Planner,
+	const TArray<USP_ActionStep*>& GeneratedPlan,
+	const USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlanGenInfos)
+
+	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
+
+	/**
+	*	PostCondition will modify PlanGenInfos.
+	*	PostCondition must be added to check next PreConditions.
+	*	Call ResetPostCondition to get back initial PlanGenInfos.
+	*	Avoid PlanGenInfos copy.
+	*/
+	USP_PlanGenInfos* NonConstPlanGenInfos = const_cast<USP_PlanGenInfos*>(PlanGenInfos);
+
+	for (int i = 0; i < Tasks.Num(); ++i)
+	{
+		SP_RCHECK_NULLPTR(Tasks[i], false)
+
+		if (!Tasks[i]->PreCondition(Planner, GeneratedPlan, PlanGenInfos) || !Tasks[i]->PostCondition(Planner, NonConstPlanGenInfos))
+		{
+			// PostCondition failed: Reset all previously set.
+
+			for (int j = i - 1; j >= 0; --j)
+				Tasks[j]->ResetPostCondition(Planner, NonConstPlanGenInfos);
+
+			return false;
+		}
+	}
+
+
+	// Reset NonConstPlanGenInfos to initial value.
+	for (int i = 0; i < Tasks.Num(); ++i)
+	{
+		SP_RCHECK_NULLPTR(Tasks[i], false)
+
+		Tasks[i]->ResetPostCondition(Planner, NonConstPlanGenInfos);
+	}
+
+	return true;
+}
+bool USP_TaskChain::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
 
 	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 
@@ -29,29 +71,34 @@ bool USP_TaskChain::PreCondition(const USP_PlannerComponent& Planner, const TArr
 	{
 		SP_RCHECK_NULLPTR(Tasks[i], false)
 
-		if (!Tasks[i]->PreCondition(Planner, GeneratedPlan, PlannerFlags))
-			return false;
+		// Precondition has already been checked.
+		if (!Tasks[i]->PostCondition(Planner, PlanGenInfos))
+		{
+			// Post Condition failed: Reset all previously set.
 
-		PlannerFlags = Tasks[i]->PostCondition(Planner, PlannerFlags);
+			for (int j = i - 1; j >= 0; --j)
+				Tasks[j]->ResetPostCondition(Planner, PlanGenInfos);
+
+			return false;
+		}
 	}
 
 	return true;
 }
-uint64 USP_TaskChain::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_TaskChain::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
 
-	SP_RCHECK(Tasks.Num(), PlannerFlags, "Empty tasks!")
+	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
-		SP_RCHECK_NULLPTR(Tasks[i], PlannerFlags)
+		SP_RCHECK_NULLPTR(Tasks[i], false)
 
-		// Precondition has already been checked.
-		PlannerFlags = Tasks[i]->PostCondition(Planner, PlannerFlags);
+		Tasks[i]->ResetPostCondition(Planner, PlanGenInfos);
 	}
 
-	return PlannerFlags;
+	return true;
 }
 
 bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)

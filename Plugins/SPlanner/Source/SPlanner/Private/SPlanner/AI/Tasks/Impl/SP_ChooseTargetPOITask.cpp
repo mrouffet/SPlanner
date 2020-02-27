@@ -2,7 +2,7 @@
 
 #include <SPlanner/AI/Tasks/Impl/SP_ChooseTargetPOITask.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
@@ -16,7 +16,7 @@ void USP_ChooseTargetPOITask::SetPOITarget(USP_AIPlannerComponent* Planner, USP_
 	SP_CHECK_NULLPTR(POI)
 	SP_CHECK_NULLPTR(Planner)
 
-	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
+	const USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_CHECK_NULLPTR(Blackboard)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -25,12 +25,29 @@ void USP_ChooseTargetPOITask::SetPOITarget(USP_AIPlannerComponent* Planner, USP_
 	Target->SetPOI(POI);
 }
 
-uint64 USP_ChooseTargetPOITask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_ChooseTargetPOITask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
 
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetPOI);
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetActor);
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	return PlannerFlags;
+	AIPlanGenInfos->AddBlackboardFlags(TargetEntryName,
+		ESP_AIBBPlanGenFlags::PG_TargetPOI,
+		ESP_AIBBPlanGenFlags::PG_TargetActor);
+
+	return true;
+}
+bool USP_ChooseTargetPOITask::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
+
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
+
+	AIPlanGenInfos->RemoveBlackboardFlags(TargetEntryName,
+		ESP_AIBBPlanGenFlags::PG_TargetPOI,
+		ESP_AIBBPlanGenFlags::PG_TargetActor);
+
+	return true;
 }

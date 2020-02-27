@@ -4,7 +4,7 @@
 
 #include <Kismet/KismetMathLibrary.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
@@ -13,11 +13,11 @@
 
 FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {
-	SP_SRCHECK_NULLPTR(Planner, FRotator())
+	SP_RCHECK_NULLPTR(Planner, FRotator())
 
 	APawn* Pawn = Planner->GetPawn();
-	SP_SRCHECK_NULLPTR(Pawn, FRotator())
-	SP_SRCHECK_NULLPTR(Target, FRotator())
+	SP_RCHECK_NULLPTR(Pawn, FRotator())
+	SP_RCHECK_NULLPTR(Target, FRotator())
 
 	FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(Pawn->GetActorLocation(), Target->GetAnyPosition());
 
@@ -33,19 +33,26 @@ FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent* Pla
 	return Rotator;
 }
 
-USP_TaskInfos* USP_LookAtTask::InstantiateInfos()
+USP_LookAtTask::USP_LookAtTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	return NewObject<USP_LookAtTaskInfos>();
+	TaskInfosClass = USP_LookAtTaskInfos::StaticClass();
 }
 
-bool USP_LookAtTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_LookAtTask::PreCondition_Implementation(const USP_PlannerComponent* Planner,
+	const TArray<USP_ActionStep*>& GeneratedPlan,
+	const USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlanGenInfos)
 
-	if(SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
+	const USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
+
+	// Target will be set.
+	if(AIPlanGenInfos->IsBlackboardFlagSet(TargetEntryName, ESP_AIBBPlanGenFlags::PG_Dirty))
 		return true;
 
-	USP_AIBlackboardComponent* const Blackboard = Planner.GetBlackboard<USP_AIBlackboardComponent>();
+	// Check valid Target.
+	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
@@ -53,13 +60,27 @@ bool USP_LookAtTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	return Target->IsValid();
 }
-uint64 USP_LookAtTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_LookAtTask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
 
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_RotationDirty);
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	return PlannerFlags;
+	AIPlanGenInfos->AddFlag(ESP_AIPlanGenFlags::PG_PawnDirtyRotation);
+
+	return true;
+}
+bool USP_LookAtTask::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
+
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
+
+	AIPlanGenInfos->RemoveFlag(ESP_AIPlanGenFlags::PG_PawnDirtyRotation);
+
+	return true;
 }
 
 bool USP_LookAtTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)

@@ -23,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_AIPlannerTaskNotifyDelegate, 
 *	Planner behavior.
 *	Use planning to generate behavior using action set.
 */
-UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), DisplayName = "SP_AIPlanner", ClassGroup = "SPlanner|Planner")
+UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent), DisplayName = "SP_AIPlanner", ClassGroup = "SPlanner|Planner|AI")
 class SPLANNER_API USP_AIPlannerComponent : public USP_PlannerComponent
 {
 	GENERATED_BODY()
@@ -64,7 +64,7 @@ protected:
 	*	Use linear plan construction algorithm.
 	*	Return true on construction succeed.
 	*/
-	bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const override;
+	bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, USP_PlanGenInfos* PlanGenInfos, uint8 MaxDepth, float LODLevel) const override;
 
 	/** Check cooldown and call AskNewPlan after newly available task. */
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;

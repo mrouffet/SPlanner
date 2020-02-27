@@ -9,7 +9,7 @@
 
 #include <SPlanner/AI/Controllers/SP_AIController.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
@@ -17,6 +17,11 @@
 #include <SPlanner/AI/Target/SP_Target.h>
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
+
+USP_MoveToTask::USP_MoveToTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	TaskInfosClass = USP_MoveToTaskInfos::StaticClass();
+}
 
 bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {
@@ -122,11 +127,6 @@ void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
 	}
 }
 
-USP_TaskInfos* USP_MoveToTask::InstantiateInfos()
-{
-	return NewObject<USP_MoveToTaskInfos>();
-}
-
 void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult)
 {
 	USP_MoveToTaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
@@ -149,19 +149,24 @@ void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPat
 	Infos->Controller->ReceiveMoveCompleted.RemoveDynamic(this, &USP_MoveToTask::OnMoveCompleted);
 }
 
-bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_MoveToTask::PreCondition_Implementation(const USP_PlannerComponent* Planner,
+	const TArray<USP_ActionStep*>& GeneratedPlan,
+	const USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlanGenInfos)
+
+	const USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
 	// Not already moved to.
-	if(!bAllowMultipleMoveTo && SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty))
+	if(!bAllowMultipleMoveTo && AIPlanGenInfos->IsFlagSet(ESP_AIPlanGenFlags::PG_PawnDirtyLocation))
 		return false;
 
 	// New target will be set.
-	if (SP_IS_FLAG_SET(PlannerFlags, ESP_AIPlannerFlags::PF_TargetDirty))
+	if (AIPlanGenInfos->IsBlackboardFlagSet(TargetEntryName, ESP_AIBBPlanGenFlags::PG_Dirty))
 		return true;
 
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(&Planner);
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
 
 	USP_AIBlackboardComponent* const Blackboard = AIPlanner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
@@ -198,14 +203,27 @@ bool USP_MoveToTask::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(AIPlanner, Target) : true;
 }
-uint64 USP_MoveToTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_MoveToTask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
 	
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_LocationDirty);
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_RotationDirty);
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	return PlannerFlags;
+	AIPlanGenInfos->AddFlags(ESP_AIPlanGenFlags::PG_PawnDirtyLocation, ESP_AIPlanGenFlags::PG_PawnDirtyRotation);
+
+	return true;
+}
+bool USP_MoveToTask::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
+
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
+	
+	AIPlanGenInfos->RemoveFlags(ESP_AIPlanGenFlags::PG_PawnDirtyLocation, ESP_AIPlanGenFlags::PG_PawnDirtyRotation);
+
+	return true;
 }
 
 bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)

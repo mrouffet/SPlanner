@@ -5,6 +5,7 @@
 #include <SPlanner/Miscs/SP_FlagHelper.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 
 USP_Task::USP_Task(const FObjectInitializer& ObjectInitializer)
 {
@@ -13,6 +14,8 @@ USP_Task::USP_Task(const FObjectInitializer& ObjectInitializer)
 
 	// Default never TimeOut.
 	TimeOut.Default = -1.0f;
+
+	TaskInfosClass = USP_TaskInfos::StaticClass();
 }
 
 bool USP_Task::GetUseCooldownOnFailed() const
@@ -70,16 +73,40 @@ void USP_Task::InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskIn
 	}
 }
 
-USP_TaskInfos* USP_Task::InstantiateInfos()
+USP_TaskInfos* USP_Task::InstantiateInfos(UObject* Outer)
 {
-	return NewObject<USP_TaskInfos>();
+	SP_RCHECK_NULLPTR(Outer, nullptr)
+	SP_RCHECK_NULLPTR(TaskInfosClass, nullptr)
+
+	return NewObject<USP_TaskInfos>(Outer, TaskInfosClass);
 }
 
-bool USP_Task::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+bool USP_Task::PreCondition_Implementation(const USP_PlannerComponent* Planner,
+	const TArray<USP_ActionStep*>& GeneratedPlan,
+	const USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlannerFlags)
+	SP_ACTION_STEP_SUPER_PRECONDITION(Planner, GeneratedPlan, PlanGenInfos)
 
-	SP_RCHECK_NULLPTR(Cast<USP_AIPlannerComponent>(&Planner), false)
+	SP_RCHECK(Cast<USP_AIPlannerComponent>(Planner), false, "AI Planner nullptr! Planner must be a USP_AIPlannerComponent!")
+	SP_RCHECK(Cast<USP_AIPlanGenInfos>(PlanGenInfos), false, "AI PlanGenInfos nullptr! PlanGenInfos must be a USP_AIPlanGenInfos!")
+
+	return true;
+}
+bool USP_Task::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
+
+	SP_RCHECK(Cast<USP_AIPlannerComponent>(Planner), false, "AI Planner nullptr! Planner must be a USP_AIPlannerComponent!")
+	SP_RCHECK(Cast<USP_AIPlanGenInfos>(PlanGenInfos), false, "AI PlanGenInfos nullptr! PlanGenInfos must be a USP_AIPlanGenInfos!")
+
+	return true;
+}
+bool USP_Task::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
+
+	SP_RCHECK(Cast<USP_AIPlannerComponent>(Planner), false, "AI Planner nullptr! Planner must be a USP_AIPlannerComponent!")
+	SP_RCHECK(Cast<USP_AIPlanGenInfos>(PlanGenInfos), false, "AI PlanGenInfos nullptr! PlanGenInfos must be a USP_AIPlanGenInfos!")
 
 	return true;
 }

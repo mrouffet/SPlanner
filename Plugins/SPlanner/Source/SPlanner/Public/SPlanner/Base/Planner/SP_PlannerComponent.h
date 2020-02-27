@@ -6,6 +6,7 @@
 
 #include <SPlanner/Base/Planner/SP_PlanState.h>
 #include <SPlanner/Base/Planner/SP_PlanError.h>
+#include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
 
 #include <Components/ActorComponent.h>
 #include "SP_PlannerComponent.generated.h"
@@ -38,6 +39,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SPlanner")
 	USP_Goal* Goal = nullptr;
 	
+	/** The class to use to store infos while generated plan. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SPlanner")
+	TSubclassOf<USP_PlanGenInfos> PlanGenInfosClass = USP_PlanGenInfos::StaticClass();
+
 	/** Timer handle before calling ConstructPlan(). */
 	FTimerHandle ConstructPlanTimer;
 
@@ -79,7 +84,7 @@ protected:
 	*	Must be overridden in children.
 	*	Return true on construction succeed.
 	*/
-	virtual bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const;
+	virtual bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, USP_PlanGenInfos* PlanGenInfos, uint8 MaxDepth, float LODLevel) const;
 
 
 	/** Callback function called when a plan's construction failed (no valid plan found). */

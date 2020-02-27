@@ -26,7 +26,7 @@ protected:
 	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	USP_TaskInfos* InstantiateInfos() override;
+	USP_IdleTask(const FObjectInitializer& ObjectInitializer);
 };
 
 

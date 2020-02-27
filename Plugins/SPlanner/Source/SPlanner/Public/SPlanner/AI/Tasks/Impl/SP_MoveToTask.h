@@ -126,15 +126,18 @@ protected:
 	/** Implementation of move request creation. */
 	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
 
-	USP_TaskInfos* InstantiateInfos() override;
+	bool PreCondition_Implementation(const USP_PlannerComponent* Planner,
+		const TArray<USP_ActionStep*>& GeneratedPlan,
+		const USP_PlanGenInfos* PlanGenInfos) const override;
+	bool PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+	bool ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
 
 	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
-	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
+	USP_MoveToTask(const FObjectInitializer& ObjectInitializer);
 };
 
 /** Task info implementation for USP_MoveToTask. */

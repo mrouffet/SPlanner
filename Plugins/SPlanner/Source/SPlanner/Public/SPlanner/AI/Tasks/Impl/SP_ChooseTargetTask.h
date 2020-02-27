@@ -84,14 +84,18 @@ protected:
 	float DebugDrawTime = 2.0f;
 #endif
 
+	bool PreCondition_Implementation(const USP_PlannerComponent* Planner,
+		const TArray<USP_ActionStep*>& GeneratedPlan,
+		const USP_PlanGenInfos* PlanGenInfos) const override;
+	bool PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+	bool ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+
 #if WITH_EDITOR
 	void DrawDebug(const USP_AIPlannerComponent* Planner, const FVector& TargetLocation);
 #endif
 
 public:
-	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
-	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
-
+	/** Get the FOV center using Pawn and LocalOffset. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
 	FVector GetFOVCenter(const APawn* Pawn) const;
 };

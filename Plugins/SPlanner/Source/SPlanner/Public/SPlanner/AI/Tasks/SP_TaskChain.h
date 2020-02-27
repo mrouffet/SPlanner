@@ -26,14 +26,18 @@ protected:
 	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
-public:
-	USP_TaskInfos* InstantiateInfos() override;
-
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
-	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
+	bool PreCondition_Implementation(const USP_PlannerComponent* Planner,
+		const TArray<USP_ActionStep*>& GeneratedPlan,
+		const USP_PlanGenInfos* PlanGenInfos) const override;
 
 	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
-	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
+	bool PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+
+	bool ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+
+public:
+	USP_TaskChain(const FObjectInitializer& ObjectInitializer);
 };
 
 

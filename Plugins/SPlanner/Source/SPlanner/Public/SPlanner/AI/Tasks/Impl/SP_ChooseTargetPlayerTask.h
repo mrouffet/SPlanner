@@ -14,8 +14,8 @@ class SPLANNER_API USP_ChooseTargetPlayerTask : public USP_ChooseTargetTask
 	GENERATED_BODY()
 
 protected:
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	bool PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+	bool ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
 
-public:
-	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 };

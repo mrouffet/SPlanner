@@ -29,6 +29,12 @@ protected:
 	// Allow TaskChain to call OnNotify().
 	friend class USP_TaskChain;
 
+	/**
+	*	The task infos class to instantiate.
+	*	Value set in constructor in children implementations.
+	*/
+	TSubclassOf<USP_TaskInfos> TaskInfosClass;
+
 	/** The cooldown of this task. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Cooldown")
 	FSP_FloatParam Cooldown;
@@ -83,6 +89,12 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, DisplayName = "End", Category = "SPlanner|Action|Task")
 	bool End_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
+	bool PreCondition_Implementation(const USP_PlannerComponent* Planner,
+		const TArray<USP_ActionStep*>& GeneratedPlan,
+		const USP_PlanGenInfos* PlanGenInfos) const override;
+	bool PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+	bool ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+
 public:
 	USP_Task(const FObjectInitializer& ObjectInitializer);
 
@@ -93,9 +105,7 @@ public:
 	float GetCooldown(float LODLevel = -1.0f) const;
 
 	/** Instantiate the TaskInfos for this task. */
-	virtual USP_TaskInfos* InstantiateInfos();
-
-	bool PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const override;
+	USP_TaskInfos* InstantiateInfos(UObject* Outer = static_cast<UObject*>(GetTransientPackage()));
 
 	/**
 	*	The tick implementation of the task.

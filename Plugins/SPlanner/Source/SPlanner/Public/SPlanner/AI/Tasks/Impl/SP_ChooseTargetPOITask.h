@@ -19,6 +19,6 @@ protected:
 	/** Set the POI target into Planner. */
 	void SetPOITarget(USP_AIPlannerComponent* Planner, USP_POIComponent* POI);
 
-public:
-	uint64 PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const override;
+	bool PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
+	bool ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const override;
 };

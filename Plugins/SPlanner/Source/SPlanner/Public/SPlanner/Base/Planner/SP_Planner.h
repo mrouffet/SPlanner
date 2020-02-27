@@ -6,6 +6,7 @@
 
 class USP_ActionStep;
 class USP_PlannerComponent;
+class USP_PlanGenInfos;
 
 /** Planner algorithms implementation. */
 class SPLANNER_API SP_Planner
@@ -17,9 +18,11 @@ public:
 	*/
 	struct FSP_LinearConstructInfos
 	{
-		const USP_PlannerComponent& Planner;
+		const USP_PlannerComponent* Planner;
 		FSP_PlannerActionSet& PlannerActions;
 		TArray<USP_ActionStep*>& OutPlan;
+
+		USP_PlanGenInfos* PlanGenInfos = nullptr;
 		uint8 MaxDepth = 7u;
 		float LODLevel = -1.0f;
 	};
@@ -29,7 +32,7 @@ public:
 
 private:
 	/** Internal implementation of LinearConstruct. */
-	static bool LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8 CurrDepth, uint64 PlannerFlags);
+	static bool LinearConstruct_Internal(FSP_LinearConstructInfos& Infos, uint8 CurrDepth);
 
 	/**
 	*	Update planner action set using action generation type.

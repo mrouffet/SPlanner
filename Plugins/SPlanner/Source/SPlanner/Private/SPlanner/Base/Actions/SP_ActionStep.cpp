@@ -4,8 +4,15 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-bool USP_ActionStep::PreCondition(const USP_PlannerComponent& Planner, const TArray<USP_ActionStep*>& GeneratedPlan, uint64 PlannerFlags) const
+#include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
+
+bool USP_ActionStep::PreCondition_Implementation(const USP_PlannerComponent* Planner,
+	const TArray<USP_ActionStep*>& GeneratedPlan,
+	const USP_PlanGenInfos* PlanGenInfos) const
 {
+	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(PlanGenInfos, false)
+
 	if(PreviousRequieredSteps.Num())
 	{
 		if (bUseRequiredStepOrder)
@@ -34,7 +41,18 @@ bool USP_ActionStep::PreCondition(const USP_PlannerComponent& Planner, const TAr
 
 	return true;
 }
-uint64 USP_ActionStep::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_ActionStep::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	return PlannerFlags;
+	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(PlanGenInfos, false)
+
+	return true;
+}
+
+bool USP_ActionStep::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(PlanGenInfos, false)
+
+	return true;
 }

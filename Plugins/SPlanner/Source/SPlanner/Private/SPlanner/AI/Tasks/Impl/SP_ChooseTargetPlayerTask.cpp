@@ -5,21 +5,38 @@
 #include <GameFramework/PlayerState.h>
 #include <GameFramework/GameStateBase.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerFlags.h>
+#include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 #include <SPlanner/AI/Target/SP_Target.h>
 
-uint64 USP_ChooseTargetPlayerTask::PostCondition(const USP_PlannerComponent& Planner, uint64 PlannerFlags) const
+bool USP_ChooseTargetPlayerTask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
 {
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlannerFlags)
+	SP_ACTION_STEP_SUPER_POSTCONDITION(Planner, PlanGenInfos)
 
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetActor);
-	SP_ADD_FLAG(PlannerFlags, ESP_AIPlannerFlags::PF_TargetPlayer);
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	return PlannerFlags;
+	AIPlanGenInfos->AddBlackboardFlags(TargetEntryName,
+		ESP_AIBBPlanGenFlags::PG_TargetActor,
+		ESP_AIBBPlanGenFlags::PG_TargetPlayer);
+
+	return true;
+}
+bool USP_ChooseTargetPlayerTask::ResetPostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
+{
+	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Planner, PlanGenInfos)
+
+	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
+	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
+
+	AIPlanGenInfos->RemoveBlackboardFlags(TargetEntryName,
+		ESP_AIBBPlanGenFlags::PG_TargetActor,
+		ESP_AIBBPlanGenFlags::PG_TargetPlayer);
+
+	return true;
 }
 
 ESP_PlanExecutionState USP_ChooseTargetPlayerTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)

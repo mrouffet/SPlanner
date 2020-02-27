@@ -357,7 +357,7 @@ void USP_PlannerComponent::ConstructPlan()
 	NewPlan.Reserve(MaxDepth);
 
 	// Planner Computation.
-	if (ConstructPlan_Internal(PlannerActions, NewPlan, MaxDepth, LODLevel))
+	if (ConstructPlan_Internal(PlannerActions, NewPlan, NewObject<USP_PlanGenInfos>(this, PlanGenInfosClass), MaxDepth, LODLevel))
 	{
 		// Plan still being computed by this thread (not cancelled with AskNewPlan or SetNewGoal on main thread).
 		if(PlanState == ESP_PlanState::PS_Computing)
@@ -366,7 +366,11 @@ void USP_PlannerComponent::ConstructPlan()
 	else // No plan found.
 		OnPlanConstructionFailed(ESP_PlanError::PE_CantBeAchieved);
 }
-bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, uint8 MaxDepth, float LODLevel) const
+bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions,
+	TArray<USP_ActionStep*>& OutPlan,
+	USP_PlanGenInfos* PlanGenInfos,
+	uint8 MaxDepth,
+	float LODLevel) const
 {
 	// Must be overridden in children.
 
