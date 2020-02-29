@@ -9,7 +9,7 @@
 *	Implementation of structure infos for plan generation.
 */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Planner")
-class USP_PlanGenInfos : public UObject
+class SPLANNER_API USP_PlanGenInfos : public UObject
 {
 	GENERATED_BODY()
 

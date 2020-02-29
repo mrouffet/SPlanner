@@ -13,7 +13,7 @@
 *	AI specialization of structure infos for plan generation.
 */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Planner|AI")
-class USP_AIPlanGenInfos : public USP_PlanGenInfos
+class SPLANNER_API USP_AIPlanGenInfos : public USP_PlanGenInfos
 {
 	GENERATED_BODY()
 
