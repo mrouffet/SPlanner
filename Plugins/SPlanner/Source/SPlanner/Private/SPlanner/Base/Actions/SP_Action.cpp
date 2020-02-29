@@ -6,4 +6,6 @@ FSP_Action::FSP_Action()
 {
 	// Default weight is 1.0f.
 	Weight.Default = 1.0f;
+
+	WeightMultiplier.GetRichCurve()->AddKey(0.0f, 1.0f);
 }

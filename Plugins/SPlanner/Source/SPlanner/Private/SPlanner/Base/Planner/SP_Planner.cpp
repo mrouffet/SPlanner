@@ -106,7 +106,7 @@ uint64 SP_Planner::UpdateSet(FSP_LinearConstructInfos& Infos, const FSP_PlannerA
 	}
 	case ESP_ActionGenerationType::AGT_RandomWeight:
 	{
-		FSP_PlannerAction NewAction = FSP_PlannerAction::Make(Action.Handle, Infos.LODLevel, Action.bAchievePlan);
+		FSP_PlannerAction NewAction = FSP_PlannerAction::Make(Action, Infos.LODLevel);
 		ActionKey = reinterpret_cast<uint64&>(NewAction.GeneratedWeight); // Store generated weight.
 
 		Infos.PlannerActions.Actions.Add(NewAction);

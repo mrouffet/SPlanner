@@ -23,5 +23,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	FSP_FloatParam Weight;
 
+	/**
+	*	The weight multiplier to apply over times added to plan.
+	*	Require GenerationType == ESP_ActionGenerationType::AGT_RandomWeight.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner", meta = (EditCondition	= "GenerationType == ESP_ActionGenerationType::AGT_RandomWeight"))
+	FRuntimeFloatCurve WeightMultiplier;
+
 	FSP_Action();
 };

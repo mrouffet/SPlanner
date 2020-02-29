@@ -30,6 +30,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
 	bool bIsForced = false;
 
+	/**
+	*	Number of time this Action has been added to the plan.
+	*	Used for Handle->GenerationType == ESP_ActionGenerationType::AGT_RandomWeight.
+	*/
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner")
+	int TimesNumInPlan = 0;
+
 	/** Create PlannerAction with random GeneratedWeight. */
 	static FSP_PlannerAction Make(const FSP_Action* Action, float LODLevel, bool bInAchievePlan = false, bool bInIsForced = false);
+
+	/** Create PlannerAction from an other with random GeneratedWeight. */
+	static FSP_PlannerAction Make(const FSP_PlannerAction& Other, float LODLevel);
 };
