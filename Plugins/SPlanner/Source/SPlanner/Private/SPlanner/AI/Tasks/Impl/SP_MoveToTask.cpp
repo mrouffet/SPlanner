@@ -395,7 +395,7 @@ bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner
 
 	if (Infos->ExecutionState == ESP_PlanExecutionState::PES_Running && Infos->Controller)
 	{
-		if(bStopMovementOnCancel)
+		if(bStopMovementOnCancel || Infos->bForcedEnd) // Always stop when task get forced cancelled (Controller Freeze).
 			Infos->Controller->StopMovement(); // Call ReceiveMoveCompleted.
 		else
 		{

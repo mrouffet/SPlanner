@@ -51,6 +51,11 @@ void ASP_AIController::Freeze(float Time)
 	SP_CHECK_NULLPTR(Planner)
 
 	SetActorTickEnabled(false);
+
+	// Cancel current executed plan task.
+	if (Planner->IsComponentTickEnabled())
+		Planner->CancelPlan();
+	
 	Planner->SetComponentTickEnabled(false);
 
 	if (Time > 0.0f)

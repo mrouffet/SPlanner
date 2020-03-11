@@ -26,9 +26,11 @@ protected:
 	static ASP_Director* Instance;
 
 	/** Registered active planners. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Director")
 	TArray<USP_PlannerComponent*> ActivePlanners;
 
 	/** Registered inactive planners. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Director")
 	TArray<USP_PlannerComponent*> InactivePlanners;
 
 	/** Registered active goals. */
