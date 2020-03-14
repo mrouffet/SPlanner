@@ -31,8 +31,12 @@ USP_AIPlannerComponent* ASP_AIController::GetPlanner() const
 
 void ASP_AIController::SetEnableBehavior(bool bEnable)
 {
+	// Unfreeze for next enable.
+	if (!bEnable && IsFrozen())
+		UnFreeze();
+
 	// Already in good state.
-	if (IsActorTickEnabled() == bEnable)
+	if (bEnable == IsActorTickEnabled())
 		return;
 
 	Planner->SetEnableBehavior(bEnable);
@@ -63,7 +67,11 @@ void ASP_AIController::Freeze(float Time)
 }
 void ASP_AIController::UnFreeze()
 {
-	SP_CHECK(IsFrozen(), "Try to UnFreeze a non-frozen planner.")
+	if (!IsFrozen())
+	{
+		SP_LOG(Warning, "Try to UnFreeze a non-frozen planner.")
+		return;
+	}
 
 	GetWorld()->GetTimerManager().ClearTimer(FrozenTimer);
 
