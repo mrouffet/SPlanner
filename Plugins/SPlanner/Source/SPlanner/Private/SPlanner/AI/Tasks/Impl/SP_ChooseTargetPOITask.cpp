@@ -32,9 +32,7 @@ bool USP_ChooseTargetPOITask::PostCondition_Implementation(const USP_PlannerComp
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->AddBlackboardFlags(TargetEntryName,
-		ESP_AIBBPlanGenFlags::PG_TargetPOI,
-		ESP_AIBBPlanGenFlags::PG_TargetActor);
+	AIPlanGenInfos->AddBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPOI);
 
 	return true;
 }
@@ -45,9 +43,7 @@ bool USP_ChooseTargetPOITask::ResetPostCondition_Implementation(const USP_Planne
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->RemoveBlackboardFlags(TargetEntryName,
-		ESP_AIBBPlanGenFlags::PG_TargetPOI,
-		ESP_AIBBPlanGenFlags::PG_TargetActor);
+	AIPlanGenInfos->RemoveBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPOI);
 
 	return true;
 }

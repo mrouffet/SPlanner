@@ -20,113 +20,6 @@ FVector USP_ChooseTargetTask::GetFOVCenter(const APawn* Pawn) const
 	return Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset);
 }
 
-bool USP_ChooseTargetTask::Predicate_Implementation(const USP_AIPlannerComponent* Planner, const AActor* Actor) const
-{
-	SP_RCHECK_NULLPTR(Actor, false)
-	SP_RCHECK_NULLPTR(Planner, false)
-
-	APawn* const Pawn = Planner->GetPawn();
-	SP_RCHECK_NULLPTR(Pawn, false)
-
-	FVector FOVCenter = Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset);
-	FVector FOVMinHalfDimensions = Pawn->GetActorRotation().RotateVector(MinHalfDimensions);
-	FVector FOVMaxHalfDimensions = Pawn->GetActorRotation().RotateVector(MaxHalfDimensions);
-
-	FVector FOVToTarget = Actor->GetActorLocation() - FOVCenter;
-
-	// Out of X bound.
-	if((MinHalfDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) < FOVMinHalfDimensions.X) ||
-		(MaxHalfDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) > FOVMaxHalfDimensions.X))
-		return false;
-
-	// Out of Y bound.
-	if ((MinHalfDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) < FOVMinHalfDimensions.Y) ||
-		(MaxHalfDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) > FOVMaxHalfDimensions.Y))
-		return false;
-
-	// Out of Z bound.
-	if ((MinHalfDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) < FOVMinHalfDimensions.Z) ||
-		(MaxHalfDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) > FOVMaxHalfDimensions.Z))
-		return false;
-
-	if (bTargetVisible)
-	{
-		FHitResult HitInfos;
-		FCollisionQueryParams Params;
-
-		Params.AddIgnoredActor(Pawn);
-		Params.AddIgnoredActor(Actor);
-
-		return !Planner->GetWorld()->LineTraceSingleByChannel(HitInfos,
-			FOVCenter,
-			Actor->GetActorLocation(),
-			ECollisionChannel::ECC_Visibility,
-			Params);
-	}
-
-	return true;
-}
-AActor* USP_ChooseTargetTask::Choose_Implementation(const USP_AIPlannerComponent* Planner, const TArray<AActor*>& Actors)
-{
-	SP_RCHECK_NULLPTR(Planner, nullptr)
-
-	switch (Method)
-	{
-	case ESP_ChooseTargetMethod::CTM_Nearest:
-	{
-		float ClosestSqrDist = FLT_MAX;
-		AActor* Target = nullptr;
-		FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
-
-		for (int i = 0; i < Actors.Num(); ++i)
-		{
-			SP_CCHECK_NULLPTR(Actors[i])
-
-			float SqrDist = FVector::DistSquared(PlannerLocation, Actors[i]->GetActorLocation());
-
-			if (SqrDist < ClosestSqrDist)
-			{
-				SqrDist = ClosestSqrDist;
-				Target = Actors[i];
-			}
-		}
-
-		return Target;
-	}
-	case ESP_ChooseTargetMethod::CTM_Furthest:
-	{
-		float FurthestSqrDist = FLT_MAX;
-		AActor* Target = nullptr;
-		FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
-
-		for (int i = 0; i < Actors.Num(); ++i)
-		{
-			SP_CCHECK_NULLPTR(Actors[i])
-
-			float SqrDist = FVector::DistSquared(PlannerLocation, Actors[i]->GetActorLocation());
-
-			if (SqrDist > FurthestSqrDist)
-			{
-				SqrDist = FurthestSqrDist;
-				Target = Actors[i];
-			}
-		}
-
-		return Target;
-	}
-	default:
-		SP_LOG(Warning, "ChooseTargetMethod not supported yet!")
-	case ESP_ChooseTargetMethod::CTM_Random:
-	{
-		// Empty Targets.
-		if (!Actors.Num())
-			return nullptr;
-
-		return Actors[FMath::RandRange(0, Actors.Num() - 1)];
-	}
-	}
-}
-
 bool USP_ChooseTargetTask::PreCondition_Implementation(const USP_PlannerComponent* Planner,
 	const TArray<USP_ActionStep*>& GeneratedPlan,
 	const USP_PlanGenInfos* PlanGenInfos) const
@@ -187,17 +80,17 @@ void USP_ChooseTargetTask::DrawDebug(const USP_AIPlannerComponent* Planner, cons
 
 	SP_IF_TASK_EXECUTE(Planner)
 	{
-		if(MinHalfDimensions.X > 0.0f && MinHalfDimensions.Y > 0.0f && MinHalfDimensions.Z > 0.0f)
+		if(MinDimensions.X > 0.0f && MinDimensions.Y > 0.0f && MinDimensions.Z > 0.0f)
 			DrawDebugBox(Pawn->GetWorld(),
 				FOVCenter,
-				MinHalfDimensions * 2.0f,
+				MinDimensions,
 				MinFOVDebugColor, false,
 				DebugDrawTime);
 
-		if (MaxHalfDimensions.X > 0.0f && MaxHalfDimensions.Y > 0.0f && MaxHalfDimensions.Z > 0.0f)
+		if (MaxDimensions.X > 0.0f && MaxDimensions.Y > 0.0f && MaxDimensions.Z > 0.0f)
 			DrawDebugBox(Pawn->GetWorld(),
 				FOVCenter,
-				MaxHalfDimensions * 2.0f,
+				MaxDimensions,
 				MaxFOVDebugColor, false,
 				DebugDrawTime);
 

@@ -5,20 +5,6 @@
 #include <SPlanner/AI/Tasks/SP_Task.h>
 #include "SP_ChooseTargetTask.generated.h"
 
-/** The method to use to choose a target. */
-UENUM(BlueprintType)
-enum class ESP_ChooseTargetMethod : uint8
-{
-	/** Target the nearest. */
-	CTM_Nearest				UMETA(DisplayName = "Nearest"),
-
-	/** Target the furthest. */
-	CTM_Furthest			UMETA(DisplayName = "Furthest"),
-
-	/** Target random. */
-	CTM_Random				UMETA(DisplayName = "Random")
-};
-
 /**
  *	Base implementation of ChooseTarget task.
  */
@@ -40,10 +26,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bTargetVisible = true;
 
-	/** The method of selection of Target from list. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	ESP_ChooseTargetMethod Method = ESP_ChooseTargetMethod::CTM_Nearest;
-
 	/** Local offset to apply to the center of the field of view. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	FVector LocalOffset = FVector::ZeroVector;
@@ -53,22 +35,14 @@ protected:
 	*	Set < 0.0f for unlimited bound.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	FVector MinHalfDimensions = FVector(-1.0f, -1.0f, -1.0f);
+	FVector MinDimensions = FVector(-1.0f, -1.0f, -1.0f);
 
 	/**
 	*	Dimensions of maximum field of view.
 	*	Set < 0.0f for unlimited bound.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	FVector MaxHalfDimensions = FVector(-1.0f, -1.0f, -1.0f);
-
-	/** Predicate to validate to choose an Actor. */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Action|Task|Target")
-	bool Predicate(const USP_AIPlannerComponent* Planner, const AActor* Actor) const;
-
-	/** Choose target from list using Method. */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Action|Task|Target")
-	AActor* Choose(const USP_AIPlannerComponent* Planner, const TArray<AActor*>& Actors);
+	FVector MaxDimensions = FVector(-1.0f, -1.0f, -1.0f);
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")

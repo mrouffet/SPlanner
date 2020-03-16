@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Tasks/Impl/SP_ChooseTargetTask.h>
+#include <SPlanner/AI/Tasks/Impl/SP_ChooseTargetActorTask.h>
 #include "SP_ChooseTargetPlayerTask.generated.h"
 
 /**
  *	Target nearest player task implementation.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Target")
-class SPLANNER_API USP_ChooseTargetPlayerTask : public USP_ChooseTargetTask
+class SPLANNER_API USP_ChooseTargetPlayerTask : public USP_ChooseTargetActorTask
 {
 	GENERATED_BODY()
 

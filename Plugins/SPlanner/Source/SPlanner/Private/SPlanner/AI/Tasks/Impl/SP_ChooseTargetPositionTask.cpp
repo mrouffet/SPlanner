@@ -12,8 +12,9 @@
 
 USP_ChooseTargetPositionTask::USP_ChooseTargetPositionTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	// Default dimensions > 0.0f.
-	MaxHalfDimensions = FVector(100.0f, 100.0f, 100.0f);
+	// Default dimensions.
+	MinDimensions = FVector(0.0f, 0.0f, 0.0f);
+	MaxDimensions = FVector(100.0f, 100.0f, 100.0f);
 }
 
 ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
@@ -23,12 +24,14 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementatio
 	const APawn* const Pawn = Planner->GetPawn();
 	SP_RCHECK_NULLPTR(Pawn, ESP_PlanExecutionState::PES_Failed)
 
-	FVector FOVCenter = GetFOVCenter(Pawn);
+	const FVector FOVCenter = GetFOVCenter(Pawn);
 
 	// Random position with character's Z (only use XY).
 	FVector TargetPosition = FOVCenter;
-	TargetPosition.X = FMath::RandRange(MinHalfDimensions.X, MaxHalfDimensions.X) * (FMath::RandBool() ? 1.0f : -1.0f);
-	TargetPosition.Y = FMath::RandRange(MinHalfDimensions.Y, MaxHalfDimensions.Y) * (FMath::RandBool() ? 1.0f : -1.0f);
+
+	TargetPosition.X += FMath::RandRange(MinDimensions.X, MaxDimensions.X) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.Y += FMath::RandRange(MinDimensions.Y, MaxDimensions.Y) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.Z += FMath::RandRange(MinDimensions.Z, MaxDimensions.Z) * (FMath::RandBool() ? 1.0f : -1.0f);
 
 	// Check visibility.
 	if (bTargetVisible)
