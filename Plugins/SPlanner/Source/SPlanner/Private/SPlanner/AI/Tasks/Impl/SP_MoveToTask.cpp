@@ -384,7 +384,7 @@ bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner
 	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
 	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
 
-	if (PawnSpeed > 0.0f)
+	if (PawnSpeed >= 0.0f && Infos->PrevPawnSpeed >= 0.0f)
 	{
 		APawn* const AIPawn = Planner->GetPawn();
 		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
