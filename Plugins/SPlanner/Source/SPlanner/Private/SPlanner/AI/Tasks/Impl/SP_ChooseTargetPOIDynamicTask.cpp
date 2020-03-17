@@ -8,7 +8,7 @@
 USP_ChooseTargetPOIDynamicTask::USP_ChooseTargetPOIDynamicTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Default dimensions > 0.0f.
-	MaxDimensions = FVector(100.0f, 100.0f, 100.0f);
+	MaxLocalExtent = FVector(100.0f, 100.0f, 100.0f);
 }
 
 bool USP_ChooseTargetPOIDynamicTask::PredicatePOI_Implementation(const USP_AIPlannerComponent* Planner, const USP_POIComponent* POI) const
@@ -42,7 +42,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOIDynamicTask::Tick_Internal_Implementat
 		FOVCenter + FVector(0.0f, 0.0f, 0.1f),
 		Pawn->GetActorRotation().Quaternion(),
 		ECollisionChannel::ECC_Pawn,
-		FCollisionShape::MakeBox(MaxDimensions / 2.0f),
+		FCollisionShape::MakeBox(MaxLocalExtent / 2.0f),
 		QParams
 	);
 

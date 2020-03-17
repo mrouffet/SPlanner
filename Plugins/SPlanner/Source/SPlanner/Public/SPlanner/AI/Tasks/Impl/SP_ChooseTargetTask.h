@@ -16,7 +16,7 @@ class SPLANNER_API USP_ChooseTargetTask : public USP_Task
 protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	FName TargetEntryName = "None";
+	FName OutTargetEntryName = "None";
 
 	/** Can target again even if a previous target has been set in plan. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
@@ -26,23 +26,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bTargetVisible = true;
 
-	/** Local offset to apply to the center of the field of view. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
+	/**
+	*	Offset to apply to the center of the field of view in Pawn's local space.
+	*	Use GetFOVCenter() accessor.
+	*/
+	UPROPERTY(EditAnywhere, Category = "SPlanner|Task|Target")
 	FVector LocalOffset = FVector::ZeroVector;
 
 	/**
-	*	Dimensions of minimum field of view.
+	*	Extent of minimum (near) field of view in Pawn's local space.
 	*	Set < 0.0f for unlimited bound.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	FVector MinDimensions = FVector(-1.0f, -1.0f, -1.0f);
+	FVector MinLocalExtent = FVector(-1.0f, -1.0f, -1.0f);
 
 	/**
-	*	Dimensions of maximum field of view.
+	*	Extent of maximum (far) field of view in Pawn's local space.
 	*	Set < 0.0f for unlimited bound.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
-	FVector MaxDimensions = FVector(-1.0f, -1.0f, -1.0f);
+	FVector MaxLocalExtent = FVector(-1.0f, -1.0f, -1.0f);
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "SPlanner|DEBUG")
@@ -69,7 +72,15 @@ protected:
 #endif
 
 public:
-	/** Get the FOV center using Pawn and LocalOffset. */
+	/** Get the World FOV center using Pawn and LocalOffset. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
 	FVector GetFOVCenter(const APawn* Pawn) const;
+
+	/** Get the World FOV min extent using MinLocalExtent. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
+	FVector GetFOVMinExtent(const APawn* Pawn) const;
+
+	/** Get the World FOV min extent using MaxLocalExtent. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
+	FVector GetFOVMaxExtent(const APawn* Pawn) const;
 };

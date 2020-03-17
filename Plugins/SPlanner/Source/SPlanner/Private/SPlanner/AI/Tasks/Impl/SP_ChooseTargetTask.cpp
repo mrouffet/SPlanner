@@ -4,6 +4,7 @@
 
 #if SP_DEBUG
 	#include <DrawDebugHelpers.h>
+	#include <Kismet/KismetSystemLibrary.h>
 #endif
 
 #include <SPlanner/AI/Target/SP_Target.h>
@@ -20,6 +21,19 @@ FVector USP_ChooseTargetTask::GetFOVCenter(const APawn* Pawn) const
 	return Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(LocalOffset);
 }
 
+FVector USP_ChooseTargetTask::GetFOVMinExtent(const APawn* Pawn) const
+{
+	SP_RCHECK_NULLPTR(Pawn, FVector::ZeroVector)
+
+	return Pawn->GetActorRotation().RotateVector(MinLocalExtent);
+}
+FVector USP_ChooseTargetTask::GetFOVMaxExtent(const APawn* Pawn) const
+{
+	SP_RCHECK_NULLPTR(Pawn, FVector::ZeroVector)
+
+	return Pawn->GetActorRotation().RotateVector(MaxLocalExtent);
+}
+
 bool USP_ChooseTargetTask::PreCondition_Implementation(const USP_PlannerComponent* Planner,
 	const TArray<USP_ActionStep*>& GeneratedPlan,
 	const USP_PlanGenInfos* PlanGenInfos) const
@@ -31,14 +45,14 @@ bool USP_ChooseTargetTask::PreCondition_Implementation(const USP_PlannerComponen
 	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
-	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
-	SP_RCHECK_NULLPTR(Target, false)
+	USP_Target* const OutTarget = Blackboard->GetObject<USP_Target>(OutTargetEntryName);
+	SP_RCHECK_NULLPTR(OutTarget, false)
 #endif
 
 	const USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 
 	// Not already re-targeted.
-	if(!bAllowReTarget && AIPlanGenInfos->IsBlackboardFlagSet(TargetEntryName, ESP_AIBBPlanGenFlags::PG_Dirty))
+	if(!bAllowReTarget && AIPlanGenInfos->IsBlackboardFlagSet(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_Dirty))
 		return false;
 
 	return true;
@@ -50,7 +64,7 @@ bool USP_ChooseTargetTask::PostCondition_Implementation(const USP_PlannerCompone
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->AddBlackboardFlags(TargetEntryName,
+	AIPlanGenInfos->AddBlackboardFlags(OutTargetEntryName,
 		ESP_AIBBPlanGenFlags::PG_Dirty,
 		ESP_AIBBPlanGenFlags::PG_TargetPosition);
 
@@ -63,7 +77,7 @@ bool USP_ChooseTargetTask::ResetPostCondition_Implementation(const USP_PlannerCo
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->RemoveBlackboardFlags(TargetEntryName,
+	AIPlanGenInfos->RemoveBlackboardFlags(OutTargetEntryName,
 		ESP_AIBBPlanGenFlags::PG_Dirty,
 		ESP_AIBBPlanGenFlags::PG_TargetPosition);
 
@@ -80,18 +94,18 @@ void USP_ChooseTargetTask::DrawDebug(const USP_AIPlannerComponent* Planner, cons
 
 	SP_IF_TASK_EXECUTE(Planner)
 	{
-		if(MinDimensions.X > 0.0f && MinDimensions.Y > 0.0f && MinDimensions.Z > 0.0f)
-			DrawDebugBox(Pawn->GetWorld(),
+		if(MinLocalExtent.X > 0.0f && MinLocalExtent.Y > 0.0f && MinLocalExtent.Z > 0.0f)
+			UKismetSystemLibrary::DrawDebugBox(Pawn->GetWorld(),
 				FOVCenter,
-				MinDimensions,
-				MinFOVDebugColor, false,
+				MinLocalExtent,
+				MinFOVDebugColor, Pawn->GetActorRotation(),
 				DebugDrawTime);
 
-		if (MaxDimensions.X > 0.0f && MaxDimensions.Y > 0.0f && MaxDimensions.Z > 0.0f)
-			DrawDebugBox(Pawn->GetWorld(),
+		if (MaxLocalExtent.X > 0.0f && MaxLocalExtent.Y > 0.0f && MaxLocalExtent.Z > 0.0f)
+			UKismetSystemLibrary::DrawDebugBox(Pawn->GetWorld(),
 				FOVCenter,
-				MaxDimensions,
-				MaxFOVDebugColor, false,
+				MaxLocalExtent,
+				MaxFOVDebugColor, Pawn->GetActorRotation(),
 				DebugDrawTime);
 
 		DrawDebugLine(Pawn->GetWorld(),

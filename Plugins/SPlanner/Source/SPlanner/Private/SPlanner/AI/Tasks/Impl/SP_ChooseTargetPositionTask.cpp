@@ -13,8 +13,8 @@
 USP_ChooseTargetPositionTask::USP_ChooseTargetPositionTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Default dimensions.
-	MinDimensions = FVector(0.0f, 0.0f, 0.0f);
-	MaxDimensions = FVector(100.0f, 100.0f, 100.0f);
+	MinLocalExtent = FVector(0.0f, 0.0f, 0.0f);
+	MaxLocalExtent = FVector(100.0f, 100.0f, 100.0f);
 }
 
 ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
@@ -28,10 +28,12 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementatio
 
 	// Random position with character's Z (only use XY).
 	FVector TargetPosition = FOVCenter;
+	FVector FOVMinExtent = GetFOVMinExtent(Pawn);
+	FVector FOVMaxExtent = GetFOVMaxExtent(Pawn);
 
-	TargetPosition.X += FMath::RandRange(MinDimensions.X, MaxDimensions.X) * (FMath::RandBool() ? 1.0f : -1.0f);
-	TargetPosition.Y += FMath::RandRange(MinDimensions.Y, MaxDimensions.Y) * (FMath::RandBool() ? 1.0f : -1.0f);
-	TargetPosition.Z += FMath::RandRange(MinDimensions.Z, MaxDimensions.Z) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.X += FMath::RandRange(FOVMinExtent.X, FOVMaxExtent.X) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.Y += FMath::RandRange(FOVMinExtent.Y, FOVMaxExtent.Y) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.Z += FMath::RandRange(FOVMinExtent.Z, FOVMaxExtent.Z) * (FMath::RandBool() ? 1.0f : -1.0f);
 
 	// Check visibility.
 	if (bTargetVisible)
@@ -49,10 +51,10 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementatio
 	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
-	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
-	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
+	USP_Target* const OutTarget = Blackboard->GetObject<USP_Target>(OutTargetEntryName);
+	SP_RCHECK_NULLPTR(OutTarget, ESP_PlanExecutionState::PES_Failed)
 
-	Target->SetPosition(TargetPosition);
+	OutTarget->SetPosition(TargetPosition);
 
 #if SP_DEBUG_EDITOR
 	DrawDebug(Planner, TargetPosition);

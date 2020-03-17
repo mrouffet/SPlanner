@@ -19,10 +19,10 @@ void USP_ChooseTargetPOITask::SetPOITarget(USP_AIPlannerComponent* Planner, USP_
 	const USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_CHECK_NULLPTR(Blackboard)
 
-	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
-	SP_CHECK_NULLPTR(Target)
+	USP_Target* const OutTarget = Blackboard->GetObject<USP_Target>(OutTargetEntryName);
+	SP_CHECK_NULLPTR(OutTarget)
 
-	Target->SetPOI(POI);
+	OutTarget->SetPOI(POI);
 }
 
 bool USP_ChooseTargetPOITask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const
@@ -32,7 +32,7 @@ bool USP_ChooseTargetPOITask::PostCondition_Implementation(const USP_PlannerComp
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->AddBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPOI);
+	AIPlanGenInfos->AddBlackboardFlag(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPOI);
 
 	return true;
 }
@@ -43,7 +43,7 @@ bool USP_ChooseTargetPOITask::ResetPostCondition_Implementation(const USP_Planne
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->RemoveBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPOI);
+	AIPlanGenInfos->RemoveBlackboardFlag(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPOI);
 
 	return true;
 }

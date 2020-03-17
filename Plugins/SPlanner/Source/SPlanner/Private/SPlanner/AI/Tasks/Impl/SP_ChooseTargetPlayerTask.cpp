@@ -19,7 +19,7 @@ bool USP_ChooseTargetPlayerTask::PostCondition_Implementation(const USP_PlannerC
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->AddBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPlayer);
+	AIPlanGenInfos->AddBlackboardFlag(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPlayer);
 
 	return true;
 }
@@ -30,7 +30,7 @@ bool USP_ChooseTargetPlayerTask::ResetPostCondition_Implementation(const USP_Pla
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->RemoveBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPlayer);
+	AIPlanGenInfos->RemoveBlackboardFlag(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetPlayer);
 
 	return true;
 }
@@ -69,10 +69,10 @@ ESP_PlanExecutionState USP_ChooseTargetPlayerTask::Tick_Internal_Implementation(
 	USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
-	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
-	SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
+	USP_Target* const OutTarget = Blackboard->GetObject<USP_Target>(OutTargetEntryName);
+	SP_RCHECK_NULLPTR(OutTarget, ESP_PlanExecutionState::PES_Failed)
 
-	Target->SetPlayer(TargetPlayer);
+	OutTarget->SetPlayer(TargetPlayer);
 
 #if SP_DEBUG_EDITOR
 

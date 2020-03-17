@@ -18,24 +18,24 @@ bool USP_ChooseTargetActorTask::Predicate_Implementation(const USP_AIPlannerComp
 	SP_RCHECK_NULLPTR(Pawn, false)
 
 	FVector FOVCenter = GetFOVCenter(Pawn);
-	FVector FOVMinHalfDimensions = Pawn->GetActorRotation().RotateVector(MinDimensions / 2.0f);
-	FVector FOVMaxHalfDimensions = Pawn->GetActorRotation().RotateVector(MaxDimensions / 2.0f);
+	FVector FOVMinHalfExtent = GetFOVMinExtent(Pawn) / 2.0f;
+	FVector FOVMaxHalfExtent = GetFOVMaxExtent(Pawn) / 2.0f;
 
 	FVector FOVToTarget = Actor->GetActorLocation() - FOVCenter;
 
 	// Out of X bound.
-	if((MinDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) < FOVMinHalfDimensions.X) ||
-		(MaxDimensions.X > 0.0f && FMath::Abs(FOVToTarget.X) > FOVMaxHalfDimensions.X))
+	if((MinLocalExtent.X > 0.0f && FMath::Abs(FOVToTarget.X) < FOVMinHalfExtent.X) ||
+		(MaxLocalExtent.X > 0.0f && FMath::Abs(FOVToTarget.X) > FOVMaxHalfExtent.X))
 		return false;
 
 	// Out of Y bound.
-	if ((MinDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) < FOVMinHalfDimensions.Y) ||
-		(MaxDimensions.Y > 0.0f && FMath::Abs(FOVToTarget.Y) > FOVMaxHalfDimensions.Y))
+	if ((MinLocalExtent.Y > 0.0f && FMath::Abs(FOVToTarget.Y) < FOVMinHalfExtent.Y) ||
+		(MaxLocalExtent.Y > 0.0f && FMath::Abs(FOVToTarget.Y) > FOVMaxHalfExtent.Y))
 		return false;
 
 	// Out of Z bound.
-	if ((MinDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) < FOVMinHalfDimensions.Z) ||
-		(MaxDimensions.Z > 0.0f && FMath::Abs(FOVToTarget.Z) > FOVMaxHalfDimensions.Z))
+	if ((MinLocalExtent.Z > 0.0f && FMath::Abs(FOVToTarget.Z) < FOVMinHalfExtent.Z) ||
+		(MaxLocalExtent.Z > 0.0f && FMath::Abs(FOVToTarget.Z) > FOVMaxHalfExtent.Z))
 		return false;
 
 	if (bTargetVisible)
@@ -123,7 +123,7 @@ bool USP_ChooseTargetActorTask::PostCondition_Implementation(const USP_PlannerCo
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->AddBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetActor);
+	AIPlanGenInfos->AddBlackboardFlag(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetActor);
 
 	return true;
 }
@@ -134,7 +134,7 @@ bool USP_ChooseTargetActorTask::ResetPostCondition_Implementation(const USP_Plan
 	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(PlanGenInfos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	AIPlanGenInfos->RemoveBlackboardFlag(TargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetActor);
+	AIPlanGenInfos->RemoveBlackboardFlag(OutTargetEntryName, ESP_AIBBPlanGenFlags::PG_TargetActor);
 
 	return true;
 }
