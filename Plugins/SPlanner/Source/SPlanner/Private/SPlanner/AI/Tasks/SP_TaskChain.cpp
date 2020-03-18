@@ -112,6 +112,7 @@ bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planne
 	SP_RCHECK(Tasks[0], false, "Task[0] is nullptr!")
 
 	Infos->TaskInfos = Tasks[0]->InstantiateInfos();
+	Infos->TaskInfos->bUseNotify = false; // Task chain handle notify forwarding.
 
 	return true;
 }
@@ -140,6 +141,7 @@ ESP_PlanExecutionState USP_TaskChain::Tick_Internal_Implementation(float DeltaSe
 	// Begin next task.
 	SP_RCHECK(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed, "Task [%d] is nullptr!", Infos->Index)
 	Infos->TaskInfos = Tasks[Infos->Index]->InstantiateInfos();
+	Infos->TaskInfos->bUseNotify = false; // Task chain handle notify forwarding.
 
 	return ESP_PlanExecutionState::PES_Running;
 }

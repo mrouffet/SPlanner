@@ -30,23 +30,21 @@ float USP_Task::GetCooldown(float LODLevel) const
 void USP_Task::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
 {
 	SP_CHECK_NULLPTR(Planner)
+	SP_CHECK_NULLPTR(TaskInfos)
 
 	if (!SP_IS_FLAG_SET(NotifyMask, Notify))
 		return;
 
-	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
-	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
-
 	switch (NotifyAction)
 	{
 	case ESP_TaskNotification::TNA_TimeOut:
-		Infos->BaseExecutionState = ESP_PlanExecutionState::PES_Failed;
+		TaskInfos->BaseExecutionState = ESP_PlanExecutionState::PES_Failed;
 		break;
 	case ESP_TaskNotification::TNA_WaitForNotify:
-		Infos->BaseExecutionState = ESP_PlanExecutionState::PES_Succeed;
+		TaskInfos->BaseExecutionState = ESP_PlanExecutionState::PES_Succeed;
 		break;
 	default:
-		SP_LOG(Warning, "TaskNotification not supported yet!")
+		SP_LOG(Warning, "TaskNotification [%d] not supported yet!", static_cast<int>(NotifyAction))
 		break;
 	}
 }
@@ -68,7 +66,7 @@ void USP_Task::InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskIn
 		TaskInfos->BaseExecutionState = ESP_PlanExecutionState::PES_Running;
 		break;
 	default:
-		SP_LOG(Warning, "TaskNotification not supported yet!")
+		SP_LOG(Warning, "TaskNotification [%d] not supported yet!", static_cast<int>(NotifyAction))
 		break;
 	}
 }
@@ -113,11 +111,10 @@ bool USP_Task::ResetPostCondition_Implementation(const USP_PlannerComponent* Pla
 
 ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
 {
-	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
-	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
+	SP_RCHECK_NULLPTR(TaskInfos, ESP_PlanExecutionState::PES_Failed)
 
 	// Begin Task.
-	if (!Infos->bHasBegun && !Begin_Internal(&Planner, TaskInfos))
+	if (!TaskInfos->bHasBegun && !Begin_Internal(&Planner, TaskInfos))
 	{
 		// Begin has failed.
 		End_Internal(&Planner, TaskInfos); // Call End to uninit.
@@ -140,12 +137,11 @@ ESP_PlanExecutionState USP_Task::Tick(float DeltaSeconds, USP_AIPlannerComponent
 }
 void USP_Task::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
 {
-	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
-	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
+	SP_CHECK_NULLPTR(TaskInfos)
 
-	if (Infos->bHasBegun)
+	if (TaskInfos->bHasBegun)
 	{
-		Infos->bForcedEnd = true;
+		TaskInfos->bForcedEnd = true;
 		End_Internal(&Planner, TaskInfos);
 	}
 }
@@ -153,41 +149,37 @@ void USP_Task::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
 bool USP_Task::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
-
-	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
-	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
+	SP_RCHECK_NULLPTR(TaskInfos, false)
 
 	// Time Out.
 	float TimeOutTime = TimeOut.Get(Planner->GetLODLevel());
 
 	if (TimeOutTime > 0.0f)
-		Infos->TimeOutTime = TimeOutTime;
+		TaskInfos->TimeOutTime = TimeOutTime;
 
+	if(TaskInfos->bUseNotify)
+		InitNotify(Planner, TaskInfos);
 
-	InitNotify(Planner, Infos);
-
-	Infos->bHasBegun = true;
+	TaskInfos->bHasBegun = true;
 
 	return true;
 }
 ESP_PlanExecutionState USP_Task::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
-
-	USP_TaskInfos* const Infos = Cast<USP_TaskInfos>(TaskInfos);
-	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_TaskInfos")
+	SP_RCHECK_NULLPTR(TaskInfos, ESP_PlanExecutionState::PES_Failed)
 
 	// Time Out.
-	if (Infos->TimeOutTime > 0.0f)
+	if (TaskInfos->TimeOutTime > 0.0f)
 	{
-		Infos->CurrTimeOut += DeltaSeconds;
+		TaskInfos->CurrTimeOut += DeltaSeconds;
 
-		if (Infos->CurrTimeOut >= Infos->TimeOutTime)
+		if (TaskInfos->CurrTimeOut >= TaskInfos->TimeOutTime)
 			return ESP_PlanExecutionState::PES_Failed;
 	}
 
 
-	return Infos->BaseExecutionState;
+	return TaskInfos->BaseExecutionState;
 }
 bool USP_Task::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {

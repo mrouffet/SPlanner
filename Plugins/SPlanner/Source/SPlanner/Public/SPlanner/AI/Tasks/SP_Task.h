@@ -144,4 +144,8 @@ public:
 	/** Whether the task has been cancelled. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|Task")
 	bool bForcedEnd = false;
+
+	/** Whether the task should bind to Notify events. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SPlanner|Task")
+	bool bUseNotify = true;
 };
