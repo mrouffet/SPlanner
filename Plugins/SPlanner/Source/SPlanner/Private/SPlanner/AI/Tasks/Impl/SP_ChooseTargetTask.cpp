@@ -34,6 +34,49 @@ FVector USP_ChooseTargetTask::GetFOVMaxExtent(const APawn* Pawn) const
 	return Pawn->GetActorRotation().RotateVector(MaxLocalExtent);
 }
 
+bool USP_ChooseTargetTask::IsInBox_Internal(const APawn* Pawn, const FVector& BoxLocalExtent, const FVector& InLocation) const
+{
+	const FVector FOVCenter = GetFOVCenter(Pawn);
+	const FVector HalfLocalExtent = BoxLocalExtent / 2.0f;
+
+	// Get input location in local pawn space.
+	const FVector LocalInLocation = Pawn->GetActorRotation().UnrotateVector(InLocation);
+
+	// Valid X Bound.
+	if (BoxLocalExtent.X > 0.0f)
+	{
+		// Out of X bound.
+		if (LocalInLocation.X < FOVCenter.X - HalfLocalExtent.X || LocalInLocation.X > FOVCenter.X + HalfLocalExtent.X)
+			return false;
+	}
+
+	// Valid Y Bound.
+	if (BoxLocalExtent.Y > 0.0f)
+	{
+		// Out of Y bound.
+		if (LocalInLocation.Y < FOVCenter.Y - HalfLocalExtent.Y || LocalInLocation.Y > FOVCenter.Y + HalfLocalExtent.Y)
+			return false;
+	}
+
+	// Valid Z Bound.
+	if (BoxLocalExtent.Z > 0.0f)
+	{
+		// Out of Z bound.
+		if (LocalInLocation.Z < FOVCenter.Z - HalfLocalExtent.Z || LocalInLocation.Z > FOVCenter.Z + HalfLocalExtent.Z)
+			return false;
+	}
+
+	return true;
+}
+bool USP_ChooseTargetTask::IsInMinBox(const APawn* Pawn, const FVector& InLocation) const
+{
+	return IsInBox_Internal(Pawn, MinLocalExtent, InLocation);
+}
+bool USP_ChooseTargetTask::IsInMaxBox(const APawn* Pawn, const FVector& InLocation) const
+{
+	return IsInBox_Internal(Pawn, MaxLocalExtent, InLocation);
+}
+
 bool USP_ChooseTargetTask::PreCondition_Implementation(const USP_PlannerComponent* Planner,
 	const TArray<USP_ActionStep*>& GeneratedPlan,
 	const USP_PlanGenInfos* PlanGenInfos) const

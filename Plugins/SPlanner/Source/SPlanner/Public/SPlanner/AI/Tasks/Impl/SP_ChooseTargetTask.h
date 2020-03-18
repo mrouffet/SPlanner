@@ -61,6 +61,16 @@ protected:
 	float DebugDrawTime = 2.0f;
 #endif
 
+	bool IsInBox_Internal(const APawn* Pawn, const FVector& BoxLocalExtent, const FVector& Location) const;
+
+	/** Check whether Location is in Pawn's Min Box. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	bool IsInMinBox(const APawn* Pawn, const FVector& InLocation) const;
+
+	/** Check whether Location is in Pawn's Max Box. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	bool IsInMaxBox(const APawn* Pawn, const FVector& InLocation) const;
+
 	bool PreCondition_Implementation(const USP_PlannerComponent* Planner,
 		const TArray<USP_ActionStep*>& GeneratedPlan,
 		const USP_PlanGenInfos* PlanGenInfos) const override;

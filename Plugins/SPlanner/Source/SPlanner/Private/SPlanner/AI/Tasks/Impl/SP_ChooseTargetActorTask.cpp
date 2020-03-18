@@ -14,28 +14,12 @@ bool USP_ChooseTargetActorTask::Predicate_Implementation(const USP_AIPlannerComp
 	SP_RCHECK_NULLPTR(Actor, false)
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	APawn* const Pawn = Planner->GetPawn();
+	const APawn* const Pawn = Planner->GetPawn();
 	SP_RCHECK_NULLPTR(Pawn, false)
 
-	FVector FOVCenter = GetFOVCenter(Pawn);
-	FVector FOVMinHalfExtent = GetFOVMinExtent(Pawn) / 2.0f;
-	FVector FOVMaxHalfExtent = GetFOVMaxExtent(Pawn) / 2.0f;
+	const FVector ActorLocation = Actor->GetActorLocation();
 
-	FVector FOVToTarget = Actor->GetActorLocation() - FOVCenter;
-
-	// Out of X bound.
-	if((MinLocalExtent.X > 0.0f && FMath::Abs(FOVToTarget.X) < FOVMinHalfExtent.X) ||
-		(MaxLocalExtent.X > 0.0f && FMath::Abs(FOVToTarget.X) > FOVMaxHalfExtent.X))
-		return false;
-
-	// Out of Y bound.
-	if ((MinLocalExtent.Y > 0.0f && FMath::Abs(FOVToTarget.Y) < FOVMinHalfExtent.Y) ||
-		(MaxLocalExtent.Y > 0.0f && FMath::Abs(FOVToTarget.Y) > FOVMaxHalfExtent.Y))
-		return false;
-
-	// Out of Z bound.
-	if ((MinLocalExtent.Z > 0.0f && FMath::Abs(FOVToTarget.Z) < FOVMinHalfExtent.Z) ||
-		(MaxLocalExtent.Z > 0.0f && FMath::Abs(FOVToTarget.Z) > FOVMaxHalfExtent.Z))
+	if (IsInMinBox(Pawn, ActorLocation) || !IsInMaxBox(Pawn, ActorLocation))
 		return false;
 
 	if (bTargetVisible)
@@ -47,7 +31,7 @@ bool USP_ChooseTargetActorTask::Predicate_Implementation(const USP_AIPlannerComp
 		Params.AddIgnoredActor(Actor);
 
 		return !Planner->GetWorld()->LineTraceSingleByChannel(HitInfos,
-			FOVCenter,
+			GetFOVCenter(Pawn),
 			Actor->GetActorLocation(),
 			ECollisionChannel::ECC_Visibility,
 			Params);
