@@ -55,12 +55,11 @@ void ASP_AIController::Freeze(float Time)
 	SP_CHECK_NULLPTR(Planner)
 
 	SetActorTickEnabled(false);
+	Planner->SetComponentTickEnabled(false); // Call before CancelPlan to allow IsFrozen() check.
 
 	// Cancel current executed plan task.
 	if (Planner->IsComponentTickEnabled())
 		Planner->CancelPlan();
-	
-	Planner->SetComponentTickEnabled(false);
 
 	if (Time > 0.0f)
 		GetWorld()->GetTimerManager().SetTimer(FrozenTimer, this, &ASP_AIController::UnFreeze, Time, false);
