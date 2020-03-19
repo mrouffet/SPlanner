@@ -15,7 +15,7 @@ class USP_AIBlackboardKey_Bool : public USP_AIBlackboardKey
 
 protected:
 	/** Handled value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	bool Handle = false;
 
 public:

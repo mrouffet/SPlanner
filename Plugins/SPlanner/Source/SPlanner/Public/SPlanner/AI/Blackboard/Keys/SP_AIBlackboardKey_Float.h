@@ -15,7 +15,7 @@ class USP_AIBlackboardKey_Float : public USP_AIBlackboardKey
 
 protected:
 	/** Handled value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	float Handle = 0.0f;
 
 public:

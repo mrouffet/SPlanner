@@ -15,7 +15,7 @@ class USP_AIBlackboardKey_Vector : public USP_AIBlackboardKey
 
 protected:
 	/** Handled value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	FVector Handle;
 
 public:

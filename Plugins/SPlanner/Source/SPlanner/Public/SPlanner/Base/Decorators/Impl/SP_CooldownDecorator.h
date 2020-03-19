@@ -17,11 +17,11 @@ class SPLANNER_API USP_CooldownDecorator : public USP_Decorator
 	
 protected:
 	/** The cooldown to apply. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Cooldown")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	FSP_FloatParam Cooldown;
 
 	/** Should use cooldown even if the task has failed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Cooldown")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	bool bUseCooldownOnFailed = true;
 
 	/**

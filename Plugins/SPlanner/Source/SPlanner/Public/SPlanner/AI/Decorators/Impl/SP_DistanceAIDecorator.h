@@ -16,21 +16,21 @@ class SPLANNER_API USP_DistanceAIDecorator : public USP_AIDecorator
 	
 protected:
 	/** The entry name to access Target object in Blackboard. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Dist")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	FName TargetEntryName = "None";
 
 	/**
 	*	The minimum distance (near) to check with Target object.
 	*	Use < 0.0f for no check.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Dist")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	float MinDistance = 10.0f;
 
 	/**
 	*	The maximum distance (far) to check with Target object.
 	*	Use < 0.0f for no check.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Dist")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	float MaxDistance = 100.0f;
 
 	/** Internal implementation of Validate. */

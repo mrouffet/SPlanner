@@ -5,7 +5,7 @@
 #include <UObject/Object.h>
 #include "SP_AIBlackboardObject.generated.h"
 
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Blackboard")
+UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Blackboard")
 class SPLANNER_API USP_AIBlackboardObject : public UObject
 {
 	GENERATED_BODY()

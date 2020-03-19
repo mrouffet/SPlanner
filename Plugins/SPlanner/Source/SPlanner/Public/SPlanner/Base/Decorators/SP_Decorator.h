@@ -21,7 +21,7 @@ class SPLANNER_API USP_Decorator : public UObject
 	
 protected:
 	/** Whether the condition should be inverted (ie NOT condition). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	bool bInverseCondition = false;
 
 	/** Common validate implementation. */
