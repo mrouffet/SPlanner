@@ -51,20 +51,6 @@ protected:
 	float AcceptanceRadius = 10.0f;
 
 	/**
-	*	The minimum distance from MainTarget.
-	*	Set < 0.0f to disable.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	float MinDistance = -1.0f;
-
-	/**
-	*	The maximum distance from MainTarget.
-	*	Set < 0.0f to disable.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|MoveTo")
-	float MaxDistance = -1.0f;
-
-	/**
 	*	The pawn speed to set.
 	*	Set < 0.0f to disable.
 	*/

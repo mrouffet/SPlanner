@@ -184,23 +184,6 @@ bool USP_MoveToTask::PreCondition_Implementation(const USP_PlannerComponent* Pla
 	if (bTargetVisible && !IsTargetVisible(AIPlanner, Target))
 		return false;
 
-	// Check is in range.
-	if (MinDistance > 0.0f || MaxDistance > 0.0f)
-	{
-		APawn* AIPawn = AIPlanner->GetPawn();
-		SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
-
-		float TargetDistSqr = FVector::DistSquared(AIPawn->GetActorLocation(), TargetLocation);
-
-		// Min Distance range.
-		if (MinDistance > 0.0f && TargetDistSqr < MinDistance * MinDistance)
-			return !bPreconditionFailWhileAlreadyAtGoal;
-
-		// Max Distance range.
-		if (MaxDistance > 0.0f && TargetDistSqr > MaxDistance * MaxDistance)
-			return false;
-	}
-
 	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(AIPlanner, Target) : true;
 }
 bool USP_MoveToTask::PostCondition_Implementation(const USP_PlannerComponent* Planner, USP_PlanGenInfos* PlanGenInfos) const

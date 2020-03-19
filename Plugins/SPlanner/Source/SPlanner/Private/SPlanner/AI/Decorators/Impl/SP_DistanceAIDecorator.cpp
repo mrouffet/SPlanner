@@ -24,7 +24,7 @@ bool USP_DistanceAIDecorator::Validate_Internal_Implementation(const USP_Planner
 	const USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
 
-	float SqrDist = (Pawn->GetActorLocation() - Target->GetAnyPosition()).SizeSquared();
+	float SqrDist = FVector::DistSquared(Pawn->GetActorLocation(), Target->GetAnyPosition());
 
 	// Valid Min Distance.
 	if (MinDistance > 0.0f)
