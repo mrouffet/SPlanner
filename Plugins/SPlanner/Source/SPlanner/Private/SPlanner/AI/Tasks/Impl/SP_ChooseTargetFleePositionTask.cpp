@@ -25,8 +25,8 @@ FVector USP_ChooseTargetFleePositionTask::ComputeFleePoint(const FVector& FleeDi
 	FVector FleePoint = FleeDirection;
 
 	// Scale direction by Extent.
-	FleePoint.X *= MaxLocalExtent.X;
-	FleePoint.Y *= MaxLocalExtent.Y;
+	FleePoint.X *= MaxLocalExtent.X / 2.0f;
+	FleePoint.Y *= MaxLocalExtent.Y / 2.0f;
 	
 	// Add FOV location.
 	FleePoint += FOVCenter;
@@ -95,7 +95,7 @@ ESP_PlanExecutionState USP_ChooseTargetFleePositionTask::Tick_Internal_Implement
 			{
 				// Compute new flee direction.
 				float ImpactDirSize = (HitInfos.ImpactPoint - PawnLocation).Size();
-				FleeDirection = (HitInfos.ImpactPoint + FleeDirection.MirrorByVector(HitInfos.Normal) * ImpactDirSize).GetSafeNormal();
+				FleeDirection = (HitInfos.ImpactPoint + FleeDirection.MirrorByVector(HitInfos.ImpactNormal) * ImpactDirSize - PawnLocation).GetSafeNormal();
 
 				FleePoint = ComputeFleePoint(FleeDirection, FOVCenter);
 			}

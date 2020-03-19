@@ -140,14 +140,14 @@ void USP_ChooseTargetTask::DrawDebug(const USP_AIPlannerComponent* Planner, cons
 		if(MinLocalExtent.X > 0.0f && MinLocalExtent.Y > 0.0f && MinLocalExtent.Z > 0.0f)
 			UKismetSystemLibrary::DrawDebugBox(Pawn->GetWorld(),
 				FOVCenter,
-				MinLocalExtent,
+				MinLocalExtent / 2.0f,
 				MinFOVDebugColor, Pawn->GetActorRotation(),
 				DebugDrawTime);
 
 		if (MaxLocalExtent.X > 0.0f && MaxLocalExtent.Y > 0.0f && MaxLocalExtent.Z > 0.0f)
 			UKismetSystemLibrary::DrawDebugBox(Pawn->GetWorld(),
 				FOVCenter,
-				MaxLocalExtent,
+				MaxLocalExtent / 2.0f,
 				MaxFOVDebugColor, Pawn->GetActorRotation(),
 				DebugDrawTime);
 

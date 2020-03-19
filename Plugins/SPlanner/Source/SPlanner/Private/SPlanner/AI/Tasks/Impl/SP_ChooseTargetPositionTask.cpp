@@ -28,12 +28,12 @@ ESP_PlanExecutionState USP_ChooseTargetPositionTask::Tick_Internal_Implementatio
 
 	// Random position with character's Z (only use XY).
 	FVector TargetPosition = FOVCenter;
-	FVector FOVMinExtent = GetFOVMinExtent(Pawn);
-	FVector FOVMaxExtent = GetFOVMaxExtent(Pawn);
+	FVector FOVMinHalfExtent = GetFOVMinExtent(Pawn) / 2.0f;
+	FVector FOVMaxHalfExtent = GetFOVMaxExtent(Pawn) / 2.0f;
 
-	TargetPosition.X += FMath::RandRange(FOVMinExtent.X, FOVMaxExtent.X) * (FMath::RandBool() ? 1.0f : -1.0f);
-	TargetPosition.Y += FMath::RandRange(FOVMinExtent.Y, FOVMaxExtent.Y) * (FMath::RandBool() ? 1.0f : -1.0f);
-	TargetPosition.Z += FMath::RandRange(FOVMinExtent.Z, FOVMaxExtent.Z) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.X += FMath::RandRange(FOVMinHalfExtent.X, FOVMaxHalfExtent.X) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.Y += FMath::RandRange(FOVMinHalfExtent.Y, FOVMaxHalfExtent.Y) * (FMath::RandBool() ? 1.0f : -1.0f);
+	TargetPosition.Z += FMath::RandRange(FOVMinHalfExtent.Z, FOVMaxHalfExtent.Z) * (FMath::RandBool() ? 1.0f : -1.0f);
 
 	// Check visibility.
 	if (bTargetVisible)
