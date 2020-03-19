@@ -4,27 +4,17 @@
 
 #include <SPlanner/Miscs/SP_FlagHelper.h>
 
-#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
+#include <SPlanner/AI/Decorators/SP_AIDecorator.h>
+
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 USP_Task::USP_Task(const FObjectInitializer& ObjectInitializer)
 {
-	// Default Cooldown is 0.
-	Cooldown.Default = 0.0f;
-
 	// Default never TimeOut.
 	TimeOut.Default = -1.0f;
 
 	TaskInfosClass = USP_TaskInfos::StaticClass();
-}
-
-bool USP_Task::GetUseCooldownOnFailed() const
-{
-	return bUseCooldownOnFailed;
-}
-float USP_Task::GetCooldown(float LODLevel) const
-{
-	return Cooldown.Get(LODLevel);
 }
 
 void USP_Task::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
@@ -151,6 +141,22 @@ bool USP_Task::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, US
 	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(TaskInfos, false)
 
+	// Check decorators all valid.
+	for (int i = 0; i < BeginDecorators.Num(); ++i)
+	{
+		SP_SCCHECK(BeginDecorators[i], "BeginDecorators[%d] nullptr!", i)
+
+		if (USP_AIDecorator* const AIDecorator = Cast<USP_AIDecorator>(BeginDecorators[i]))
+		{
+			// AI Decorator begin spec.
+			if (!AIDecorator->Begin_Validate(Planner, TaskInfos))
+				return false;
+		}
+		else if (!BeginDecorators[i]->Validate(Planner))
+			return false;
+	}
+
+
 	// Time Out.
 	float TimeOutTime = TimeOut.Get(Planner->GetLODLevel());
 
@@ -185,7 +191,8 @@ bool USP_Task::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	Planner->OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
+	if(TaskInfos->bUseNotify && TaskInfos->bHasBegun)
+		Planner->OnNotifyTask.RemoveDynamic(this, &USP_Task::OnNotify);
 
 	return true;
 }

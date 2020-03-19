@@ -20,19 +20,18 @@ struct FSP_POIAction : public FSP_Action
 protected:
 	/** All goals served by this task. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_Goal*> ServedGoals;
+	TArray<const USP_Goal*> ServedGoals;
 
 	/** All goals achieved by this task. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_Goal*> AchievedGoals;
+	TArray<const USP_Goal*> AchievedGoals;
 
 public:
 	/** Getter of Task. */
 	USP_Task* GetTask() const;
 
-	/** Getter of ServedGoals. */
-	const TArray<USP_Goal*>& GetServedGoals() const;
+	/** Whether Goal is in AchievedGoals */
+	bool IsGoalAchieved(const USP_Goal* Goal) const;
 
-	/** Getter of AchievedGoals. */
-	const TArray<USP_Goal*>& GetAchievedGoals() const;
+	bool CheckAvailability(const USP_PlannerComponent* Planner) const override;
 };

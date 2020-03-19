@@ -8,6 +8,8 @@
 
 class USP_ActionStep;
 
+class USP_PlannerComponent;
+
 /**
 *	One or more ActionStep used by Planner to generate a plan.
 */
@@ -26,6 +28,10 @@ struct SPLANNER_API FSP_ActionBase
 
 	FSP_ActionBase() = default;
 	FSP_ActionBase(USP_ActionStep* InStep, ESP_ActionGenerationType InGenerationType = ESP_ActionGenerationType::AGT_OnceInPlan);
+	virtual ~FSP_ActionBase() = default;
+
+	/** Check Action and ActionStep availability. */
+	virtual bool CheckAvailability(const USP_PlannerComponent* Planner) const;
 
 #if WITH_EDITOR
 	/**

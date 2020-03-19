@@ -7,6 +7,8 @@
 #include <Engine/DataAsset.h>
 #include "SP_ActionStep.generated.h"
 
+class USP_Decorator;
+
 class USP_PlanGenInfos;
 class USP_PlannerComponent;
 
@@ -31,7 +33,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	bool bUseRequiredStepOrder = true;
 
+	/**
+	*	Additionnal condition to validate availability.
+	*	Used in CheckAvailability().
+	*/
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner|Decorator")
+	TArray<USP_Decorator*> AvailabilityDecorators;
+
+	/** Additionnal condition to validate PreCondition. */
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner|Decorator")
+	TArray<USP_Decorator*> PreConditionDecorators;
+
 public:
+	/** Check action availability for Planner. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task")
+	virtual bool CheckAvailability(const USP_PlannerComponent* Planner) const;
+
 	/**
 	*	The pre-condition of the step.
 	*	Must return true to be added to the plan during generation.

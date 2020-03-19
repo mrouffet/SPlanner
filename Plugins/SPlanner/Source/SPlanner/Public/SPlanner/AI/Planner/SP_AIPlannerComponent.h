@@ -36,12 +36,6 @@ protected:
 	int CurrentPlanIndex = 0;
 
 	/**
-	*	Cooldown time of all tasks of this planner.
-	*	World Time since beginning + task cooldown is stored.
-	*/
-	TMap<const USP_Task*, float> Cooldowns;
-
-	/**
 	*	Current executed task infos.
 	*	Must be UPROPERTY() to avoid garbage collection.
 	*/
@@ -112,18 +106,6 @@ public:
 	/** Getter of next Tasks to execute in Plan*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
 	TArray<USP_Task*> GetNextTasks() const;
-
-	/** Getter of cooldown for one task. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	float GetCooldown(const USP_Task* Task) const;
-
-	/** Getter of cooldown for one task. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner|AI")
-	void SetCooldown(const USP_Task* Task);
-
-	/** Helper function for cooldown check */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	bool IsInCooldown(const USP_Task* Task) const;
 
 	/** Notify by calling OnNotify(). */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner|AI")

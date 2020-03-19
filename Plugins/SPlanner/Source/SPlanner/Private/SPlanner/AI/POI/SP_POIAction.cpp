@@ -4,6 +4,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
+
 #include <SPlanner/AI/Tasks/SP_Task.h>
 
 USP_Task* FSP_POIAction::GetTask() const
@@ -13,11 +15,17 @@ USP_Task* FSP_POIAction::GetTask() const
 	return Cast<USP_Task>(Step);
 }
 
-const TArray<USP_Goal*>& FSP_POIAction::GetServedGoals() const
+bool FSP_POIAction::IsGoalAchieved(const USP_Goal* Goal) const
 {
-	return ServedGoals;
+	SP_SRCHECK_NULLPTR(Goal, false)
+
+	return AchievedGoals.Find(Goal) != INDEX_NONE;
 }
-const TArray<USP_Goal*>& FSP_POIAction::GetAchievedGoals() const
+
+bool FSP_POIAction::CheckAvailability(const USP_PlannerComponent* Planner) const
 {
-	return AchievedGoals;
+	if (!Super::CheckAvailability(Planner))
+		return false;
+
+	return ServedGoals.Find(Planner->GetGoal()) != INDEX_NONE || AchievedGoals.Find(Planner->GetGoal()) != INDEX_NONE;
 }

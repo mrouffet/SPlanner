@@ -13,9 +13,8 @@
 #include <SPlanner/Base/Actions/SP_ActionStep.h>
 #include "SP_Task.generated.h"
 
-class USP_AIPlannerComponent;
-
 class USP_TaskInfos;
+class USP_AIPlannerComponent;
 
 /**
  *	AI Planner task base.
@@ -35,13 +34,10 @@ protected:
 	*/
 	TSubclassOf<USP_TaskInfos> TaskInfosClass;
 
-	/** The cooldown of this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Cooldown")
-	FSP_FloatParam Cooldown;
-
-	/** Should use cooldown even if the task has failed. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Cooldown")
-	bool bUseCooldownOnFailed = true;
+	
+	/** Additionnal condition to validate Begin. */
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner|Decorator")
+	TArray<USP_Decorator*> BeginDecorators;
 
 	/**
 	*	The time this task can be in Running before failing.
@@ -97,12 +93,6 @@ protected:
 
 public:
 	USP_Task(const FObjectInitializer& ObjectInitializer);
-
-	/** Gette of bUseCooldownOnFailed. */
-	bool GetUseCooldownOnFailed() const;
-
-	/** Getter of Cooldown. */
-	float GetCooldown(float LODLevel = -1.0f) const;
 
 	/** Instantiate the TaskInfos for this task. */
 	USP_TaskInfos* InstantiateInfos(UObject* Outer = static_cast<UObject*>(GetTransientPackage()));

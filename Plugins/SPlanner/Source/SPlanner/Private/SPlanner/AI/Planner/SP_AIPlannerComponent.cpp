@@ -92,33 +92,6 @@ TArray<USP_Task*> USP_AIPlannerComponent::GetNextTasks() const
 	return Result;
 }
 
-float USP_AIPlannerComponent::GetCooldown(const USP_Task* Task) const
-{
-	SP_RCHECK_NULLPTR(Task, -1.0f)
-
-	const float* const CooldownPtr = Cooldowns.Find(Task);
-	return CooldownPtr ? *CooldownPtr - GetWorld()->GetTimeSeconds() : -1.0f;
-}
-void USP_AIPlannerComponent::SetCooldown(const USP_Task* Task)
-{
-	SP_CHECK_NULLPTR(Task)
-
-	float Cooldown = Task->GetCooldown(GetLODLevel());
-
-	// Never save task without cooldown.
-	if(Cooldown <= 0.0f)
-		return;
-	
-	// Add 0.001f to ensure float precision.
-	Cooldowns.FindOrAdd(Task) = GetWorld()->GetTimeSeconds() + Cooldown + 0.001f;
-}
-bool USP_AIPlannerComponent::IsInCooldown(const USP_Task* Task) const
-{
-	SP_RCHECK_NULLPTR(Task, false)
-
-	return GetCooldown(Task) > 0.0f;
-}
-
 void USP_AIPlannerComponent::Notify(ESP_AIPlannerNotify Notify)
 {
 	OnNotify.Broadcast(this, Notify);
@@ -163,27 +136,16 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	// Process task result.
 	if (TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
-		// Set cooldown.
-		if (CurrentTask->GetUseCooldownOnFailed())
-			SetCooldown(CurrentTask);
-
 		// Plan got invalid: ask a new one.
 		PlanState = ESP_PlanState::PS_Invalid;
 
 		AskNewPlan();
 	}
-	else // Succeed.
+	else if (++CurrentPlanIndex == Plan.Num()) // Succeed and No other task left.
 	{
-		// Set cooldown.
-		SetCooldown(CurrentTask);
+		PlanState = ESP_PlanState::PS_Finished;
 
-		// No other task left.
-		if (++CurrentPlanIndex == Plan.Num())
-		{
-			PlanState = ESP_PlanState::PS_Finished;
-
-			AskNewPlan();
-		}
+		AskNewPlan();
 	}
 }
 
@@ -191,29 +153,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 {
 	SP_BENCHMARK_SCOPE(AIPC_CreatePlannerActionSet)
 
-	SP_RCHECK_NULLPTR(Goal, FSP_PlannerActionSet())
-	SP_RCHECK_NULLPTR(Blackboard, FSP_PlannerActionSet())
-
-	const USP_ActionSet* const CurrActionSet = Blackboard->GetActionSet(Goal);
-	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
-
-	struct CooldownPredicate
-	{
-		const USP_AIPlannerComponent* Planner = nullptr;
-
-		bool operator()(const FSP_Action& Action) const
-		{
-			SP_SRCHECK_NULLPTR(Planner, false)
-
-			return !Planner->IsInCooldown(Cast<USP_Task>(Action.Step));
-		}
-	};
-
-#if PLATFORM_WINDOWS
-	FSP_PlannerActionSet PlannerActions = CurrActionSet->Shuffle(LODLevel, CooldownPredicate{ this }, bCanBeAchievedPtr);
-#else
-	FSP_PlannerActionSet PlannerActions = FSP_PlannerActionSet::Make(CurrActionSet, LODLevel, CooldownPredicate{ this }, bCanBeAchievedPtr);
-#endif
+	FSP_PlannerActionSet PlannerActions = Super::CreatePlannerActionSet(LODLevel, bCanBeAchievedPtr);
 
 	// Add all available actions from POI.
 	if (POIZone)
@@ -229,12 +169,11 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLev
 			{
 				SP_CCHECK(POIActions[i].GetTask(), "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
 
-				// Use INDEX_NONE to convert int32 to bool.
-				bool bAchieveGoal = POIActions[i].GetAchievedGoals().Find(Goal) != INDEX_NONE;
-
 				// Add to actions.
-				if (!IsInCooldown(POIActions[i].GetTask()) && (bAchieveGoal || POIActions[i].GetServedGoals().Find(Goal) != INDEX_NONE))
+				if (POIActions[i].CheckAvailability(this))
 				{
+					bool bAchieveGoal = POIActions[i].IsGoalAchieved(Goal);
+
 					PlannerActions.Actions.Add(FSP_PlannerAction::Make(&POIActions[i], LODLevel, bAchieveGoal));
 
 					// Update goal achieve.
@@ -277,25 +216,26 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 {
 	Super::OnPlanConstructionFailed_Implementation(PlanError);
 
-	// Catch construction failed because of cooldowns.
-	if (PlanError != ESP_PlanError::PE_CantBeAchieved)
-		return;
+	// TODO: FIX.
+	//// Catch construction failed because of cooldowns.
+	//if (PlanError != ESP_PlanError::PE_CantBeAchieved)
+	//	return;
 
-	float MinCooldown = FLT_MAX;
+	//float MinCooldown = FLT_MAX;
 
-	// Check among all cooldown registered, not only action in current ActionSet: POI Task may be in cooldown.
-	for (auto it = Cooldowns.begin(); it != Cooldowns.end(); ++it)
-	{
-		float Cooldown = it->Value - GetWorld()->GetTimeSeconds();
+	//// Check among all cooldown registered, not only action in current ActionSet: POI Task may be in cooldown.
+	//for (auto it = Cooldowns.begin(); it != Cooldowns.end(); ++it)
+	//{
+	//	float Cooldown = it->Value - GetWorld()->GetTimeSeconds();
 
-		// Still in cooldown.
-		if (Cooldown > 0.0f && Cooldown < MinCooldown)
-			MinCooldown = Cooldown;
-	}
+	//	// Still in cooldown.
+	//	if (Cooldown > 0.0f && Cooldown < MinCooldown)
+	//		MinCooldown = Cooldown;
+	//}
 
-	SP_CHECK(!FMath::IsNearlyEqual(MinCooldown, FLT_MAX), "Plan construction failed while no task are in cooldown.")
+	//SP_CHECK(!FMath::IsNearlyEqual(MinCooldown, FLT_MAX), "Plan construction failed while no task are in cooldown.")
 
-	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this]{	AskNewPlan(); }, MinCooldown, false);
+	//GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this]{	AskNewPlan(); }, MinCooldown, false);
 }
 bool USP_AIPlannerComponent::CancelPlan()
 {

@@ -211,7 +211,7 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel
 	const USP_ActionSet* const CurrActionSet = Blackboard->GetActionSet(Goal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
-	return CurrActionSet->Shuffle(LODLevel, bCanBeAchievedPtr);
+	return CurrActionSet->Shuffle(this, LODLevel, bCanBeAchievedPtr);
 }
 
 void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
