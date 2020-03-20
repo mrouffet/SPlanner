@@ -9,7 +9,7 @@
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
-#include <SPlanner/AI/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/Objects/Target/SP_Target.h>
 
 FRotator USP_LookAtTask::ComputeTargetRotation(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
 {

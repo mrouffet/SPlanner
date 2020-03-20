@@ -5,7 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardAsset.h>
-#include <SPlanner/AI/Blackboard/SP_AIBlackboardObject.h>
+#include <SPlanner/AI/Blackboard/Objects/SP_AIBlackboardObject.h>
 
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Bool.h>
 #include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Int.h>

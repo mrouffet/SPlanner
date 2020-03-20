@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <SPlanner/AI/Target/SP_TargetState.h>
+#include <SPlanner/AI/Blackboard/Objects/Target/SP_TargetState.h>
 
-#include <SPlanner/AI/Blackboard/SP_AIBlackboardObject.h>
+#include <SPlanner/AI/Blackboard/Objects/SP_AIBlackboardObject.h>
 #include "SP_Target.generated.h"
 
 class USP_POIComponent;

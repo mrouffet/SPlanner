@@ -2,7 +2,7 @@
 
 #include <SPlanner/AI/Tasks/Impl/SP_ChooseTargetActorTask.h>
 
-#include <SPlanner/AI/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/Objects/Target/SP_Target.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>

@@ -8,7 +8,7 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
-#include <SPlanner/AI/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/Objects/Target/SP_Target.h>
 
 bool USP_DistanceAIDecorator::Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
 {

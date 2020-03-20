@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/Objects/Target/SP_Target.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 

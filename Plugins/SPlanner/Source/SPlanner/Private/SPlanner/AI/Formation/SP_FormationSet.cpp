@@ -6,7 +6,7 @@
 
 #include <SPlanner/Base/Zones/SP_LODComponent.h>
 
-#include <SPlanner/AI/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/Objects/Target/SP_Target.h>
 #include <SPlanner/AI/Formation/SP_Formation.h>
 #include <SPlanner/AI/Formation/SP_FormationFocusType.h>
 #include <SPlanner/AI/Controllers/SP_AIController.h>

@@ -4,7 +4,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/AI/Blackboard/SP_AIBlackboardObject.h>
+#include <SPlanner/AI/Blackboard/Objects/SP_AIBlackboardObject.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
 USP_AIBlackboardObject* USP_AIBlackboardKey_Object::GetValue() const
