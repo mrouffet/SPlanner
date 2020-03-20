@@ -13,9 +13,12 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
+#include <SPlanner/AI/Controllers/SP_PathFollowingComponent.h>
+
 FName ASP_AIController::PlannerComponentName(TEXT("Planner"));
 
-ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+ASP_AIController::ASP_AIController(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<USP_PathFollowingComponent>(TEXT("PathFollowingComponent")))
 {
 	Planner = CreateOptionalDefaultSubobject<USP_AIPlannerComponent>(PlannerComponentName);
 	
