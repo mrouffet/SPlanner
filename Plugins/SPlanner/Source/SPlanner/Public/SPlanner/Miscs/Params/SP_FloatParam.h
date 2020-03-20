@@ -6,13 +6,14 @@
 
 #include <SPlanner/Miscs/Assets/SP_FloatAsset.h>
 
+#include <SPlanner/Miscs/Params/SP_Param.h>
 #include "SP_FloatParam.generated.h"
 
 /**
 *	float parameter struct implementation.
 */
 USTRUCT(BlueprintType, Category = "SPlanner|Misc|Param")
-struct SPLANNER_API FSP_FloatParam
+struct SPLANNER_API FSP_FloatParam : public FSP_Param
 {
 	GENERATED_BODY()
 

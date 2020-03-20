@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Engine/DataAsset.h>
+#include <SPlanner/Miscs/Assets/SP_Asset.h>
 #include "SP_FloatAsset.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_FloatAssetEvent, float, Value);
@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_FloatAssetEvent, float, Value);
 *	Serialized float asset.
 */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Asset")
-class SPLANNER_API USP_FloatAsset : public UDataAsset
+class SPLANNER_API USP_FloatAsset : public USP_Asset
 {
 	GENERATED_BODY()
 
