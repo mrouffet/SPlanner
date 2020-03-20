@@ -7,27 +7,27 @@
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-bool USP_FormationGoal::CanStart_Implementation(USP_PlannerComponent* Planner) const
+bool USP_FormationGoal::CanStart_Implementation(const USP_PlannerComponent* Planner) const
 {
 	if (!Super::CanStart_Implementation(Planner))
 		return false;
 
 	SP_RCHECK_NULLPTR(FormationSet, false)
 
-	USP_AIPlannerComponent* AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
 
 	SP_RCHECK(AIPlanner, false, "AIPlanner nullptr! Planner must be of type USP_AIPlannerComponent!")
 
 	return FormationSet->CanAdd(AIPlanner);
 }
-bool USP_FormationGoal::CanLeave_Implementation(USP_PlannerComponent* Planner) const
+bool USP_FormationGoal::CanLeave_Implementation(const USP_PlannerComponent* Planner) const
 {
 	if (!Super::CanLeave_Implementation(Planner))
 		return false;
 
 	SP_RCHECK_NULLPTR(FormationSet, false)
 
-	USP_AIPlannerComponent* AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
 
 	SP_RCHECK(AIPlanner, false, "AIPlanner nullptr! Planner must be of type USP_AIPlannerComponent!")
 

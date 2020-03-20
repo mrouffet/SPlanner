@@ -20,8 +20,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|AI")
 	USP_FormationSet* FormationSet = nullptr;
 
-	bool CanStart_Implementation(USP_PlannerComponent* Planner) const override;
-	bool CanLeave_Implementation(USP_PlannerComponent* Planner) const override;
+	bool CanStart_Implementation(const USP_PlannerComponent* Planner) const override;
+	bool CanLeave_Implementation(const USP_PlannerComponent* Planner) const override;
 
 	void OnStart_Implementation(USP_PlannerComponent* Planner) override;
 	void OnEnd_Implementation(USP_PlannerComponent* Planner) override;

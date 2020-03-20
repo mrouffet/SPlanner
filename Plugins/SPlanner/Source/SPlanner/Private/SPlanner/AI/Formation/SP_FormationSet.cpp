@@ -73,7 +73,7 @@ void USP_FormationSet::SetLeadActor(AActor* NewLeadActor)
 	LeadLOD = Cast<USP_LODComponent>(LeadActor->GetComponentByClass(USP_LODComponent::StaticClass()));
 }
 
-bool USP_FormationSet::CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const
+bool USP_FormationSet::CheckAreContained(const TArray<const USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const
 {
 	// Quick size check.
 	if (InPlanners.Num() > Planners.Num())
@@ -82,7 +82,19 @@ bool USP_FormationSet::CheckAreContained(const TArray<USP_AIPlannerComponent*>& 
 
 	for (int i = 0; i < InPlanners.Num(); ++i)
 	{
-		if ((Planners.Find(InPlanners[i]) == INDEX_NONE) == bShouldBeContained)
+		// Find with const T* in T* Array.
+		bool bFound = false;
+
+		for (int j = 0; j < Planners.Num(); ++j)
+		{
+			if (InPlanners[i] == Planners[j])
+			{
+				bFound = true;
+				break;
+			}
+		}
+
+		if (bFound != bShouldBeContained)
 			return false;
 	}
 
@@ -127,11 +139,11 @@ void USP_FormationSet::UnInitPlannersData(const TArray<USP_AIPlannerComponent*>&
 	}
 }
 
-bool USP_FormationSet::CanAdd(USP_AIPlannerComponent* Planner) const
+bool USP_FormationSet::CanAdd(const USP_AIPlannerComponent* Planner) const
 {
-	return CanAdd(TArray<USP_AIPlannerComponent*>{ Planner });
+	return CanAdd(TArray<const USP_AIPlannerComponent*>{ Planner });
 }
-bool USP_FormationSet::CanAdd(const TArray<USP_AIPlannerComponent*>& InPlanners) const
+bool USP_FormationSet::CanAdd(const TArray<const USP_AIPlannerComponent*>& InPlanners) const
 {
 	// None of InPlanners must not be already contained in Planners.
 	if (!Formations.Num() || !CheckAreContained(InPlanners, false))
@@ -151,11 +163,11 @@ bool USP_FormationSet::CanAdd(const TArray<USP_AIPlannerComponent*>& InPlanners)
 	return NewNum <= MaxNum;
 }
 
-bool USP_FormationSet::CanRemove(USP_AIPlannerComponent* Planner) const
+bool USP_FormationSet::CanRemove(const USP_AIPlannerComponent* Planner) const
 {
-	return CanRemove(TArray<USP_AIPlannerComponent*>{ Planner });
+	return CanRemove(TArray<const USP_AIPlannerComponent*>{ Planner });
 }
-bool USP_FormationSet::CanRemove(const TArray<USP_AIPlannerComponent*>& InPlanners) const
+bool USP_FormationSet::CanRemove(const TArray<const USP_AIPlannerComponent*>& InPlanners) const
 {
 	// Each of InPlanners must be contained in Planners.
 	if (!Formations.Num() || !CheckAreContained(InPlanners, true))
@@ -187,7 +199,7 @@ bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>&
 	SP_BENCHMARK_SCOPE(AddToFormation)
 
 	// None of InPlanners must not be already contained in Planners.
-	SP_RCHECK(CheckAreContained(InPlanners, false), false, "InPlanners already contained in Planners!")
+	SP_RCHECK(CheckAreContained(reinterpret_cast<const TArray<const USP_AIPlannerComponent*>&>(InPlanners), false), false, "InPlanners already contained in Planners!")
 
 	// Formation is full.
 	if(!TryChangeFormation(Planners.Num() + InPlanners.Num()))
@@ -237,7 +249,7 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 	SP_BENCHMARK_SCOPE(RemoveFromFormation)
 
 	// Each of InPlanners must be contained in Planners.
-	SP_RCHECK(CheckAreContained(InPlanners, true), false, "InPlanners must be contained in Planners!")
+	SP_RCHECK(CheckAreContained(reinterpret_cast<const TArray<const USP_AIPlannerComponent*>&>(InPlanners), true), false, "InPlanners must be contained in Planners!")
 
 	// Start by uninit, InPlanners won't be longer in formation.
 	UnInitPlannersData(InPlanners);

@@ -95,7 +95,7 @@ protected:
 	void ClearFormationFocus(USP_AIPlannerComponent* Planner) const;
 
 	/** Check if every planner in InPlanners are contained or not in Planners. */
-	bool CheckAreContained(const TArray<USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const;
+	bool CheckAreContained(const TArray<const USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const;
 
 	/** Init the data for InPlanners. */
 	virtual void InitPlannersData(const TArray<USP_AIPlannerComponent*>& InPlanners);
@@ -160,18 +160,16 @@ public:
 
 
 	/** Whether Planner can be added to the formation. */
-	bool CanAdd(USP_AIPlannerComponent* Planner) const;
+	bool CanAdd(const USP_AIPlannerComponent* Planner) const;
 
 	/** Whether InPlanners can be added to the formation (enough places and not already in this formation). */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool CanAdd(const TArray<USP_AIPlannerComponent*>& InPlanners) const;
+	bool CanAdd(const TArray<const USP_AIPlannerComponent*>& InPlanners) const;
 
 	/** Whether Planner can be removed to the formation. */
-	bool CanRemove(USP_AIPlannerComponent* Planner) const;
+	bool CanRemove(const USP_AIPlannerComponent* Planner) const;
 
 	/** Whether InPlanners can be removed from the formation (still enough planner and contained in this formation). */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool CanRemove(const TArray<USP_AIPlannerComponent*>& InPlanners) const;
+	bool CanRemove(const TArray<const USP_AIPlannerComponent*>& InPlanners) const;
 
 	
 	/** Add one planner to the formation. */

@@ -29,36 +29,36 @@ protected:
 	*	Let empty to allow transition with all other goals.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|In")
-	TArray<USP_Goal*> AllowedInTransitions;
+	TArray<const USP_Goal*> AllowedInTransitions;
 
 	/**
 	*	Blocked input transition list (from old goal to this).
 	*	Only used if AllowedTransitions is empty.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|In")
-	TArray<USP_Goal*> BlockedInTransitions;
+	TArray<const USP_Goal*> BlockedInTransitions;
 
 	/**
 	*	Allowed output transition list (from this goal to a new one).
 	*	Let empty to allow transition with all other goals.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|Out")
-	TArray<USP_Goal*> AllowedOutTransitions;
+	TArray<const USP_Goal*> AllowedOutTransitions;
 
 	/**
 	*	Blocked output transition list (from this goal to a new one).
 	*	Only used if AllowedTransitions is empty.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal|Out")
-	TArray<USP_Goal*> BlockedOutTransitions;
+	TArray<const USP_Goal*> BlockedOutTransitions;
 
 	/** Whether Planner can start this goal. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "SPlanner|Goal|In")
-	bool CanStart(USP_PlannerComponent* Planner) const;
+	bool CanStart(const USP_PlannerComponent* Planner) const;
 
 	/** Whether Planner can leave this goal. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "SPlanner|Goal|Out")
-	bool CanLeave(USP_PlannerComponent* Planner) const;
+	bool CanLeave(const USP_PlannerComponent* Planner) const;
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -88,5 +88,5 @@ public:
 	*	Use bForce to avoid In and Out transition check.
 	*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Goal")
-	static bool CanTransitTo(USP_PlannerComponent* Planner, USP_Goal* OldGoal, USP_Goal* NewGoal, bool bForce = false);
+	static bool CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal* OldGoal, const USP_Goal* NewGoal, bool bForce = false);
 };
