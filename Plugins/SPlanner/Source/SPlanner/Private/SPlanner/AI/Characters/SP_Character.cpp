@@ -2,6 +2,8 @@
 
 #include <SPlanner/AI/Characters/SP_Character.h>
 
+#include <GameFramework/CharacterMovementComponent.h>
+
 #include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
 
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
@@ -21,4 +23,13 @@ ASP_Character::ASP_Character(const FObjectInitializer& ObjectInitializer) : Supe
 
 	PlannerLOD = CreateDefaultSubobject<USP_PlannerLODComponent>(TEXT("SP_PlannerLOD"));
 	PlannerLOD->SetupAttachment(RootComponent);
+
+	// Avoid collision with other AI characters.
+	UCharacterMovementComponent* const MovementComponent = GetCharacterMovement();
+	SP_CHECK_NULLPTR(MovementComponent)
+
+	// Set default avoidance.
+	MovementComponent->bUseRVOAvoidance = true;
+	MovementComponent->AvoidanceWeight = 0.5f;
+	MovementComponent->AvoidanceConsiderationRadius = 250.0f;
 }
