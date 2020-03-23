@@ -5,12 +5,11 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Goal/SP_Goal.h>
-#include <SPlanner/Base/Planner/SP_Planner.h>
 #include <SPlanner/Base/Planner/SP_PlanState.h>
-#include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
-#include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
+#include <SPlanner/Base/Planner/SP_PlannerEngine.h>
+#include <SPlanner/Base/Action/SP_PlannerActionSet.h>
 
-#include <SPlanner/AI/Controllers/SP_AIController.h>
+#include <SPlanner/AI/Controller/SP_AIController.h>
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
@@ -19,11 +18,12 @@
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
-#include <SPlanner/AI/Tasks/SP_Task.h>
+#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/LOD/SP_AILODComponent.h>
 
 #if SP_DEBUG_EDITOR
 
-#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+#include <SPlannerEditor/Misc/SP_EditorSettings.h>
 
 #endif
 
@@ -35,7 +35,32 @@ USP_AIPlannerComponent::USP_AIPlannerComponent(const FObjectInitializer& ObjectI
 	PlanGenInfosClass = USP_AIPlanGenInfos::StaticClass();
 }
 
-USP_Task* USP_AIPlannerComponent::GetPrevTask() const
+float USP_AIPlannerComponent::GetLODLevel() const
+{
+	if (LOD)
+		return LOD->GetLODLevel();
+
+	return -1.0f;
+}
+void USP_AIPlannerComponent::SetLOD(USP_AILODComponent* NewLOD)
+{
+	if (LOD)
+	{
+		LOD->OnActive.RemoveDynamic(this, &USP_AIPlannerComponent::OnActiveLOD);
+		LOD->OnInactive.RemoveDynamic(this, &USP_AIPlannerComponent::OnInactiveLOD);
+	}
+
+	LOD = NewLOD;
+
+	// Can be nullptr to reset component.
+	if (LOD)
+	{
+		LOD->OnActive.AddDynamic(this, &USP_AIPlannerComponent::OnActiveLOD);
+		LOD->OnInactive.AddDynamic(this, &USP_AIPlannerComponent::OnInactiveLOD);
+	}
+}
+
+USP_TaskStep* USP_AIPlannerComponent::GetPrevTask() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
@@ -45,29 +70,29 @@ USP_Task* USP_AIPlannerComponent::GetPrevTask() const
 	if(CurrentPlanIndex <= 0)
 		return nullptr;
 
-	return Cast<USP_Task>(Plan[CurrentPlanIndex - 1]);
+	return Cast<USP_TaskStep>(Plan[CurrentPlanIndex - 1]);
 }
-TArray<USP_Task*> USP_AIPlannerComponent::GetPrevTasks() const
+TArray<USP_TaskStep*> USP_AIPlannerComponent::GetPrevTasks() const
 {
-	TArray<USP_Task*> Result;
+	TArray<USP_TaskStep*> Result;
 
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, Result, "Invalid plan: performing unsafe operation!")
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), Result, "Index out of range!")
 
-	Result.Append(reinterpret_cast<USP_Task* const*>(Plan.GetData()), CurrentPlanIndex);
+	Result.Append(reinterpret_cast<USP_TaskStep* const*>(Plan.GetData()), CurrentPlanIndex);
 
 	return Result;
 }
-USP_Task* USP_AIPlannerComponent::GetCurrentTask() const
+USP_TaskStep* USP_AIPlannerComponent::GetCurrentTask() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
 	SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), nullptr, "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
 
-	return Cast<USP_Task>(Plan[CurrentPlanIndex]);
+	return Cast<USP_TaskStep>(Plan[CurrentPlanIndex]);
 }
-USP_Task* USP_AIPlannerComponent::GetNextTask() const
+USP_TaskStep* USP_AIPlannerComponent::GetNextTask() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, nullptr, "Invalid plan: performing unsafe operation!")
@@ -77,17 +102,17 @@ USP_Task* USP_AIPlannerComponent::GetNextTask() const
 	if(CurrentPlanIndex + 1 >= Plan.Num())
 		return nullptr;
 
-	return Cast<USP_Task>(Plan[CurrentPlanIndex + 1]);
+	return Cast<USP_TaskStep>(Plan[CurrentPlanIndex + 1]);
 }
-TArray<USP_Task*> USP_AIPlannerComponent::GetNextTasks() const
+TArray<USP_TaskStep*> USP_AIPlannerComponent::GetNextTasks() const
 {
-	TArray<USP_Task*> Result;
+	TArray<USP_TaskStep*> Result;
 
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, Result, "Invalid plan: performing unsafe operation!")
 	SP_RCHECK(CurrentPlanIndex < Plan.Num(), Result, "Index out of range!")
 
-	Result.Append(reinterpret_cast<USP_Task* const*>(Plan.GetData()) + CurrentPlanIndex + 1, Plan.Num() - CurrentPlanIndex - 1);
+	Result.Append(reinterpret_cast<USP_TaskStep* const*>(Plan.GetData()) + CurrentPlanIndex + 1, Plan.Num() - CurrentPlanIndex - 1);
 
 	return Result;
 }
@@ -118,7 +143,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 {
 	SP_BENCHMARK_SCOPE(AIPC_ExecuteTask)
 
-	USP_Task* CurrentTask = GetCurrentTask();
+	USP_TaskStep* CurrentTask = GetCurrentTask();
 	SP_CHECK_NULLPTR(CurrentTask)
 
 	if(!TaskInfos)
@@ -149,40 +174,50 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	}
 }
 
-FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr) const
+void USP_AIPlannerComponent::OnActiveLOD()
+{
+	SetEnableBehavior(true);
+}
+void USP_AIPlannerComponent::OnInactiveLOD()
+{
+	SetEnableBehavior(false);
+}
+
+FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(bool* bCanBeAchievedPtr) const
 {
 	SP_BENCHMARK_SCOPE(AIPC_CreatePlannerActionSet)
 
-	FSP_PlannerActionSet PlannerActions = Super::CreatePlannerActionSet(LODLevel, bCanBeAchievedPtr);
+	FSP_PlannerActionSet PlannerActions = Super::CreatePlannerActionSet(bCanBeAchievedPtr);
 
-	// Add all available actions from POI.
-	if (POIZone)
-	{
-		for (int j = 0; j < POIZone->GetPOIs().Num(); ++j)
-		{
-			SP_CCHECK(POIZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
-			SP_CCHECK(POIZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %s ] action set nullptr!", false, *GetName(), *POIZone->GetPOIs()[j]->GetOwner()->GetName())
+	// TODO: FIX
+	//// Add all available actions from POI.
+	//if (POIZone)
+	//{
+	//	for (int j = 0; j < POIZone->GetPOIs().Num(); ++j)
+	//	{
+	//		SP_CCHECK(POIZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
+	//		SP_CCHECK(POIZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %s ] action set nullptr!", false, *GetName(), *POIZone->GetPOIs()[j]->GetOwner()->GetName())
 
-			const TArray<FSP_POIAction>& POIActions = POIZone->GetPOIs()[j]->GetActionSet()->GetActions();
+	//		const TArray<FSP_POIAction>& POIActions = POIZone->GetPOIs()[j]->GetActionSet()->GetActions();
 
-			for (int i = 0; i < POIActions.Num(); ++i)
-			{
-				SP_CCHECK(POIActions[i].GetTask(), "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
+	//		for (int i = 0; i < POIActions.Num(); ++i)
+	//		{
+	//			SP_CCHECK(POIActions[i].GetTask(), "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
 
-				// Add to actions.
-				if (POIActions[i].CheckAvailability(this))
-				{
-					bool bAchieveGoal = POIActions[i].IsGoalAchieved(Goal);
+	//			// Add to actions.
+	//			if (POIActions[i].CheckAvailability(this))
+	//			{
+	//				bool bAchieveGoal = POIActions[i].IsGoalAchieved(Goal);
 
-					PlannerActions.Actions.Add(FSP_PlannerAction::Make(&POIActions[i], LODLevel, bAchieveGoal));
+	//				PlannerActions.Actions.Add(FSP_PlannerAction::Make(&POIActions[i], LODLevel, bAchieveGoal));
 
-					// Update goal achieve.
-					if (bCanBeAchievedPtr && !*bCanBeAchievedPtr)
-						*bCanBeAchievedPtr = bAchieveGoal;
-				}
-			}
-		}
-	}
+	//				// Update goal achieve.
+	//				if (bCanBeAchievedPtr && !*bCanBeAchievedPtr)
+	//					*bCanBeAchievedPtr = bAchieveGoal;
+	//			}
+	//		}
+	//	}
+	//}
 
 	// Plan can't be achieve: save performance.
 	if(bCanBeAchievedPtr && !*bCanBeAchievedPtr)
@@ -201,15 +236,11 @@ void USP_AIPlannerComponent::AskNewPlan(bool bInstantRequest)
 	Super::AskNewPlan(bInstantRequest);
 }
 
-bool USP_AIPlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions,
-	TArray<USP_ActionStep*>& OutPlan,
-	USP_PlanGenInfos* PlanGenInfos,
-	uint8 MaxDepth,
-	float LODLevel) const
+bool USP_AIPlannerComponent::ConstructPlan_Internal(USP_PlanGenInfos* Infos) const
 {
-	SP_RCHECK(Cast<USP_AIPlanGenInfos>(PlanGenInfos), false, "AI PlanGenInfos nullptr! PlanGenInfos must be a USP_AIPlanGenInfos!")
+	SP_RCHECK(Cast<USP_AIPlanGenInfos>(Infos), false, "AI Infos nullptr! Infos must be a USP_AIPlanGenInfos!")
 
-	return SP_Planner::LinearConstruct(SP_Planner::FSP_LinearConstructInfos{ this, PlannerActions, OutPlan, PlanGenInfos, MaxDepth, LODLevel });
+	return SP_PlannerEngine::LinearConstruct(Infos);
 }
 
 void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError)
@@ -247,7 +278,7 @@ bool USP_AIPlannerComponent::CancelPlan()
 	{
 		SP_RCHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), false, "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
 
-		USP_Task* CurrentTask = Cast<USP_Task>(Plan[CurrentPlanIndex]);
+		USP_TaskStep* CurrentTask = Cast<USP_TaskStep>(Plan[CurrentPlanIndex]);
 		SP_RCHECK_NULLPTR(CurrentTask, false)
 
 		CurrentTask->Cancel(*this, TaskInfos);
@@ -274,6 +305,24 @@ bool USP_AIPlannerComponent::OnInactive_Internal_Implementation()
 	SetComponentTickEnabled(false);
 
 	return true;
+}
+
+float USP_AIPlannerComponent::QueryTimeBeforeConstructPlan_Implementation() const
+{
+	if (LOD)
+	{
+		SP_RCHECK(LOD->IsLODActive(), DefaultTimeBeforeConstructPlan, "LOD inactive!")
+		return LOD->GetTimeBeforeConstructPlan();
+	}
+
+	return Super::QueryTimeBeforeConstructPlan_Implementation();
+}
+int USP_AIPlannerComponent::QueryMaxPlannerDepth_Implementation() const
+{
+	if (LOD && LOD->GetLODLevel() > 0.0f)
+		return static_cast<int>(LOD->GetMaxPlannerDepth());
+
+	return Super::QueryMaxPlannerDepth_Implementation();
 }
 
 void USP_AIPlannerComponent::BeginPlay()

@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <SPlanner/AI/POI/SP_POIAction.h>
-
 #include <Engine/DataAsset.h>
 #include "SP_POIActionSet.generated.h"
+
+class USP_POIAction;
 
 /**
  *	Set of Planner POI Action.
@@ -17,10 +17,10 @@ class SPLANNER_API USP_POIActionSet : public UDataAsset
 
 protected:
 	/** List of available actions. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	TArray<FSP_POIAction> Actions;
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
+	TArray<USP_POIAction*> Actions;
 
 public:
 	/** Getter of Actions. */
-	const TArray<FSP_POIAction>& GetActions() const;
+	const TArray<USP_POIAction*>& GetActions() const;
 };

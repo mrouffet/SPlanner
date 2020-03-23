@@ -21,6 +21,8 @@ protected:
 	TArray<FSP_AIBlackboardEntry> Entries;
 
 public:
+	USP_AIBlackboardAsset(const FObjectInitializer& ObjectInitializer);
+
 	/** Getter of Entries. */
 	const TArray<FSP_AIBlackboardEntry>& GetEntries() const;
 };

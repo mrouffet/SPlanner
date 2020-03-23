@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/Miscs/Params/SP_FloatParam.h>
-
 #include <SPlanner/AI/Formation/SP_FormationInfos.h>
 #include <SPlanner/AI/Formation/SP_FormationFocusType.h>
 #include <SPlanner/AI/Formation/SP_FormationConstructionType.h>
 
-#include <Engine/DataAsset.h>
+#include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_Formation.generated.h"
+
+class USP_AIFloatParam;
 
 class USP_FormationSet;
 
@@ -19,7 +19,7 @@ class USP_AIPlannerComponent;
  *	Base formation shape.
  */
 UCLASS(Abstract, Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation")
-class SPLANNER_API USP_Formation : public UDataAsset
+class SPLANNER_API USP_Formation : public USP_DataAsset
 {
 	GENERATED_BODY()
 	
@@ -76,7 +76,7 @@ protected:
 	*	LOD Level will be computed from formation's lead actor.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	FSP_FloatParam Weight;
+	USP_AIFloatParam* Weight;
 
 	/**
 	*	Cooldown of this shape.
@@ -84,7 +84,7 @@ protected:
 	*	LOD Level will be computed from formation's lead actor.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	FSP_FloatParam Cooldown;
+	USP_AIFloatParam* Cooldown;
 
 	/** Whether cooldown should be shared across all formations. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
@@ -128,10 +128,10 @@ public:
 	float GetLeadSqrDistThreshold() const;
 
 	/** Getter of Weight. */
-	float GetWeight(float LODLevel = -1.0f) const;
+	float GetWeight(const USP_AIPlannerComponent* Planner) const;
 
 	/** Getter of Cooldown. */
-	float GetCooldown(float LODLevel = -1.0f) const;
+	float GetCooldown(const USP_AIPlannerComponent* Planner) const;
 
 	/** Getter of bShareCooldown. */
 	bool IsCooldownShared() const;

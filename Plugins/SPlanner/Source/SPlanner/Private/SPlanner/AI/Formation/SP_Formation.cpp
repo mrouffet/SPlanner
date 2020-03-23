@@ -4,15 +4,20 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Base/Zones/SP_LODComponent.h>
+#include <SPlanner/AI/LOD/SP_AILODComponent.h>
 
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
+
+#include <SPlanner/AI/Planner/SP_AIFloatParam.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 USP_Formation::USP_Formation(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Set default cooldown value.
-	Cooldown.Default = 0.0f;
+	Cooldown = CreateDefaultSubobject<USP_AIFloatParam>("Cooldown");
+	Cooldown->DefaultValue = 0.0f;
+
+	Weight = CreateDefaultSubobject<USP_AIFloatParam>("Weight");
 }
 
 ESP_FormationFocusType USP_Formation::GetFormationFocusType() const
@@ -38,13 +43,13 @@ float USP_Formation::GetLeadSqrDistThreshold() const
 	return LeadSqrDistThreshold;
 }
 
-float USP_Formation::GetWeight(float LODLevel) const
+float USP_Formation::GetWeight(const USP_AIPlannerComponent* Planner) const
 {
-	return Weight.Get(LODLevel);
+	return Weight->Query(Planner);
 }
-float USP_Formation::GetCooldown(float LODLevel) const
+float USP_Formation::GetCooldown(const USP_AIPlannerComponent* Planner) const
 {
-	return Cooldown.Get(LODLevel);
+	return Cooldown->Query(Planner);
 }
 
 bool USP_Formation::IsCooldownShared() const
@@ -164,8 +169,9 @@ void USP_Formation::OnStart_Implementation(const USP_FormationSet* FormationSet)
 	SP_CHECK_NULLPTR(FormationSet)
 	SP_CHECK_NULLPTR(FormationSet->GetLeadActor())
 
-	if (bShareCooldown)
-		SavedTimeCooldown = GetWorld()->GetTimeSeconds() + GetCooldown(FormationSet->GetLeadLOD() ? FormationSet->GetLeadLOD()->GetLevel() : -1.0f);
+	// TODO: FIX
+	//if (bShareCooldown)
+	//	SavedTimeCooldown = GetWorld()->GetTimeSeconds() + GetCooldown(FormationSet->GetLeadLOD() ? FormationSet->GetLeadLOD()->GetLODLevel() : -1.0f);
 }
 void USP_Formation::OnEnd_Implementation(const USP_FormationSet* FormationSet)
 {

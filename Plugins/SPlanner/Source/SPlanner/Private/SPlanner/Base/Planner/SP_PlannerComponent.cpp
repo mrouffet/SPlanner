@@ -5,22 +5,21 @@
 #include <TimerManager.h>
 
 #include <SPlanner/SP_Config.h>
-#include <SPlanner/Miscs/SP_FlagHelper.h>
+#include <SPlanner/Misc/SP_FlagHelper.h>
 
 #include <SPlanner/Base/Goal/SP_Goal.h>
 
-#include <SPlanner/Base/Actions/SP_ActionStep.h>
-#include <SPlanner/Base/Actions/SP_PlannerActionSet.h>
+#include <SPlanner/Base/Action/SP_Action.h>
+#include <SPlanner/Base/Action/SP_ActionStep.h>
+#include <SPlanner/Base/Action/SP_PlannerActionSet.h>
 
 #include <SPlanner/Base/Blackboard/SP_BlackboardComponent.h>
 
 #include <SPlanner/Base/Director/SP_Director.h>
 
-#include <SPlanner/Base/Zones/SP_PlannerLODComponent.h>
-
 #if SP_DEBUG_EDITOR
 
-#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+#include <SPlannerEditor/Misc/SP_EditorSettings.h>
 
 #endif
 
@@ -54,31 +53,6 @@ void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
 		OnActive_Internal();
 	else
 		OnInactive_Internal();
-}
-
-float USP_PlannerComponent::GetLODLevel() const
-{
-	if (LOD && LOD->IsInRange())
-		return LOD->GetLevel();
-
-	return -1.0f;
-}
-void USP_PlannerComponent::SetLOD(USP_PlannerLODComponent* NewLOD)
-{
-	if (LOD)
-	{
-		LOD->OnActive.RemoveDynamic(this, &USP_PlannerComponent::OnActiveLOD);
-		LOD->OnInactive.RemoveDynamic(this, &USP_PlannerComponent::OnInactiveLOD);
-	}
-
-	LOD = NewLOD;
-
-	// Can be nullptr to reset component.
-	if (LOD)
-	{
-		LOD->OnActive.AddDynamic(this, &USP_PlannerComponent::OnActiveLOD);
-		LOD->OnInactive.AddDynamic(this, &USP_PlannerComponent::OnInactiveLOD);
-	}
 }
 
 USP_Goal* USP_PlannerComponent::GetGoal() const
@@ -201,7 +175,7 @@ void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
 		PlanState = ESP_PlanState::PS_Invalid;
 }
 
-FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr) const
+FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(bool* bCanBeAchievedPtr) const
 {
 	SP_BENCHMARK_SCOPE(PC_CreatePlannerActionSet)
 
@@ -211,7 +185,7 @@ FSP_PlannerActionSet USP_PlannerComponent::CreatePlannerActionSet(float LODLevel
 	const USP_ActionSet* const CurrActionSet = Blackboard->GetActionSet(Goal);
 	SP_RCHECK_NULLPTR(CurrActionSet, FSP_PlannerActionSet())
 
-	return CurrActionSet->Shuffle(this, LODLevel, bCanBeAchievedPtr);
+	return CurrActionSet->Shuffle(this, bCanBeAchievedPtr);
 }
 
 void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
@@ -235,15 +209,7 @@ void USP_PlannerComponent::AskNewPlan(bool bInstantRequest)
 
 	OnAskPlan.Broadcast(this);
 
-	float TimeBeforeConstructPlan = DefaultTimeBeforeConstructPlan;
-
-	if (bInstantRequest)
-		TimeBeforeConstructPlan = -1.0f;
-	else if (LOD)
-	{
-		SP_CHECK(LOD->IsInRange(), "LOD inactive!")
-		TimeBeforeConstructPlan = LOD->GetTimeBeforeConstructPlan();
-	}
+	float TimeBeforeConstructPlan = bInstantRequest ? -1.0f : QueryTimeBeforeConstructPlan();
 
 #if SP_DEBUG_EDITOR
 	if (SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Plan) && IsSelectedInEditor())
@@ -273,24 +239,11 @@ void USP_PlannerComponent::ConstructPlan()
 
 	PlanState = ESP_PlanState::PS_Computing;
 
-	// Get current LOD level.
-	float LODLevel = -1.0f;
-
-	if (LOD)
-	{
-#if SP_DEBUG
-		if (!LOD->IsInRange())
-		{
-			SP_LOG(Error, "LOD inactive!")
-			OnPlanConstructionFailed(ESP_PlanError::PE_LODOutOfRange);
-			return;
-		}
-#endif
-		LODLevel = LOD->GetLevel();
-	}
+	USP_PlanGenInfos* Infos = NewObject<USP_PlanGenInfos>(this, PlanGenInfosClass);
+	Infos->Planner = this;
 
 	bool bCanBeAchieved = false;
-	FSP_PlannerActionSet PlannerActions = CreatePlannerActionSet(LODLevel, &bCanBeAchieved);
+	Infos->PlannerActions = CreatePlannerActionSet(&bCanBeAchieved);
 
 	// Check plan valid for constrution.
 	if (!bCanBeAchieved)
@@ -305,31 +258,31 @@ void USP_PlannerComponent::ConstructPlan()
 	{
 		FString PlanDebugStr = "Action list: ";
 
-		if (PlannerActions.BeginActions.Num() != 0)
+		if (Infos->PlannerActions.BeginActions.Num() != 0)
 		{
 			PlanDebugStr += "\nBegin: ";
 
-			for(int i = 0; i < PlannerActions.BeginActions.Num(); ++i)
-				PlanDebugStr += PlannerActions.BeginActions[i].Handle->GetDebugStr() + ", ";
+			for(int i = 0; i < Infos->PlannerActions.BeginActions.Num(); ++i)
+				PlanDebugStr += Infos->PlannerActions.BeginActions[i].Handle->GetDebugStr() + ", ";
 
 			PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
 		}
 
-		if (PlannerActions.Actions.Num() != 0)
+		if (Infos->PlannerActions.Actions.Num() != 0)
 		{
 			if(PlanDebugStr != "Action list: ")
 				PlanDebugStr += "\nCore: ";
 
-			for (int i = 0; i < PlannerActions.Actions.Num(); ++i)
+			for (int i = 0; i < Infos->PlannerActions.Actions.Num(); ++i)
 			{
-				if (PlannerActions.Actions[i].bIsForced)
+				if (Infos->PlannerActions.Actions[i].bIsForced)
 					PlanDebugStr += "F_"; // Forced action.
-				else if (PlannerActions.Actions[i].bAchievePlan)
+				else if (Infos->PlannerActions.Actions[i].bAchievePlan)
 					PlanDebugStr += "E_"; // End action.
 				else
 					PlanDebugStr += "C_"; // Core action.
 
-				PlanDebugStr += PlannerActions.Actions[i].Handle->GetDebugStr() + ", ";
+				PlanDebugStr += Infos->PlannerActions.Actions[i].Handle->GetDebugStr() + ", ";
 			}
 
 			PlanDebugStr.RemoveAt(PlanDebugStr.Len() - 2, 2);
@@ -341,38 +294,30 @@ void USP_PlannerComponent::ConstructPlan()
 	}
 #endif
 
-	int8 MaxDepth = LODLevel > 0.0f ? LOD->GetMaxPlannerDepth(LODLevel) : DefaultMaxPlannerDepth;
+	Infos->SetMaxDepth(QueryMaxPlannerDepth());
 
 #if SP_DEBUG
-	if (MaxDepth <= 0)
+	if (Infos->MaxDepth <= 0)
 	{
-		SP_LOG(Error, "Bad MaxDepth: %d", MaxDepth)
+		SP_LOG(Error, "Bad MaxDepth: %d", Infos->MaxDepth)
 		OnPlanConstructionFailed(ESP_PlanError::PE_BadArgument);
 		return;
 	}
 #endif
 
-	// Output plan.
-	TArray<USP_ActionStep*> NewPlan;
-	NewPlan.Reserve(MaxDepth);
-
 	// Planner Computation.
-	if (ConstructPlan_Internal(PlannerActions, NewPlan, NewObject<USP_PlanGenInfos>(this, PlanGenInfosClass), MaxDepth, LODLevel))
+	if (ConstructPlan_Internal(Infos))
 	{
 		// Plan still being computed by this thread (not cancelled with AskNewPlan or SetNewGoal on main thread).
 		if(PlanState == ESP_PlanState::PS_Computing)
-			SetNewPlan(std::move(NewPlan));
+			SetNewPlan(std::move(Infos->OutPlan));
 	}
 	else // No plan found.
 		OnPlanConstructionFailed(ESP_PlanError::PE_CantBeAchieved);
 }
-bool USP_PlannerComponent::ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions,
-	TArray<USP_ActionStep*>& OutPlan,
-	USP_PlanGenInfos* PlanGenInfos,
-	uint8 MaxDepth,
-	float LODLevel) const
+bool USP_PlannerComponent::ConstructPlan_Internal(USP_PlanGenInfos* Infos) const
 {
-	// Must be overridden in children.
+	SP_LOG(Error, "Implementation must be overridden in children.")
 
 	return false;
 }
@@ -433,13 +378,13 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 	return true;
 }
 
-void USP_PlannerComponent::OnActiveLOD()
+float USP_PlannerComponent::QueryTimeBeforeConstructPlan_Implementation() const
 {
-	SetEnableBehavior(true);
+	return DefaultTimeBeforeConstructPlan;
 }
-void USP_PlannerComponent::OnInactiveLOD()
+int USP_PlannerComponent::QueryMaxPlannerDepth_Implementation() const
 {
-	SetEnableBehavior(false);
+	return DefaultMaxPlannerDepth;
 }
 
 void USP_PlannerComponent::InitializeComponent()

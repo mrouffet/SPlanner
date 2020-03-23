@@ -7,8 +7,9 @@
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 #include "SP_AIPlannerComponent.generated.h"
 
-class USP_Task;
+class USP_TaskStep;
 
+class USP_AILODComponent;
 class USP_POIZoneComponent;
 
 class APawn;
@@ -29,6 +30,10 @@ class SPLANNER_API USP_AIPlannerComponent : public USP_PlannerComponent
 	GENERATED_BODY()
 
 protected:
+	/** LOD component used  for plan generation. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	USP_AILODComponent* LOD = nullptr;
+
 	/**
 	*	The current index in plan executed.
 	*	Avoid Plan.PopFront().
@@ -49,7 +54,21 @@ protected:
 	*/
 	void ExecuteTask(float DeltaTime);
 
-	FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr = nullptr) const override;
+	/**
+	*	Callback function bind to LOD.OnActive.
+	*	call SetEnableBehavior(true).
+	*/
+	UFUNCTION(Category = "SPlanner|Planner")
+	void OnActiveLOD();
+
+	/**
+	*	Callback function bind to LOD.OnInactive.
+	*	call SetEnableBehavior(false).
+	*/
+	UFUNCTION(Category = "SPlanner|Planner")
+	void OnInactiveLOD();
+
+	FSP_PlannerActionSet CreatePlannerActionSet(bool* bCanBeAchievedPtr = nullptr) const override;
 
 	void AskNewPlan(bool bInstantRequest = false) override;
 
@@ -58,13 +77,16 @@ protected:
 	*	Use linear plan construction algorithm.
 	*	Return true on construction succeed.
 	*/
-	bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, USP_PlanGenInfos* PlanGenInfos, uint8 MaxDepth, float LODLevel) const override;
+	bool ConstructPlan_Internal(USP_PlanGenInfos* Infos) const override;
 
 	/** Check cooldown and call AskNewPlan after newly available task. */
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;
 
 	bool OnActive_Internal_Implementation() override;
 	bool OnInactive_Internal_Implementation() override;
+
+	float QueryTimeBeforeConstructPlan_Implementation() const override;
+	int QueryMaxPlannerDepth_Implementation() const override;
 
 	void BeginPlay() override;
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -87,25 +109,36 @@ public:
 
 	USP_AIPlannerComponent(const FObjectInitializer& ObjectInitializer);
 
+	/** Getter of LOD level. */
+	UFUNCTION(BlueprintPure, Category = "SPlanner")
+	float GetLODLevel() const;
+
+	/**
+	*	Setter of LOD.
+	*	Bind OnActiveLOD / OnInactiveLOD events.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
+	void SetLOD(USP_AILODComponent* NewLOD);
+
 	/** Getter of the previous executed Task in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_Task* GetPrevTask() const;
+	USP_TaskStep* GetPrevTask() const;
 
 	/** Getter of previous executed Tasks in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	TArray<USP_Task*> GetPrevTasks() const;
+	TArray<USP_TaskStep*> GetPrevTasks() const;
 
 	/** Getter of current executed Task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_Task* GetCurrentTask() const;
+	USP_TaskStep* GetCurrentTask() const;
 
 	/** Getter of the next Task to execute in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_Task* GetNextTask() const;
+	USP_TaskStep* GetNextTask() const;
 
 	/** Getter of next Tasks to execute in Plan*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	TArray<USP_Task*> GetNextTasks() const;
+	TArray<USP_TaskStep*> GetNextTasks() const;
 
 	/** Notify by calling OnNotify(). */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner|AI")

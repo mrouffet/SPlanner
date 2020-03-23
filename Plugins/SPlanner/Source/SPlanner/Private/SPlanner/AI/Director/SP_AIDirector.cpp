@@ -4,7 +4,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/AI/Controllers/SP_AIController.h>
+#include <SPlanner/AI/Controller/SP_AIController.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 

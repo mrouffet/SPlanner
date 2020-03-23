@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Engine/DataAsset.h>
+#include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_Goal.generated.h"
 
 class USP_PlannerComponent;
@@ -11,7 +11,7 @@ class USP_PlannerComponent;
  *	Planner goal asset.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Goal")
-class SPLANNER_API USP_Goal : public UDataAsset
+class SPLANNER_API USP_Goal : public USP_DataAsset
 {
 	GENERATED_BODY()
 

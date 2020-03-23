@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <GameFramework/Actor.h>
+#include <SPlanner/Framework/SP_Actor.h>
 #include "SP_Director.generated.h"
 
 class USP_Goal;
@@ -14,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_DirectorGoalRegisterDelegate, US
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_DirectorPlannerRegisterDelegate, USP_PlannerComponent*, InPlanner);
 
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Director")
-class SPLANNER_API ASP_Director : public AActor
+class SPLANNER_API ASP_Director : public ASP_Actor
 {
 	GENERATED_BODY()
 

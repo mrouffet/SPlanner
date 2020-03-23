@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/Miscs/SP_FlagHelper.h>
+#include <SPlanner/Misc/SP_FlagHelper.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenFlags.h>
 

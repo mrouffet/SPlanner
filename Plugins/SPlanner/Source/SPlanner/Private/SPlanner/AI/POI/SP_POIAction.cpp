@@ -6,23 +6,23 @@
 
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
-#include <SPlanner/AI/Tasks/SP_Task.h>
+#include <SPlanner/AI/Task/SP_TaskStep.h>
 
-USP_Task* FSP_POIAction::GetTask() const
+USP_TaskStep* USP_POIAction::GetTask() const
 {
-	SP_SRCHECK_NULLPTR(Cast<USP_Task>(Step), nullptr)
+	SP_SRCHECK_NULLPTR(Cast<USP_TaskStep>(Step), nullptr)
 
-	return Cast<USP_Task>(Step);
+	return Cast<USP_TaskStep>(Step);
 }
 
-bool FSP_POIAction::IsGoalAchieved(const USP_Goal* Goal) const
+bool USP_POIAction::IsGoalAchieved(const USP_Goal* Goal) const
 {
 	SP_SRCHECK_NULLPTR(Goal, false)
 
 	return AchievedGoals.Find(Goal) != INDEX_NONE;
 }
 
-bool FSP_POIAction::CheckAvailability(const USP_PlannerComponent* Planner) const
+bool USP_POIAction::CheckAvailability(const USP_PlannerComponent* Planner) const
 {
 	if (!Super::CheckAvailability(Planner))
 		return false;

@@ -4,12 +4,12 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Base/Zones/SP_LODComponent.h>
+#include <SPlanner/AI/LOD/SP_AILODComponent.h>
 
-#include <SPlanner/AI/Blackboard/Objects/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
 #include <SPlanner/AI/Formation/SP_Formation.h>
 #include <SPlanner/AI/Formation/SP_FormationFocusType.h>
-#include <SPlanner/AI/Controllers/SP_AIController.h>
+#include <SPlanner/AI/Controller/SP_AIController.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 #include <SPlanner/AI/Director/SP_AIDirector.h>
@@ -17,8 +17,8 @@
 #if SP_DEBUG_EDITOR
 	#include <DrawDebugHelpers.h>
 
-	#include <SPlanner/Miscs/SP_FlagHelper.h>
-	#include <SPlannerEditor/Miscs/SP_EditorSettings.h>
+	#include <SPlanner/Misc/SP_FlagHelper.h>
+	#include <SPlannerEditor/Misc/SP_EditorSettings.h>
 #endif
 
 AActor* USP_FormationSet::GetLeadActor() const
@@ -357,9 +357,10 @@ bool USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& Av
 	{
 		CurrentFormation->OnEnd(this);
 
-		// Set private cooldown.
-		if (!CurrentFormation->IsCooldownShared())
-			Cooldowns.FindOrAdd(CurrentFormation) = CurrentFormation->GetCooldown(LeadLOD ? LeadLOD->GetLevel() : -1.0f);
+		// TODO: FIX.
+		//// Set private cooldown.
+		//if (!CurrentFormation->IsCooldownShared())
+		//	Cooldowns.FindOrAdd(CurrentFormation) = CurrentFormation->GetCooldown(LeadLOD ? LeadLOD->GetLODLevel() : -1.0f);
 	}
 
 	CurrentFormation = NewFormation;
@@ -490,15 +491,16 @@ USP_Formation* USP_FormationSet::SelectRandomFormation(const TArray<USP_Formatio
 
 	TArray<FSP_WeightFormation> WeightFormations;
 
-	// Query Leader LOD Level.
-	float LODLevel = LeadLOD ? LeadLOD->GetLevel() : -1.0f;
+	// TODO: FIX
+	//// Query Leader LOD Level.
+	//float LODLevel = LeadLOD ? LeadLOD->GetLevel() : -1.0f;
 
-	for (int i = 0; i < AvailableFormations.Num(); ++i)
-	{
-		SP_CCHECK_NULLPTR(AvailableFormations[i])
+	//for (int i = 0; i < AvailableFormations.Num(); ++i)
+	//{
+	//	SP_CCHECK_NULLPTR(AvailableFormations[i])
 
-		WeightFormations.Add(FSP_WeightFormation{ AvailableFormations[i], AvailableFormations[i]->GetWeight(LODLevel) * FMath::FRand() });
-	}
+	//	WeightFormations.Add(FSP_WeightFormation{ AvailableFormations[i], AvailableFormations[i]->GetWeight(LODLevel) * FMath::FRand() });
+	//}
 
 	WeightFormations.Sort(WeightFormationFunctor{});
 

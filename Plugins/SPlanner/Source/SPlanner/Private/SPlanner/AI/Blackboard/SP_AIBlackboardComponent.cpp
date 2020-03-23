@@ -5,15 +5,15 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardAsset.h>
-#include <SPlanner/AI/Blackboard/Objects/SP_AIBlackboardObject.h>
+#include <SPlanner/AI/Blackboard/Object/SP_AIBlackboardObject.h>
 
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Bool.h>
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Int.h>
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Float.h>
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Vector.h>
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Rotator.h>
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Name.h>
-#include <SPlanner/AI/Blackboard/Keys/SP_AIBlackboardKey_Object.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Bool.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Int.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Float.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Vector.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Rotator.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Name.h>
+#include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Object.h>
 
 bool USP_AIBlackboardComponent::GetBool(const FName& EntryName) const
 {

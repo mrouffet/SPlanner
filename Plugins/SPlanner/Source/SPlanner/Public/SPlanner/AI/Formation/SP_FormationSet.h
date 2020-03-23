@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Engine/DataAsset.h>
+#include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_FormationSet.generated.h"
 
 class USP_Formation;
@@ -14,7 +14,7 @@ class USP_AIPlannerComponent;
  *	Base implementation of AI Formation.
  */
 UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|AI|Formation")
-class SPLANNER_API USP_FormationSet : public UDataAsset
+class SPLANNER_API USP_FormationSet : public USP_DataAsset
 {
 	GENERATED_BODY()
 

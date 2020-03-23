@@ -8,7 +8,7 @@
 #include <SPlanner/Base/Planner/SP_PlanError.h>
 #include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
 
-#include <Components/ActorComponent.h>
+#include <SPlanner/Framework/SP_ActorComponent.h>
 #include "SP_PlannerComponent.generated.h"
 
 class USP_Goal;
@@ -17,7 +17,6 @@ class USP_ActionStep;
 struct FSP_PlannerActionSet;
 
 class USP_BlackboardComponent;
-class USP_PlannerLODComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_PlannerDelegate, USP_PlannerComponent*, Planner);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_PlannerGoalDelegate, USP_PlannerComponent*, Planner, USP_Goal*, OldGoal, USP_Goal*, NewGoal);
@@ -27,7 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSP_PlannerGoalDelegate, USP_Plan
 *	Use planning to generate behavior using action set.
 */
 UCLASS(Abstract, BlueprintType, Blueprintable, DisplayName = "Planner", ClassGroup = "SPlanner|Planner")
-class SPLANNER_API USP_PlannerComponent : public UActorComponent
+class SPLANNER_API USP_PlannerComponent : public USP_ActorComponent
 {
 	GENERATED_BODY()
 
@@ -57,10 +56,6 @@ protected:
 	*/
 	std::atomic<ESP_PlanState> PlanState;
 
-	/** LOD component used  for plan generation. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_PlannerLODComponent* LOD = nullptr;
-
 	/**
 	*	Set new plan to execute and update PlanState.
 	*	Executed on external thread.
@@ -68,7 +63,7 @@ protected:
 	void SetNewPlan(TArray<USP_ActionStep*>&& Plan);
 
 	/** Create the planner action set to generate the plan with. */
-	virtual FSP_PlannerActionSet CreatePlannerActionSet(float LODLevel, bool* bCanBeAchievedPtr = nullptr) const;
+	virtual FSP_PlannerActionSet CreatePlannerActionSet(bool* bCanBeAchievedPtr = nullptr) const;
 
 	/**
 	*	Ask a new plan generation on external thread.
@@ -84,7 +79,7 @@ protected:
 	*	Must be overridden in children.
 	*	Return true on construction succeed.
 	*/
-	virtual bool ConstructPlan_Internal(FSP_PlannerActionSet& PlannerActions, TArray<USP_ActionStep*>& OutPlan, USP_PlanGenInfos* PlanGenInfos, uint8 MaxDepth, float LODLevel) const;
+	virtual bool ConstructPlan_Internal(USP_PlanGenInfos* Infos) const;
 
 
 	/** Callback function called when a plan's construction failed (no valid plan found). */
@@ -108,18 +103,18 @@ protected:
 	bool OnInactive_Internal();
 
 	/**
-	*	Callback function bind to LOD.OnActive.
-	*	call SetEnableBehavior(true).
+	*	Query the TimeBeforeConstructPlan.
+	*	Called in AskPlan() on main thread.
 	*/
-	UFUNCTION(Category = "SPlanner|Planner")
-	void OnActiveLOD();
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
+	float QueryTimeBeforeConstructPlan() const;
 
 	/**
-	*	Callback function bind to LOD.OnInactive.
-	*	call SetEnableBehavior(false).
+	*	Query the TimeBeforeConstructPlan.
+	*	Called in ConstructPlan() on external thread.
 	*/
-	UFUNCTION(Category = "SPlanner|Planner")
-	void OnInactiveLOD();
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Planner")
+	int QueryMaxPlannerDepth() const;
 
 	void InitializeComponent() override;
 	void UninitializeComponent() override;
@@ -212,17 +207,6 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner")
 	void SetEnableBehavior(bool bEnable);
-
-	/** Getter of LOD level. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner")
-	float GetLODLevel() const;
-
-	/**
-	*	Setter of LOD.
-	*	Bind OnActiveLOD / OnInactiveLOD events.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
-	void SetLOD(USP_PlannerLODComponent* NewLOD);
 
 	/** Getter of Goal. */
 	USP_Goal* GetGoal() const;

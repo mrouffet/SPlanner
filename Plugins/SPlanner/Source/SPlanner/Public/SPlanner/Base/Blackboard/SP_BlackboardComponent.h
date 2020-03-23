@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Components/ActorComponent.h>
+#include <SPlanner/Framework/SP_ActorComponent.h>
 #include "SP_BlackboardComponent.generated.h"
 
 class USP_Goal;
@@ -14,7 +14,7 @@ class USP_BlackboardAsset;
  *	SPlanner base Blackboard implementation
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Blackboard")
-class SPLANNER_API USP_BlackboardComponent : public UActorComponent
+class SPLANNER_API USP_BlackboardComponent : public USP_ActorComponent
 {
 	GENERATED_BODY()
 

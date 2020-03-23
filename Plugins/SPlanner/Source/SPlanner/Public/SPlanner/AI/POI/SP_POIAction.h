@@ -2,33 +2,33 @@
 
 #pragma once
 
-#include <SPlanner/Base/Actions/SP_Action.h>
+#include <SPlanner/Base/Action/SP_Action.h>
 #include "SP_POIAction.generated.h"
 
-class USP_Task;
+class USP_TaskStep;
 class USP_Goal;
 
 /**
 *	Planner POI Action.
 *	Pair task and weight.
 */
-USTRUCT(BlueprintType, Category = "SPlanner|POI")
-struct FSP_POIAction : public FSP_Action
+UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, Category = "SPlanner|POI")
+class USP_POIAction : public USP_Action
 {
 	GENERATED_BODY()
 
 protected:
 	/** All goals served by this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	TArray<const USP_Goal*> ServedGoals;
 
 	/** All goals achieved by this task. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	TArray<const USP_Goal*> AchievedGoals;
 
 public:
 	/** Getter of Task. */
-	USP_Task* GetTask() const;
+	USP_TaskStep* GetTask() const;
 
 	/** Whether Goal is in AchievedGoals */
 	bool IsGoalAchieved(const USP_Goal* Goal) const;
