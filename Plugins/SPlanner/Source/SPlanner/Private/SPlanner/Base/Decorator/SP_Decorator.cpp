@@ -4,9 +4,18 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Misc/SP_FlagHelper.h>
+
+#include <SPlanner/Base/Decorator/SP_DecoratorFlag.h>
+
 uint8 USP_Decorator::GetValidateMask() const
 {
 	return ValidateMask;
+}
+
+USP_Decorator::USP_Decorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	SP_SET_FLAG(ValidateMask, ESP_DecoratorFlag::DF_Availability);
 }
 
 bool USP_Decorator::Validate(const UObject* Object)
@@ -49,3 +58,17 @@ void USP_Decorator::OnValidationSuccess_Implementation(const UObject* Object)
 void USP_Decorator::OnValidationFailure_Implementation(const UObject* Object)
 {
 }
+
+#if WITH_EDITOR
+bool USP_Decorator::CanEditChange(const UProperty* InProperty) const
+{
+	if (!Super::CanEditChange(InProperty))
+		return false;
+
+	// Mask no more editable (from child implementation).
+	if (!bCanEditValidateMask && InProperty->GetName() == "ValidateMask")
+		return false;
+
+	return true;
+}
+#endif

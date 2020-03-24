@@ -26,10 +26,6 @@ protected:
 
 	bool PreCondition_Validate_Internal_Implementation(const USP_PlanGenInfos* Infos) override;
 
-#if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
-
 public:
 	USP_RequireStepDecorator(const FObjectInitializer& ObjectInitializer);
 };

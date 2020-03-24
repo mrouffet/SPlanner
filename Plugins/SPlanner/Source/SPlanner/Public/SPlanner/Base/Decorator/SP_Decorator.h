@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <SPlanner/Base/Decorator/SP_DecoratorFlag.h>
 #include <SPlanner/Base/Decorator/SP_DecoratorMacro.h>
 
 #include <SPlanner/Framework/SP_Object.h>
@@ -23,8 +22,8 @@ protected:
 	bool bInverseCondition = false;
 
 	/** Mask to call validate. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = "ESP_DecoratorFlag"))
-	uint8 ValidateMask = static_cast<uint8>(ESP_DecoratorFlag::DF_Availability);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = "ESP_DecoratorFlag_TEMPFIX")) // TODO: FIX.
+	uint8 ValidateMask = 0u; // init in .cpp
 
 	/** Common validate implementation. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
@@ -42,7 +41,14 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
 	void OnValidationFailure(const UObject* Object);
 
+#if WITH_EDITOR
+	/** Whether ValidateMask can be edited from Editor window. */
+	bool bCanEditValidateMask = true;
+#endif
+
 public:
+	USP_Decorator(const FObjectInitializer& ObjectInitializer);
+
 	/** Getter of ValidateMask. */
 	uint8 GetValidateMask() const;
 
@@ -60,4 +66,8 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")
 	bool Available_Validate(const UObject* Object);
+
+#if WITH_EDITOR
+	bool CanEditChange(const UProperty* InProperty) const override;
+#endif
 };

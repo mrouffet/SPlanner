@@ -16,4 +16,4 @@ enum class ESP_PlannerDecoratorFlag : uint8
 	DF_Max											UMETA(Hidden)
 };
 
-ENUM_CLASS_FLAGS(ESP_PlannerDecoratorFlag);
+ENUM_CLASS_FLAGS(ESP_PlannerDecoratorFlag)

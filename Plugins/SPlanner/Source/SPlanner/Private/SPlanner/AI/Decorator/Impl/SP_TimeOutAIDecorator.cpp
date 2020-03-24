@@ -2,7 +2,7 @@
 
 #include <SPlanner/AI/Decorator/Impl/SP_TimeOutAIDecorator.h>
 
-#include <SPlanner/Debug/SP_Debug.h>
+#include <SPlanner/Misc/SP_FlagHelper.h>
 
 #include <SPlanner/AI/Planner/SP_AIFloatParam.h>
 
@@ -13,7 +13,11 @@ USP_TimeOutAIDecorator::USP_TimeOutAIDecorator(const FObjectInitializer& ObjectI
 	TimeOutParam = CreateDefaultSubobject<USP_AIFloatParam>("TimeOutParam");
 	TimeOutParam->DefaultValue = 5.0f;
 
-	ValidateMask = static_cast<uint8>(ESP_AIPlannerDecoratorFlag::DF_Tick);
+	SP_SET_FLAG(ValidateMask, ESP_AIPlannerDecoratorFlag::DF_Tick);
+
+#if WITH_EDITOR
+	bCanEditValidateMask = false;
+#endif
 }
 
 bool USP_TimeOutAIDecorator::Validate_Internal_Implementation(const UObject* Object)
@@ -36,17 +40,3 @@ bool USP_TimeOutAIDecorator::Tick_Validate_Internal_Implementation(float DeltaSe
 
 	return Super::Tick_Validate_Internal_Implementation(DeltaSeconds, Planner, TaskInfos);
 }
-
-#if WITH_EDITOR
-void USP_TimeOutAIDecorator::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	// Force PreCondition only. 
-	if (PropertyChangedEvent.GetPropertyName() == "ValidateMask")
-	{
-		SP_LOG(Warning, "Decorator must always be checked in Tick.")
-		ValidateMask = static_cast<uint8>(ESP_AIPlannerDecoratorFlag::DF_Tick);
-	}
-}
-#endif

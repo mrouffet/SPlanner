@@ -4,13 +4,19 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Misc/SP_FlagHelper.h>
+
 #include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
 
 #include <SPlanner/Base/Decorator/SP_PlannerDecoratorFlag.h>
 
 USP_RequireStepDecorator::USP_RequireStepDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	ValidateMask = static_cast<uint8>(ESP_PlannerDecoratorFlag::DF_PreCondition);
+	SP_SET_FLAG(ValidateMask, ESP_PlannerDecoratorFlag::DF_PreCondition);
+
+#if WITH_EDITOR
+	bCanEditValidateMask = false;
+#endif
 }
 
 bool USP_RequireStepDecorator::PreCondition_Validate_Internal_Implementation(const USP_PlanGenInfos* Infos)
@@ -40,17 +46,3 @@ bool USP_RequireStepDecorator::PreCondition_Validate_Internal_Implementation(con
 
 	return Super::PreCondition_Validate_Internal_Implementation(Infos);
 }
-
-#if WITH_EDITOR
-void USP_RequireStepDecorator::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	// Force PreCondition only. 
-	if (PropertyChangedEvent.GetPropertyName() == "ValidateMask")
-	{
-		SP_LOG(Warning, "Decorator must always be checked in PreCondition.")
-		ValidateMask = static_cast<uint8>(ESP_PlannerDecoratorFlag::DF_PreCondition);
-	}
-}
-#endif

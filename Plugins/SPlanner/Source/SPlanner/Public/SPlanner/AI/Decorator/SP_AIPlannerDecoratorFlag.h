@@ -6,7 +6,7 @@
 #include "SP_AIPlannerDecoratorFlag.generated.h"
 
 /** Debug plan enum flags. */
-UENUM(Category = "SPlanner|AI", meta = (Bitflags))
+UENUM(Category = "SPlanner|AI|Decorator", meta = (Bitflags))
 enum class ESP_AIPlannerDecoratorFlag : uint8
 {
 	/** Check decorator to validate Begin. */
@@ -19,4 +19,4 @@ enum class ESP_AIPlannerDecoratorFlag : uint8
 	DF_Max											UMETA(Hidden)
 };
 
-ENUM_CLASS_FLAGS(ESP_AIPlannerDecoratorFlag);
+ENUM_CLASS_FLAGS(ESP_AIPlannerDecoratorFlag)
