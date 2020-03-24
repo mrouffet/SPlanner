@@ -11,9 +11,9 @@
 
 class USP_AIFloatParam;
 
-class USP_FormationSet;
+class USP_Decorator;
 
-class USP_AIPlannerComponent;
+class USP_FormationSet;
 
 /**
  *	Base formation shape.
@@ -64,31 +64,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	bool bUseLeadForwardAsReference = false;
 
-	/**
-	*	Saved world time with cooldown.
-	*	Require bShareCooldown == true.
-	*/
-	float SavedTimeCooldown = -1.0f;
+	/** Additionnal condition to validate. */
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadWrite, Category = "SPlanner")
+	TArray<USP_Decorator*> Decorators;
 
 	/**
 	*	Weight of this shape.
 	*	Increase weight for chances to be selected.
 	*	LOD Level will be computed from formation's lead actor.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_AIFloatParam* Weight;
-
-	/**
-	*	Cooldown of this shape.
-	*	Time before this shape become available again.
-	*	LOD Level will be computed from formation's lead actor.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_AIFloatParam* Cooldown;
-
-	/** Whether cooldown should be shared across all formations. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	bool bShareCooldown = false;
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
+	USP_AIFloatParam* Weight = nullptr;
 
 	/** Compute the base direction. */
 	virtual FVector ComputeBaseDirection(const FSP_FormationSetInfos& SetInfos);
@@ -110,8 +96,6 @@ protected:
 	virtual void ConstructPointByPoint(FSP_FormationInfos& Infos);
 
 public:
-	USP_Formation(const FObjectInitializer& ObjectInitializer);
-
 	/** Getter of FormationFocusType. */
 	ESP_FormationFocusType GetFormationFocusType() const;
 
@@ -128,14 +112,9 @@ public:
 	float GetLeadSqrDistThreshold() const;
 
 	/** Getter of Weight. */
-	float GetWeight(const USP_AIPlannerComponent* Planner) const;
+	float GetWeight(const UObject* Outer) const;
 
-	/** Getter of Cooldown. */
-	float GetCooldown(const USP_AIPlannerComponent* Planner) const;
-
-	/** Getter of bShareCooldown. */
-	bool IsCooldownShared() const;
-
+	/** Check availability. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|AI|Formation")
 	virtual bool IsAvailable(const USP_FormationSet* FormationSet) const;
 

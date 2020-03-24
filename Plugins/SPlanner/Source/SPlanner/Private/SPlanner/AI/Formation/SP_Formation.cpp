@@ -4,21 +4,11 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/AI/LOD/SP_AILODComponent.h>
+#include <SPlanner/Base/Decorator/SP_Decorator.h>
 
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 
 #include <SPlanner/AI/Planner/SP_AIFloatParam.h>
-#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
-
-USP_Formation::USP_Formation(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
-	// Set default cooldown value.
-	Cooldown = CreateDefaultSubobject<USP_AIFloatParam>("Cooldown");
-	Cooldown->DefaultValue = 0.0f;
-
-	Weight = CreateDefaultSubobject<USP_AIFloatParam>("Weight");
-}
 
 ESP_FormationFocusType USP_Formation::GetFormationFocusType() const
 {
@@ -43,18 +33,9 @@ float USP_Formation::GetLeadSqrDistThreshold() const
 	return LeadSqrDistThreshold;
 }
 
-float USP_Formation::GetWeight(const USP_AIPlannerComponent* Planner) const
+float USP_Formation::GetWeight(const UObject* Outer) const
 {
-	return Weight->Query(Planner);
-}
-float USP_Formation::GetCooldown(const USP_AIPlannerComponent* Planner) const
-{
-	return Cooldown->Query(Planner);
-}
-
-bool USP_Formation::IsCooldownShared() const
-{
-	return bShareCooldown;
+	return Weight->Query(Outer);
 }
 
 bool USP_Formation::IsAvailable(const USP_FormationSet* FormationSet) const
@@ -62,8 +43,17 @@ bool USP_Formation::IsAvailable(const USP_FormationSet* FormationSet) const
 	SP_RCHECK_NULLPTR(FormationSet, false)
 	SP_RCHECK_NULLPTR(FormationSet->GetLeadActor(), false)
 
-	if (bShareCooldown && SavedTimeCooldown > 0.0f)
-		return SavedTimeCooldown - FormationSet->GetLeadActor()->GetWorld()->GetTimeSeconds() <= 0.0f;
+	for (int i = 0; i < Decorators.Num(); ++i)
+	{
+		SP_CCHECK(Decorators[i], "Decorators[%d] is nulltpr!")
+		SP_CCHECK(SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(),
+			ESP_DecoratorFlag::DF_Availability), "Decorators[%d] flag must be ESP_DecoratorFlag::DF_Availability!")
+
+		if (!Decorators[i]->Available_Validate(FormationSet))
+			return false;
+	}
+
+	return true;
 
 	return true;
 }
@@ -168,10 +158,6 @@ void USP_Formation::OnStart_Implementation(const USP_FormationSet* FormationSet)
 {
 	SP_CHECK_NULLPTR(FormationSet)
 	SP_CHECK_NULLPTR(FormationSet->GetLeadActor())
-
-	// TODO: FIX
-	//if (bShareCooldown)
-	//	SavedTimeCooldown = GetWorld()->GetTimeSeconds() + GetCooldown(FormationSet->GetLeadLOD() ? FormationSet->GetLeadLOD()->GetLODLevel() : -1.0f);
 }
 void USP_Formation::OnEnd_Implementation(const USP_FormationSet* FormationSet)
 {
@@ -181,5 +167,4 @@ void USP_Formation::OnEnd_Implementation(const USP_FormationSet* FormationSet)
 
 void USP_Formation::Reset_Implementation()
 {
-	SavedTimeCooldown = -1.0f;
 }

@@ -7,7 +7,6 @@
 
 class USP_Formation;
 
-class USP_LODComponent;
 class USP_AIPlannerComponent;
 
 /**
@@ -20,29 +19,29 @@ class SPLANNER_API USP_FormationSet : public USP_DataAsset
 
 protected:
 	/** The leader actor of the formation. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|AI")
 	AActor* LeadActor = nullptr;
 
-	/** The cached LOD component of LeadActor. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	USP_LODComponent* LeadLOD = nullptr;
+	/** The cached AI Planner component of LeadActor (if lead has one). */
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|AI")
+	USP_AIPlannerComponent* LeadPlanner = nullptr;
 
 	/**
 	*	The targeted actor.
 	*	Used for formation rotation.
 	*/
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|AI")
 	AActor* TargetActor = nullptr;
 
 	/** The entry name to set the output position target object in Blackboard. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
 	FName OutputTargetEntryName = "MainTarget";
 
 	/**
 	*	The entry name to set the target actor in Blackboard.
 	*	Set to "None" to disable.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
 	FName TargetActorEntryName = "None";
 
 	/** The saved current update time. */
@@ -55,23 +54,23 @@ protected:
 	*	The rate of changing formation when a new planner is joining.
 	*	Set < 0.0f to never random.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
 	float RandomChangeFormationRate = 0.05f;
 
 	/**	Whether the same formation can be choose again when calling ChangeFormation(). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
 	bool bCanSelectSameFormationWhenChange = false;
 
-	/** All possible formations from this set. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	/** All possible formations for this set. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|AI")
 	TArray<USP_Formation*> Formations;
 
 	/** List of all planners on this formation. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|AI")
 	TArray<USP_AIPlannerComponent*> Planners;
 
 	/** Current formation in use. */
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner|AI")
 	USP_Formation* CurrentFormation = nullptr;
 
 	/** Cooldown of all formations from this set. */
@@ -141,9 +140,6 @@ public:
 	/** Getter of LeadActor. */
 	AActor* GetLeadActor() const;
 
-	/** Getter of LeadLOD. */
-	USP_LODComponent* GetLeadLOD() const;
-
 	/** Getter of TargetActor. */
 	AActor* GetTargetActor() const;
 
@@ -173,18 +169,20 @@ public:
 
 	
 	/** Add one planner to the formation. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	bool Add(USP_AIPlannerComponent* Planner);
 
 	/** Add planners to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool Add(const TArray<USP_AIPlannerComponent*>& InPlanners);
+	bool AddRange(const TArray<USP_AIPlannerComponent*>& InPlanners);
 
 	/** Remove one planner to the formation. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|AI|Formation")
 	bool Remove(USP_AIPlannerComponent* Planner);
 
 	/** Remove planners to the formation. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|AI|Formation")
-	bool Remove(const TArray<USP_AIPlannerComponent*>& InPlanners);
+	bool RemoveRange(const TArray<USP_AIPlannerComponent*>& InPlanners);
 
 
 	/** Change formation type. */

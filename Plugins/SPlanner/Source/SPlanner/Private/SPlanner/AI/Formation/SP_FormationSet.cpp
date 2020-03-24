@@ -4,15 +4,16 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/AI/LOD/SP_AILODComponent.h>
-
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+
 #include <SPlanner/AI/Formation/SP_Formation.h>
 #include <SPlanner/AI/Formation/SP_FormationFocusType.h>
-#include <SPlanner/AI/Controller/SP_AIController.h>
-#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
-#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+
 #include <SPlanner/AI/Director/SP_AIDirector.h>
+
+#include <SPlanner/AI/Controller/SP_AIController.h>
 
 #if SP_DEBUG_EDITOR
 	#include <DrawDebugHelpers.h>
@@ -24,10 +25,6 @@
 AActor* USP_FormationSet::GetLeadActor() const
 {
 	return LeadActor;
-}
-USP_LODComponent* USP_FormationSet::GetLeadLOD() const
-{
-	return LeadLOD;
 }
 
 AActor* USP_FormationSet::GetTargetActor() const
@@ -70,7 +67,7 @@ void USP_FormationSet::SetLeadActor(AActor* NewLeadActor)
 
 	LeadActor = NewLeadActor;
 
-	LeadLOD = Cast<USP_LODComponent>(LeadActor->GetComponentByClass(USP_LODComponent::StaticClass()));
+	LeadPlanner = Cast<USP_AIPlannerComponent>(LeadActor->GetComponentByClass(USP_AIPlannerComponent::StaticClass()));
 }
 
 bool USP_FormationSet::CheckAreContained(const TArray<const USP_AIPlannerComponent*>& InPlanners, bool bShouldBeContained) const
@@ -189,29 +186,41 @@ bool USP_FormationSet::Add(USP_AIPlannerComponent* Planner)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	return Add(TArray<USP_AIPlannerComponent*>{ Planner });
+	return AddRange(TArray<USP_AIPlannerComponent*>{ Planner });
 }
-bool USP_FormationSet::Add_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
+bool USP_FormationSet::AddRange_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
 	SP_RCHECK_NULLPTR(LeadActor, false)
 	SP_RCHECK(InPlanners.Num(), false, "Empty InPlanners array!")
 
-	SP_BENCHMARK_SCOPE(AddToFormation)
-
 	// None of InPlanners must not be already contained in Planners.
 	SP_RCHECK(CheckAreContained(reinterpret_cast<const TArray<const USP_AIPlannerComponent*>&>(InPlanners), false), false, "InPlanners already contained in Planners!")
 
-	// Formation is full.
-	if(!TryChangeFormation(Planners.Num() + InPlanners.Num()))
+	SP_BENCHMARK_SCOPE(AddToFormation)
+
+	// Can't find formation with new num.
+	if (!TryChangeFormation(Planners.Num() + InPlanners.Num()))
 	{
+		// Not enough planners.
+		if (Planners.Num() + InPlanners.Num() <= Formations[Formations.Num() - 1]->GetMaxNum())
+		{
 #if SP_DEBUG_EDITOR
-		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
-			SP_LOG_SCREEN(Display, FColor::Orange, "Formation full!")
+			if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+				SP_LOG_SCREEN(Display, FColor::Orange, "Not enough planner!")
 #endif
 
-		// TODO: Handle behavior: Try to add not whole InPlanners ?
+			// Wait for next planner add to have valid formation.
+			return true;
+		}
+		else // Formation is full.
+		{
+#if SP_DEBUG_EDITOR
+			if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
+				SP_LOG_SCREEN(Display, FColor::Orange, "Formation full!")
+#endif
 
-		return false;
+			return false;
+		}
 	}
 
 	int PrevPlannersNum = Planners.Num();
@@ -239,17 +248,17 @@ bool USP_FormationSet::Remove(USP_AIPlannerComponent* Planner)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	return Remove(TArray<USP_AIPlannerComponent*>{ Planner });
+	return RemoveRange(TArray<USP_AIPlannerComponent*>{ Planner });
 }
-bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
+bool USP_FormationSet::RemoveRange_Implementation(const TArray<USP_AIPlannerComponent*>& InPlanners)
 {
 	SP_RCHECK_NULLPTR(LeadActor, false)
 	SP_RCHECK(InPlanners.Num(), false, "Empty InPlanners array!")
 
-	SP_BENCHMARK_SCOPE(RemoveFromFormation)
-
 	// Each of InPlanners must be contained in Planners.
 	SP_RCHECK(CheckAreContained(reinterpret_cast<const TArray<const USP_AIPlannerComponent*>&>(InPlanners), true), false, "InPlanners must be contained in Planners!")
+
+	SP_BENCHMARK_SCOPE(RemoveFromFormation)
 
 	// Start by uninit, InPlanners won't be longer in formation.
 	UnInitPlannersData(InPlanners);
@@ -280,12 +289,11 @@ bool USP_FormationSet::Remove_Implementation(const TArray<USP_AIPlannerComponent
 	{
 #if SP_DEBUG_EDITOR
 		if (IsSelected() && SP_IS_FLAG_SET(USP_EditorSettings::GetDebugMask(), ESP_EditorDebugFlag::ED_Formation))
-			SP_LOG_SCREEN(Display, FColor::Orange, "Not enough planner in formation!")
+			SP_LOG_SCREEN(Display, FColor::Orange, "Not enough planner!")
 #endif
 
-		// TODO: Handle behavior.
-
-		return false;
+		// Wait for next planner add to have valid formation.
+		return true;
 	}
 
 	UpdateFormation();
@@ -354,14 +362,7 @@ bool USP_FormationSet::ChangeFormation_Internal(const TArray<USP_Formation*>& Av
 
 	// End previous.
 	if (CurrentFormation)
-	{
 		CurrentFormation->OnEnd(this);
-
-		// TODO: FIX.
-		//// Set private cooldown.
-		//if (!CurrentFormation->IsCooldownShared())
-		//	Cooldowns.FindOrAdd(CurrentFormation) = CurrentFormation->GetCooldown(LeadLOD ? LeadLOD->GetLODLevel() : -1.0f);
-	}
 
 	CurrentFormation = NewFormation;
 
@@ -447,6 +448,7 @@ TArray<USP_Formation*> USP_FormationSet::FindAvailableFormations(int PlannerNum)
 	{
 		SP_CCHECK_NULLPTR(Formations[i])
 
+		// Not available.
 		if (!PredicateAvailable(Formations[i]))
 			continue;
 
@@ -491,16 +493,12 @@ USP_Formation* USP_FormationSet::SelectRandomFormation(const TArray<USP_Formatio
 
 	TArray<FSP_WeightFormation> WeightFormations;
 
-	// TODO: FIX
-	//// Query Leader LOD Level.
-	//float LODLevel = LeadLOD ? LeadLOD->GetLevel() : -1.0f;
+	for (int i = 0; i < AvailableFormations.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(AvailableFormations[i])
 
-	//for (int i = 0; i < AvailableFormations.Num(); ++i)
-	//{
-	//	SP_CCHECK_NULLPTR(AvailableFormations[i])
-
-	//	WeightFormations.Add(FSP_WeightFormation{ AvailableFormations[i], AvailableFormations[i]->GetWeight(LODLevel) * FMath::FRand() });
-	//}
+		WeightFormations.Add(FSP_WeightFormation{ AvailableFormations[i], AvailableFormations[i]->GetWeight(LeadPlanner) * FMath::FRand() });
+	}
 
 	WeightFormations.Sort(WeightFormationFunctor{});
 
@@ -522,13 +520,6 @@ bool USP_FormationSet::PredicateAvailable_Implementation(USP_Formation* Formatio
 
 	if (!Formation->IsAvailable(this))
 		return false;
-
-	// Check cooldown.
-	if (!Formation->IsCooldownShared())
-	{
-		const float* const CooldownPtr = Cooldowns.Find(Formation);
-		return CooldownPtr ? *CooldownPtr - LeadActor->GetWorld()->GetTimeSeconds() <= 0.0f : true;
-	}
 
 	return true;
 }
@@ -603,8 +594,8 @@ void USP_FormationSet::Reset_Implementation()
 		Formations[i]->Reset();
 	}
 
-	LeadLOD = nullptr;
 	LeadActor = nullptr;
+	LeadPlanner = nullptr;
 
 	CurrTickTime = 0.0f;
 
