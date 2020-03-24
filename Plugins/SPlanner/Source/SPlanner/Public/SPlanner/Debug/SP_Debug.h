@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/Debug/SP_DebugMaco.h>
+#include <SPlanner/Debug/SP_DebugMacro.h>
 #include <SPlanner/Debug/SP_DebugVerbosity.h>
 #include <SPlanner/Debug/SP_DebugBenchmark.h>
 

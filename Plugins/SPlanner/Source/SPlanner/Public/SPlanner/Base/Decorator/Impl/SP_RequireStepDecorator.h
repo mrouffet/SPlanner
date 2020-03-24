@@ -22,7 +22,7 @@ protected:
 
 	/** Whether the required steps must use the specific order. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
-	bool bUseRequiredStepOrder = true;
+	bool bUseRequiredStepOrder = false;
 
 	bool PreCondition_Validate_Internal_Implementation(const USP_PlanGenInfos* Infos) override;
 

@@ -9,7 +9,10 @@
 float USP_AIFloatParam::Query_Implementation(const UObject* Outer) const
 {
 	const USP_AIPlannerComponent* const Planner = Cast<USP_AIPlannerComponent>(Outer);
-	SP_RCHECK(Planner, Super::Query_Implementation(Outer), "Planner nullptr! Outer must be of type USP_AIPlannerComponent.")
+
+	// Not a AI Planner: use base implementation.
+	if (!Planner)
+		return Super::Query_Implementation(Outer);
 
 	float LODLevel = Planner->GetLODLevel();
 
