@@ -11,8 +11,9 @@
 
 #include <SPlanner/AI/Controller/SP_AIController.h>
 
-#include <SPlanner/AI/POI/SP_POIComponent.h>
+#include <SPlanner/AI/POI/SP_POIAction.h>
 #include <SPlanner/AI/POI/SP_POIActionSet.h>
+#include <SPlanner/AI/POI/SP_POIComponent.h>
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
@@ -189,35 +190,37 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(bool* bCanBe
 
 	FSP_PlannerActionSet PlannerActions = Super::CreatePlannerActionSet(bCanBeAchievedPtr);
 
-	// TODO: FIX
-	//// Add all available actions from POI.
-	//if (POIZone)
-	//{
-	//	for (int j = 0; j < POIZone->GetPOIs().Num(); ++j)
-	//	{
-	//		SP_CCHECK(POIZone->GetPOIs()[j], "%s: POI [ %d ] nullptr!", false, *GetName(), j)
-	//		SP_CCHECK(POIZone->GetPOIs()[j]->GetActionSet(), "%s: POI [ %s ] action set nullptr!", false, *GetName(), *POIZone->GetPOIs()[j]->GetOwner()->GetName())
+	// Add all available actions from POI.
+	if (POIZone)
+	{
+		for (int j = 0; j < POIZone->GetPOIs().Num(); ++j)
+		{
+			SP_CCHECK(POIZone->GetPOIs()[j], "%s: POI [%d] nullptr!", false, *GetName(), j)
+			SP_CCHECK(POIZone->GetPOIs()[j]->GetActionSet(), "%s: POI [%s] action set nullptr!",
+				false, *GetName(), *POIZone->GetPOIs()[j]->GetOwner()->GetName())
 
-	//		const TArray<FSP_POIAction>& POIActions = POIZone->GetPOIs()[j]->GetActionSet()->GetActions();
+			const TArray<USP_POIAction*>& POIActions = POIZone->GetPOIs()[j]->GetActionSet()->GetActions();
 
-	//		for (int i = 0; i < POIActions.Num(); ++i)
-	//		{
-	//			SP_CCHECK(POIActions[i].GetTask(), "%s: POI Task [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
+			for (int i = 0; i < POIActions.Num(); ++i)
+			{
+				SP_CCHECK(POIActions[i], "%s: POI [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
+				SP_CCHECK(POIActions[i]->GetTask(), "%s: POI \"%s\" [%d] Task nullptr!",
+					*POIZone->GetPOIs()[j]->GetActionSet()->GetName(), *POIActions[i]->GetName(), i)
 
-	//			// Add to actions.
-	//			if (POIActions[i].CheckAvailability(this))
-	//			{
-	//				bool bAchieveGoal = POIActions[i].IsGoalAchieved(Goal);
+				// Add to actions.
+				if (POIActions[i]->CheckAvailability(this))
+				{
+					bool bAchieveGoal = POIActions[i]->IsGoalAchieved(Goal);
 
-	//				PlannerActions.Actions.Add(FSP_PlannerAction::Make(&POIActions[i], LODLevel, bAchieveGoal));
+					PlannerActions.Actions.Add(FSP_PlannerAction::Make(this, POIActions[i], bAchieveGoal));
 
-	//				// Update goal achieve.
-	//				if (bCanBeAchievedPtr && !*bCanBeAchievedPtr)
-	//					*bCanBeAchievedPtr = bAchieveGoal;
-	//			}
-	//		}
-	//	}
-	//}
+					// Update goal achieve.
+					if (bCanBeAchievedPtr && !*bCanBeAchievedPtr)
+						*bCanBeAchievedPtr = bAchieveGoal;
+				}
+			}
+		}
+	}
 
 	// Plan can't be achieve: save performance.
 	if(bCanBeAchievedPtr && !*bCanBeAchievedPtr)
@@ -267,6 +270,7 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 	//SP_CHECK(!FMath::IsNearlyEqual(MinCooldown, FLT_MAX), "Plan construction failed while no task are in cooldown.")
 
 	//GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this]{	AskNewPlan(); }, MinCooldown, false);
+	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this] {	AskNewPlan(); }, 0.5f, false);
 }
 bool USP_AIPlannerComponent::CancelPlan()
 {

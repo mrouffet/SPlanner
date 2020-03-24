@@ -15,7 +15,7 @@ void USP_ToogleActiveZoneComponent::Add_Implementation(USP_PlannerComponent* InP
 
 	Planners.Add(InPlanner);
 }
-void USP_ToogleActiveZoneComponent::AddRange(TArray<USP_PlannerComponent*> InPlanners)
+void USP_ToogleActiveZoneComponent::AddRange(const TArray<USP_PlannerComponent*>& InPlanners)
 {
 	for (int i = 0; i < InPlanners.Num(); ++i)
 		Add(InPlanners[i]);
@@ -31,7 +31,7 @@ void USP_ToogleActiveZoneComponent::Remove_Implementation(USP_PlannerComponent* 
 	// Reset to default state.
 	InPlanner->SetEnableBehavior(bDefaultActiveState);
 }
-void USP_ToogleActiveZoneComponent::RemoveRange(TArray<USP_PlannerComponent*> InPlanners)
+void USP_ToogleActiveZoneComponent::RemoveRange(const TArray<USP_PlannerComponent*>& InPlanners)
 {
 	for (int i = 0; i < InPlanners.Num(); ++i)
 		Remove(InPlanners[i]);

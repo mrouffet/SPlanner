@@ -34,7 +34,7 @@ public:
 
 	/** Add planners to handle in Planners.*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Zone|Toogle")
-	void AddRange(TArray<USP_PlannerComponent*> InPlanners);
+	void AddRange(const TArray<USP_PlannerComponent*>& InPlanners);
 
 	/** Remove a planner to handle in Planners.*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Zone|Toogle")
@@ -42,5 +42,5 @@ public:
 
 	/** Remove planners to handle in Planners.*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Zone|Toogle")
-	void RemoveRange(TArray<USP_PlannerComponent*> InPlanners);
+	void RemoveRange(const TArray<USP_PlannerComponent*>& InPlanners);
 };
