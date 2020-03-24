@@ -4,41 +4,39 @@
 
 #include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
 
-#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
-
-void USP_CooldownDecorator::SetCooldown(const USP_PlannerComponent* Planner)
+void USP_CooldownDecorator::SetCooldown(const UObject* Object)
 {
-	float PlannerCoolDown = Cooldown->Query(Planner);
+	float PlannerCoolDown = Cooldown->Query(Object);
 
 	// Never save no cooldown.
 	if (PlannerCoolDown <= 0.0f)
 		return;
 
 	// Add 0.001f to ensure float precision.
-	Cooldowns.FindOrAdd(Planner) = Planner->GetWorld()->GetTimeSeconds() + PlannerCoolDown + 0.001f;
+	Cooldowns.FindOrAdd(Object) = Object->GetWorld()->GetTimeSeconds() + PlannerCoolDown + 0.001f;
 }
 
-bool USP_CooldownDecorator::Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
+bool USP_CooldownDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
-	SP_DECORATOR_SUPER_VALIDATE(Planner)
+	SP_DECORATOR_SUPER_VALIDATE(Object)
 
-	const float* const CooldownPtr = Cooldowns.Find(Planner);
+	const float* const CooldownPtr = Cooldowns.Find(Object);
 
-	float PlannerCoolDown = CooldownPtr ? *CooldownPtr - Planner->GetWorld()->GetTimeSeconds() : -1.0f;
+	float ObjectCoolDown = CooldownPtr ? *CooldownPtr - Object->GetWorld()->GetTimeSeconds() : -1.0f;
 
-	return PlannerCoolDown > 0.0f;
+	return ObjectCoolDown > 0.0f;
 }
 
-void USP_CooldownDecorator::OnValidationSuccess_Implementation(const USP_PlannerComponent* Planner)
+void USP_CooldownDecorator::OnValidationSuccess_Implementation(const UObject* Object)
 {
-	Super::OnValidationSuccess_Implementation(Planner);
+	Super::OnValidationSuccess_Implementation(Object);
 
-	SetCooldown(Planner);
+	SetCooldown(Object);
 }
-void USP_CooldownDecorator::OnValidationFailure_Implementation(const USP_PlannerComponent* Planner)
+void USP_CooldownDecorator::OnValidationFailure_Implementation(const UObject* Object)
 {
-	Super::OnValidationFailure_Implementation(Planner);
+	Super::OnValidationFailure_Implementation(Object);
 
 	if (bUseCooldownOnFailed)
-		SetCooldown(Planner);
+		SetCooldown(Object);
 }

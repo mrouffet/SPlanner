@@ -20,5 +20,5 @@ protected:
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.
 	USP_BoolParam* Param = nullptr;
 
-	bool Validate_Internal_Implementation(const USP_PlannerComponent* Planner) override;
+	bool Validate_Internal_Implementation(const UObject* Object) override;
 };

@@ -22,5 +22,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	float SuccessRate = 0.5f;
 
-	bool Validate_Internal_Implementation(const USP_PlannerComponent* Planner) override;
+	bool Validate_Internal_Implementation(const UObject* Object) override;
 };

@@ -8,9 +8,6 @@
 #include <SPlanner/Framework/SP_Object.h>
 #include "SP_Decorator.generated.h"
 
-class USP_PlanGenInfos;
-class USP_PlannerComponent;
-
 /**
  *	SPlanner decorator base implementation.
  *	Decorator are additionnal conditions, which must be validated for a SP_TaskStep to be executed.
@@ -31,23 +28,19 @@ protected:
 
 	/** Common validate implementation. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
-	bool Validate_Internal(const USP_PlannerComponent* Planner);
+	bool Validate_Internal(const UObject* Object);
 
 	/** Available validate implementation. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
-	bool Available_Validate_Internal(const USP_PlannerComponent* Planner);
-
-	/** PreCondition validate implementation. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
-	bool PreCondition_Validate_Internal(const USP_PlanGenInfos* Infos);
+	bool Available_Validate_Internal(const UObject* Object);
 
 	/** Callback method called when this get validated. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
-	void OnValidationSuccess(const USP_PlannerComponent* Planner);
+	void OnValidationSuccess(const UObject* Object);
 
 	/** Callback method called when this get validated. */
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
-	void OnValidationFailure(const USP_PlannerComponent* Planner);
+	void OnValidationFailure(const UObject* Object);
 
 public:
 	/** Getter of ValidateMask. */
@@ -58,7 +51,7 @@ public:
 	*	Call Validate_Internal().
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")
-	bool Validate(const USP_PlannerComponent* Planner);
+	bool Validate(const UObject* Object);
 
 	/**
 	*	Available validate implementation.
@@ -66,13 +59,5 @@ public:
 	*	Call Available_Validate_Internal.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")
-	bool Available_Validate(const USP_PlannerComponent* Planner);
-
-	/**
-	*	PreCondition validate implementation.
-	*	Called by SP_TaskStep while this decorator is in PreConditionDecorators list.
-	*	Call PreCondition_Validate_Internal.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")
-	bool PreCondition_Validate(const USP_PlanGenInfos* Infos);
+	bool Available_Validate(const UObject* Object);
 };

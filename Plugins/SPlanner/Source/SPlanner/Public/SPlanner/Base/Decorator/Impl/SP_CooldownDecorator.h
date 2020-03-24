@@ -28,12 +28,12 @@ protected:
 	*	Cooldown time of all planners of this decorator.
 	*	World Time since beginning + task cooldown is stored.
 	*/
-	TMap<const USP_PlannerComponent*, float> Cooldowns;
+	TMap<const UObject*, float> Cooldowns;
 
 	/** Set the cooldown of Planner. */
-	void SetCooldown(const USP_PlannerComponent* Planner);
+	void SetCooldown(const UObject* Object);
 
-	bool Validate_Internal_Implementation(const USP_PlannerComponent* Planner) override;
-	void OnValidationSuccess_Implementation(const USP_PlannerComponent* Planner) override;
-	void OnValidationFailure_Implementation(const USP_PlannerComponent* Planner) override;
+	bool Validate_Internal_Implementation(const UObject* Object) override;
+	void OnValidationSuccess_Implementation(const UObject* Object) override;
+	void OnValidationFailure_Implementation(const UObject* Object) override;
 };

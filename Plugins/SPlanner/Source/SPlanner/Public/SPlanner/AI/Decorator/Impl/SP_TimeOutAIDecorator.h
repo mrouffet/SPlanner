@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Decorator/SP_AIDecorator.h>
+#include <SPlanner/AI/Decorator/SP_AIPlannerDecorator.h>
 #include "SP_TimeOutAIDecorator.generated.h"
 
 class USP_AIFloatParam;
@@ -11,8 +11,8 @@ class USP_AIFloatParam;
  *	SPlanner decorator check time out.
  *	Validate fail after time limit.
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator")
-class SPLANNER_API USP_TimeOutAIDecorator : public USP_AIDecorator
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator|AI")
+class SPLANNER_API USP_TimeOutAIDecorator : public USP_AIPlannerDecorator
 {
 	GENERATED_BODY()
 	
@@ -25,7 +25,7 @@ protected:
 	USP_AIFloatParam* TimeOutParam;
 
 	/** Internal implementation of Validate. */
-	bool Validate_Internal_Implementation(const USP_PlannerComponent* Planner) override;
+	bool Validate_Internal_Implementation(const UObject* Object) override;
 
 	bool Tick_Validate_Internal_Implementation(float DeltaSeconds, const USP_AIPlannerComponent* Planner, const USP_TaskInfos* TaskInfos) override;
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <SPlanner/Base/Decorator/SP_Decorator.h>
-#include "SP_AIDecorator.generated.h"
+#include <SPlanner/Base/Decorator/SP_PlannerDecorator.h>
+#include "SP_AIPlannerDecorator.generated.h"
 
 class USP_TaskInfos;
 class USP_AIPlannerComponent;
@@ -12,7 +12,7 @@ class USP_AIPlannerComponent;
  *	SPlanner decorator AI implementation.
  */
 UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator")
-class SPLANNER_API USP_AIDecorator : public USP_Decorator
+class SPLANNER_API USP_AIPlannerDecorator : public USP_PlannerDecorator
 {
 	GENERATED_BODY()
 	

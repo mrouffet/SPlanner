@@ -4,8 +4,8 @@
 
 #include <SPlanner/Misc/SP_FlagHelper.h>
 
-#include <SPlanner/AI/Decorator/SP_AIDecorator.h>
-#include <SPlanner/AI/Decorator/SP_AIDecoratorFlag.h>
+#include <SPlanner/AI/Decorator/SP_AIPlannerDecorator.h>
+#include <SPlanner/AI/Decorator/SP_AIPlannerDecoratorFlag.h>
 
 #include <SPlanner/AI/Planner/SP_AIFloatParam.h>
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
@@ -144,14 +144,15 @@ bool USP_TaskStep::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner
 	{
 		SP_CCHECK(Decorators[i], "Decorators[%d] nullptr!", i)
 
-		if (SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(), ESP_AIDecoratorFlag::DF_Begin))
+		if (SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(), ESP_AIPlannerDecoratorFlag::DF_Begin))
 		{
-			if (USP_AIDecorator* const AIDecorator = Cast<USP_AIDecorator>(Decorators[i]))
+			// Try cast as USP_PlannerDecorator.
+			if (USP_AIPlannerDecorator* const AIPlannerDecorator = Cast<USP_AIPlannerDecorator>(Decorators[i]))
 			{
-				if (!AIDecorator->Begin_Validate(Planner, TaskInfos))
+				if(!AIPlannerDecorator->Begin_Validate(Planner, TaskInfos))
 					return false;
 			}
-			else if (!Decorators[i]->Validate(Planner))
+			else if(Decorators[i]->Validate(Planner)) // Try base validate using Planner.
 				return false;
 		}
 	}
@@ -176,14 +177,15 @@ ESP_PlanExecutionState USP_TaskStep::Tick_Internal_Implementation(float DeltaSec
 	{
 		SP_CCHECK(Decorators[i], "Decorators[%d] nullptr!", i)
 
-		if (SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(), ESP_AIDecoratorFlag::DF_Tick))
+		if (SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(), ESP_AIPlannerDecoratorFlag::DF_Tick))
 		{
-			if (USP_AIDecorator* const AIDecorator = Cast<USP_AIDecorator>(Decorators[i]))
+			// Try cast as USP_PlannerDecorator.
+			if (USP_AIPlannerDecorator* const AIPlannerDecorator = Cast<USP_AIPlannerDecorator>(Decorators[i]))
 			{
-				if (!AIDecorator->Tick_Validate(DeltaSeconds, Planner, TaskInfos))
+				if(!AIPlannerDecorator->Tick_Validate(DeltaSeconds, Planner, TaskInfos))
 					return ESP_PlanExecutionState::PES_Failed;
 			}
-			else if (!Decorators[i]->Validate(Planner))
+			else if (Decorators[i]->Validate(Planner)) // Try base validate using Planner.
 				return ESP_PlanExecutionState::PES_Failed;
 		}
 	}

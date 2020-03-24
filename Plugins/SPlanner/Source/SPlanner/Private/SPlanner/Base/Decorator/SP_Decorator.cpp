@@ -4,18 +4,16 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
-
 uint8 USP_Decorator::GetValidateMask() const
 {
 	return ValidateMask;
 }
 
-bool USP_Decorator::Validate(const USP_PlannerComponent* Planner)
+bool USP_Decorator::Validate(const UObject* Object)
 {
-	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(Object, false)
 
-	bool bInternalResult = Validate_Internal(Planner);
+	bool bInternalResult = Validate_Internal(Object);
 
 	// Inverse.
 	if (bInverseCondition)
@@ -23,42 +21,31 @@ bool USP_Decorator::Validate(const USP_PlannerComponent* Planner)
 
 	// Validation callback.
 	if (bInternalResult)
-		OnValidationSuccess(Planner);
+		OnValidationSuccess(Object);
 	else
-		OnValidationFailure(Planner);
+		OnValidationFailure(Object);
 
 	return bInternalResult;
 }
-bool USP_Decorator::Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
+bool USP_Decorator::Validate_Internal_Implementation(const UObject* Object)
 {
 	return true;
 }
 
-bool USP_Decorator::Available_Validate(const USP_PlannerComponent* Planner)
+bool USP_Decorator::Available_Validate(const UObject* Object)
 {
-	SP_RCHECK_NULLPTR(Planner, false)
+	SP_RCHECK_NULLPTR(Object, false)
 
-	return Available_Validate_Internal(Planner);
+	return Available_Validate_Internal(Object);
 }
-bool USP_Decorator::Available_Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
+bool USP_Decorator::Available_Validate_Internal_Implementation(const UObject* Object)
 {
-	return Validate(Planner);
-}
-
-bool USP_Decorator::PreCondition_Validate(const USP_PlanGenInfos* Infos)
-{
-	SP_RCHECK_NULLPTR(Infos, false)
-
-	return PreCondition_Validate_Internal(Infos);
-}
-bool USP_Decorator::PreCondition_Validate_Internal_Implementation(const USP_PlanGenInfos* Infos)
-{
-	return Validate(Infos->Planner);
+	return Validate(Object);
 }
 
-void USP_Decorator::OnValidationSuccess_Implementation(const USP_PlannerComponent* Planner)
+void USP_Decorator::OnValidationSuccess_Implementation(const UObject* Object)
 {
 }
-void USP_Decorator::OnValidationFailure_Implementation(const USP_PlannerComponent* Planner)
+void USP_Decorator::OnValidationFailure_Implementation(const UObject* Object)
 {
 }

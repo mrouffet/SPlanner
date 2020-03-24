@@ -10,17 +10,17 @@
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
 
-bool USP_DistanceAIDecorator::Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
+bool USP_DistanceAIDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
-	SP_DECORATOR_SUPER_VALIDATE(Planner)
+	SP_DECORATOR_SUPER_VALIDATE(Object)
 
-	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Planner);
-	SP_RCHECK(AIPlanner, false, "AIPlanner nullptr! Planner must be of type USP_AIPlannerComponent!")
+	const USP_AIPlannerComponent* const AIPlanner = Cast<USP_AIPlannerComponent>(Object);
+	SP_RCHECK(AIPlanner, false, "AIPlanner nullptr! Object must be of type USP_AIPlannerComponent!")
 
 	const APawn* const Pawn = AIPlanner->GetPawn();
 	SP_RCHECK_NULLPTR(Pawn, false)
 
-	const USP_AIBlackboardComponent* const Blackboard = Planner->GetBlackboard<USP_AIBlackboardComponent>();
+	const USP_AIBlackboardComponent* const Blackboard = AIPlanner->GetBlackboard<USP_AIBlackboardComponent>();
 	SP_RCHECK_NULLPTR(Blackboard, false)
 
 	const USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);

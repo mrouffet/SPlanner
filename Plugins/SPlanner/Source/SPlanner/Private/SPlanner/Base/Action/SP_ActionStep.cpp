@@ -7,8 +7,10 @@
 #include <SPlanner/Misc/SP_FlagHelper.h>
 
 #include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
+#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
-#include <SPlanner/Base/Decorator/SP_Decorator.h>
+#include <SPlanner/Base/Decorator/SP_PlannerDecorator.h>
+#include <SPlanner/Base/Decorator/SP_PlannerDecoratorFlag.h>
 
 bool USP_ActionStep::CheckAvailability(const USP_PlannerComponent* Planner) const
 {
@@ -34,9 +36,17 @@ bool USP_ActionStep::PreCondition_Implementation(const USP_PlanGenInfos* Infos) 
 	{
 		SP_CCHECK(Decorators[i], "Decorators[%d] nullptr!", i)
 
-		if (SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(), ESP_DecoratorFlag::DF_PreCondition) &&
-			!Decorators[i]->PreCondition_Validate(Infos))
-			return false;
+		if (SP_IS_FLAG_SET(Decorators[i]->GetValidateMask(), ESP_PlannerDecoratorFlag::DF_PreCondition))
+		{
+			// Try cast as USP_PlannerDecorator.
+			if (USP_PlannerDecorator* const PlannerDecorator = Cast<USP_PlannerDecorator>(Decorators[i]))
+			{
+				if(!PlannerDecorator->PreCondition_Validate(Infos))
+					return false;
+			}
+			else if(Decorators[i]->Validate(Infos->Planner)) // Try base validate using Planner.
+				return false;
+		}
 	}
 
 	return true;

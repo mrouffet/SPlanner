@@ -4,11 +4,9 @@
 
 #include <SPlanner/Misc/VariableParam/SP_BoolParam.h>
 
-#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
-
-bool USP_BoolDecorator::Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
+bool USP_BoolDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
-	SP_DECORATOR_SUPER_VALIDATE(Planner)
+	SP_DECORATOR_SUPER_VALIDATE(Object)
 
-	return Param->Query(Planner);
+	return Param->Query(Object);
 }

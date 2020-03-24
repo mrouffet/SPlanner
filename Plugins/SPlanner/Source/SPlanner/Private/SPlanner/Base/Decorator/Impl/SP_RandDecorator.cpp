@@ -2,9 +2,9 @@
 
 #include <SPlanner/Base/Decorator/Impl/SP_RandDecorator.h>
 
-bool USP_RandDecorator::Validate_Internal_Implementation(const USP_PlannerComponent* Planner)
+bool USP_RandDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
-	SP_DECORATOR_SUPER_VALIDATE(Planner)
+	SP_DECORATOR_SUPER_VALIDATE(Object)
 
 	return FMath::FRand() <= SuccessRate;
 }

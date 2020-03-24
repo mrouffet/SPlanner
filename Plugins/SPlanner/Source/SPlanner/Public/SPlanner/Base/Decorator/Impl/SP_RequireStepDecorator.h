@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/Base/Decorator/SP_Decorator.h>
+#include <SPlanner/Base/Decorator/SP_PlannerDecorator.h>
 #include "SP_RequireStepDecorator.generated.h"
 
 class USP_ActionStep;
@@ -11,7 +11,7 @@ class USP_ActionStep;
  *	Check required steps of the currently generated plan.
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator")
-class SPLANNER_API USP_RequireStepDecorator : public USP_Decorator
+class SPLANNER_API USP_RequireStepDecorator : public USP_PlannerDecorator
 {
 	GENERATED_BODY()
 	
