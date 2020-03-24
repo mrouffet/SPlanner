@@ -2,6 +2,7 @@
 
 #include <SPlanner/AI/Character/SP_Character.h>
 
+#include <Components/SphereComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
@@ -20,10 +21,22 @@ ASP_Character::ASP_Character(const FObjectInitializer& ObjectInitializer) : Supe
 
 	Blackboard = CreateDefaultSubobject<USP_AIBlackboardComponent>(TEXT("SP_Blackboard"));
 
-	POIZone = CreateDefaultSubobject<USP_POIZoneComponent>(TEXT("SP_POIZone"));
-	POIZone->SetupAttachment(RootComponent);
-
 	LOD = CreateDefaultSubobject<USP_AILODComponent>(TEXT("SP_LOD"));
+
+	// POI.
+	POICollision = CreateDefaultSubobject<USphereComponent>(TEXT("POICollision"));
+	POICollision->SetSphereRadius(100.0f);
+
+	POICollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	POICollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+
+	POICollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	POICollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	POICollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+	POIZone = CreateDefaultSubobject<USP_POIZoneComponent>(TEXT("SP_POIZone"));
+	POIZone->SetHandle(POICollision);
+
 
 	// Avoid collision with other AI characters.
 	UCharacterMovementComponent* const MovementComponent = GetCharacterMovement();

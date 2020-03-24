@@ -6,7 +6,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Base/Zones/SP_ReactZoneComponent.h>
+#include <SPlanner/Base/Zone/SP_ReactZoneComponent.h>
 
 #include <SPlanner/AI/LOD/SP_AILODComponent.h>
 #include <SPlanner/AI/POI/SP_POIZoneComponent.h>

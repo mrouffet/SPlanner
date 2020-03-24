@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Base/Zones/SP_ReactZoneComponent.h>
+#include <SPlanner/Base/Zone/SP_ReactZoneComponent.h>
 
 #include <TimerManager.h>
 
@@ -14,9 +14,6 @@
 
 USP_ReactZoneComponent::USP_ReactZoneComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	// Default active radius.
-	SphereRadius = 400.0f;
-
 	// Add default player tag.
 	Tags.Add("SP_Player");
 }

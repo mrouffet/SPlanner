@@ -2,21 +2,25 @@
 
 #pragma once
 
-#include <Components/SphereComponent.h>
+#include <SPlanner/Framework/SP_ActorComponent.h>
 #include "SP_ZoneComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_ZoneDelegate, UPrimitiveComponent*, Object);
 
 /**
  *	Zone base implementation: enter / exit callbacks.
-*	Use radius and collision with objects to trigger events (OnEnterRange / OnExitRange).
+ *	Use handled shape and collision with objects to trigger events (OnEnter / OnExit).
  */
 UCLASS(BlueprintType, Blueprintable, DisplayName = "SP_Zone", ClassGroup = "SPlanner|Zone", meta = (BlueprintSpawnableComponent))
-class SPLANNER_API USP_ZoneComponent : public USphereComponent
+class SPLANNER_API USP_ZoneComponent : public USP_ActorComponent
 {
 	GENERATED_BODY()
 	
 protected:
+	/** The handled primitive used for collision detection. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPrimitiveComponent* Handle = nullptr;
+
 	/** Tags of objects that can react with this while overlapping. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	TArray<FName> Tags;
@@ -55,11 +59,18 @@ protected:
 public:
 	/** Callback events trigger when this actor enter the camera's range (ie BeginOverlap)*/
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
-	FSP_ZoneDelegate OnEnterRange;
+	FSP_ZoneDelegate OnEnter;
 
 	/** Callback events trigger when this actor exit the camera's range (ie EndOverlap)*/
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner")
-	FSP_ZoneDelegate OnExitRange;
+	FSP_ZoneDelegate OnExit;
 
 	USP_ZoneComponent(const FObjectInitializer& ObjectInitializer);
+
+	/**
+	*	Setter of Handle.
+	*	Bind collision events.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Zone")
+	void SetHandle(UPrimitiveComponent* Primitive);
 };

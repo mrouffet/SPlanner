@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/Base/Zones/SP_ZoneComponent.h>
+#include <SPlanner/Base/Zone/SP_ZoneComponent.h>
 #include "SP_POIZoneComponent.generated.h"
 
 class USP_POIComponent;

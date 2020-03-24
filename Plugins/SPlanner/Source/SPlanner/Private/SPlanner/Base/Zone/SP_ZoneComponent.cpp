@@ -1,23 +1,14 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Base/Zones/SP_ZoneComponent.h>
+#include <SPlanner/Base/Zone/SP_ZoneComponent.h>
+
+#include <Components/PrimitiveComponent.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
 USP_ZoneComponent::USP_ZoneComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
-
-	// Default active radius.
-	SphereRadius = 100.0f;
-
-	// Set overlaps.
-	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-
-	SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
-	SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 void USP_ZoneComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
@@ -65,7 +56,7 @@ void USP_ZoneComponent::AddObject_Implementation(UPrimitiveComponent* Object)
 
 	Objects.Add(Object);
 
-	OnEnterRange.Broadcast(Object);
+	OnEnter.Broadcast(Object);
 }
 void USP_ZoneComponent::RemoveObject_Implementation(UPrimitiveComponent* Object)
 {
@@ -73,7 +64,7 @@ void USP_ZoneComponent::RemoveObject_Implementation(UPrimitiveComponent* Object)
 
 	Objects.Remove(Object);
 
-	OnExitRange.Broadcast(Object);
+	OnExit.Broadcast(Object);
 }
 
 void USP_ZoneComponent::InitializeComponent()
@@ -84,8 +75,9 @@ void USP_ZoneComponent::InitializeComponent()
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
-	OnComponentBeginOverlap.AddDynamic(this, &USP_ZoneComponent::OnBeginOverlap);
-	OnComponentEndOverlap.AddDynamic(this, &USP_ZoneComponent::OnEndOverlap);
+	// Handle serialized in editor: force SetHandle call to bind events.
+	if(Handle)
+		SetHandle(Handle);
 }
 void USP_ZoneComponent::UninitializeComponent()
 {
@@ -95,6 +87,26 @@ void USP_ZoneComponent::UninitializeComponent()
 	if (GetOwner()->GetIsReplicated() && GetOwnerRole() != ROLE_Authority)
 		return;
 
-	OnComponentBeginOverlap.RemoveDynamic(this, &USP_ZoneComponent::OnBeginOverlap);
-	OnComponentEndOverlap.RemoveDynamic(this, &USP_ZoneComponent::OnEndOverlap);
+	// Ensure callback unbind.
+	if (Handle)
+		SetHandle(nullptr);
+}
+
+void USP_ZoneComponent::SetHandle(UPrimitiveComponent* Primitive)
+{
+	SP_CHECK(!GetOwner()->GetIsReplicated() || GetOwnerRole() != ROLE_SimulatedProxy, "Replicated zone should only be init on server!")
+
+	if (Handle)
+	{
+		Handle->OnComponentBeginOverlap.RemoveDynamic(this, &USP_ZoneComponent::OnBeginOverlap);
+		Handle->OnComponentEndOverlap.RemoveDynamic(this, &USP_ZoneComponent::OnEndOverlap);
+	}
+
+	Handle = Primitive;
+
+	if (Handle)
+	{
+		Handle->OnComponentBeginOverlap.AddDynamic(this, &USP_ZoneComponent::OnBeginOverlap);
+		Handle->OnComponentEndOverlap.AddDynamic(this, &USP_ZoneComponent::OnEndOverlap);
+	}
 }
