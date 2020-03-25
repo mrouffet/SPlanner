@@ -107,10 +107,6 @@ public:
 	/** Getter of active and inactive planners. */
 	TArray<USP_PlannerComponent*> GetAllPlanners() const;
 
-	/** Getter of activee planners with goal. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Director")
-	const TArray<USP_PlannerComponent*>& GetPlannersWithGoal(USP_Goal* Goal);
-
 	/** Getter of Instance. */
 	UFUNCTION(BlueprintPure, DisplayName = "Get SP_Director", Category = "SPlanner|Director", meta=(Keywords = "SP Director"))
 	static ASP_Director* GetInstance();

@@ -20,6 +20,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
 	bool bResetBlackboard = true;
 
+	/**
+	*	Minimum planner executing this goal.
+	*	Use < 0 for unlimited.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
+	int MinPlannerNum = -1;
+
+	/**
+	*	Maximum planner executing this goal.
+	*	Use < 0 for unlimited.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
+	int MaxPlannerNum = -1;
+
 	/** All planner registered (currently using this goal). */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Goal")
 	TArray<USP_PlannerComponent*> Planners;
@@ -68,6 +82,12 @@ public:
 	/** Getter of bResetBlackboard. */
 	bool GetResetBlackboard() const;
 
+	/** Getter of MinPlannerNum*/
+	float GetMinPlannerNum() const;
+
+	/** Getter of MaxPlannerNum*/
+	float GetMaxPlannerNum() const;
+
 	/** Getter of Planners. */
 	const TArray<USP_PlannerComponent*>& GetPlanners() const;
 
@@ -88,5 +108,5 @@ public:
 	*	Use bForce to avoid In and Out transition check.
 	*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Goal")
-	static bool CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal* OldGoal, const USP_Goal* NewGoal, bool bForce = false);
+	static bool CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal* OldGoal, const USP_Goal* NewGoal);
 };

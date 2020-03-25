@@ -62,7 +62,7 @@ USP_Goal* USP_PlannerComponent::GetGoal() const
 void USP_PlannerComponent::SetGoal(USP_Goal* InGoal, bool bForce)
 {
 	// Same goal or current goal can transit to.
-	if (Goal == InGoal || (Goal && !USP_Goal::CanTransitTo(this, Goal, InGoal, bForce)))
+	if (Goal == InGoal || (!bForce && Goal && !USP_Goal::CanTransitTo(this, Goal, InGoal)))
 		return;
 
 	if (PlanState == ESP_PlanState::PS_Valid) // Cancel previous plan.
@@ -369,7 +369,7 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 		if (Goal)
 			Goal->OnEnd(this);
 		if (bResetGoalOnInactive)
-			SetGoal(nullptr);
+			SetGoal(nullptr, true);
 	}
 	// Do not reset goal while blackboard is null (waiting for possess).
 

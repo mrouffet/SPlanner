@@ -76,20 +76,6 @@ TArray<USP_PlannerComponent*> ASP_Director::GetAllPlanners() const
 
 	return AllPlanners;
 }
-const TArray<USP_PlannerComponent*>& ASP_Director::GetPlannersWithGoal(USP_Goal* Goal)
-{
-	// Default return value as reference.
-	static const TArray<USP_PlannerComponent*> EmptyArray;
-
-	SP_RCHECK_NULLPTR(Goal, EmptyArray)
-
-	int Index = Goals.Find(Goal);
-
-	if (Index == INDEX_NONE)
-		return EmptyArray;
-
-	return Goals[Index]->GetPlanners();
-}
 
 ASP_Director* ASP_Director::GetInstance()
 {

@@ -12,6 +12,15 @@ bool USP_Goal::GetResetBlackboard() const
 	return bResetBlackboard;
 }
 
+float USP_Goal::GetMinPlannerNum() const
+{
+	return MinPlannerNum;
+}
+float USP_Goal::GetMaxPlannerNum() const
+{
+	return MaxPlannerNum;
+}
+
 const TArray<USP_PlannerComponent*>& USP_Goal::GetPlanners() const
 {
 	return Planners;
@@ -21,11 +30,19 @@ bool USP_Goal::CanStart_Implementation(const USP_PlannerComponent* Planner) cons
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
+	// Maximum planners reached.
+	if (MaxPlannerNum > 0 && Planners.Num() >= MaxPlannerNum)
+		return false;
+
 	return true;
 }
 bool USP_Goal::CanLeave_Implementation(const USP_PlannerComponent* Planner) const
 {
 	SP_RCHECK_NULLPTR(Planner, false)
+
+	// Minimum planners reached.
+	if (MinPlannerNum > 0 && Planners.Num() <= MinPlannerNum)
+		return false;
 
 	return true;
 }
@@ -56,7 +73,7 @@ void USP_Goal::Reset_Implementation()
 	Planners.Empty();
 }
 
-bool USP_Goal::CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal* OldGoal, const USP_Goal* NewGoal, bool bForce)
+bool USP_Goal::CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal* OldGoal, const USP_Goal* NewGoal)
 {
 	SP_SRCHECK_NULLPTR(Planner, false)
 
@@ -75,9 +92,6 @@ bool USP_Goal::CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal*
 	if (!OldGoal->CanLeave(Planner))
 		return false;
 
-	// Force doesn't check transitions.
-	if(bForce)
-		return NewGoal->CanStart(Planner);
 
 	// Check OUT Transition.
 	SP_SRCHECK(OldGoal->AllowedOutTransitions.Find(NewGoal) == INDEX_NONE || OldGoal->BlockedOutTransitions.Find(NewGoal) == INDEX_NONE,
