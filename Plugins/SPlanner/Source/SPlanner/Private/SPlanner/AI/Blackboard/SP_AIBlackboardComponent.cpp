@@ -38,6 +38,8 @@ void USP_AIBlackboardComponent::SetBool(const FName& EntryName, bool Value)
 	SP_CHECK(BoolKey, "BoolKey nullptr! Entry with name [%s] is not registered as a bool!", *EntryName.ToString())
 
 	BoolKey->SetValue(Value);
+
+	OnBoolValueChange.Broadcast(EntryName, Value);
 }
 
 int USP_AIBlackboardComponent::GetInt(const FName& EntryName) const
@@ -63,6 +65,8 @@ void USP_AIBlackboardComponent::SetInt(const FName& EntryName, int Value)
 	SP_CHECK(IntKey, "IntKey nullptr! Entry with name [%s] is not registered as an int!", *EntryName.ToString())
 
 	IntKey->SetValue(Value);
+
+	OnIntValueChange.Broadcast(EntryName, Value);
 }
 
 float USP_AIBlackboardComponent::GetFloat(const FName& EntryName) const
@@ -88,6 +92,8 @@ void USP_AIBlackboardComponent::SetFloat(const FName& EntryName, float Value)
 	SP_CHECK(FloatKey, "FloatKey nullptr! Entry with name [%s] is not registered as a float!", *EntryName.ToString())
 
 	FloatKey->SetValue(Value);
+
+	OnFloatValueChange.Broadcast(EntryName, Value);
 }
 
 const FVector& USP_AIBlackboardComponent::GetVector(const FName& EntryName) const
@@ -113,6 +119,8 @@ void USP_AIBlackboardComponent::SetVector(const FName& EntryName, const FVector&
 	SP_CHECK(VectorKey, "VectorKey nullptr! Entry with name [%s] is not registered as a FVector!", *EntryName.ToString())
 
 	VectorKey->SetValue(Value);
+
+	OnVectorValueChange.Broadcast(EntryName, Value);
 }
 
 const FRotator& USP_AIBlackboardComponent::GetRotator(const FName& EntryName) const
@@ -138,6 +146,8 @@ void USP_AIBlackboardComponent::SetRotator(const FName& EntryName, const FRotato
 	SP_CHECK(RotatorKey, "RotatorKey nullptr! Entry with name [%s] is not registered as a FRotator!", *EntryName.ToString())
 
 	RotatorKey->SetValue(Value);
+
+	OnRotatorValueChange.Broadcast(EntryName, Value);
 }
 
 const FName& USP_AIBlackboardComponent::GetFName(const FName& EntryName) const
@@ -167,6 +177,8 @@ void USP_AIBlackboardComponent::SetFName(const FName& EntryName, const FName& Va
 	SP_CHECK(NameKey, "NameKey nullptr! Entry with name [%s] is not registered as a FName!", *EntryName.ToString())
 
 	NameKey->SetValue(Value);
+
+	OnFNameValueChange.Broadcast(EntryName, Value);
 }
 
 USP_AIBlackboardObject* USP_AIBlackboardComponent::GetObject(const FName& EntryName) const
@@ -192,6 +204,8 @@ void USP_AIBlackboardComponent::SetObject(const FName& EntryName, USP_AIBlackboa
 	SP_CHECK(ObjectKey, "ObjectKey nullptr! Entry with name [%s] is not registered as an UObject!", *EntryName.ToString())
 
 	ObjectKey->SetValue(Value);
+
+	OnObjectValueChange.Broadcast(EntryName, Value);
 }
 
 void USP_AIBlackboardComponent::ResetValue(const FName& EntryName)

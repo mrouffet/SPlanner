@@ -8,6 +8,15 @@
 class USP_AIBlackboardKey;
 class USP_AIBlackboardObject;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBBoolDelegate, const FName&, Name, bool, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBIntDelegate, const FName&, Name, int, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBFloatDelegate, const FName&, Name, float, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBVectorDelegate, const FName&, Name, FVector, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBRotatorDelegate, const FName&, Name, FRotator, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBFNameDelegate, const FName&, Name, FName, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSP_AIBBObjectDelegate, const FName&, Name, UObject*, Value);
+
+
 /**
  *	SPlanner AI Blackboard component implementation
  */
@@ -30,6 +39,35 @@ protected:
 	void UnInitializeBlackboard_Implementation() override;
 
 public:
+	/** Callback thrown on bool value change (SetBool()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBBoolDelegate OnBoolValueChange;
+
+	/** Callback thrown on int value change (SetInt()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBIntDelegate OnIntValueChange;
+
+	/** Callback thrown on float value change (SetFloat()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBFloatDelegate OnFloatValueChange;
+
+	/** Callback thrown on Vector value change (SetVector()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBVectorDelegate OnVectorValueChange;
+
+	/** Callback thrown on Rotator value change (SetRotator()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBRotatorDelegate OnRotatorValueChange;
+
+	/** Callback thrown on FName value change (SetFName()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBFNameDelegate OnFNameValueChange;
+
+	/** Callback thrown on Object value change (SetObject()). */
+	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
+	FSP_AIBBObjectDelegate OnObjectValueChange;
+
+
 	/** Getter of bool value registered as EntryName. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	bool GetBool(const FName& EntryName) const;
