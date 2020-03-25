@@ -208,7 +208,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(bool* bCanBe
 					*POIZone->GetPOIs()[j]->GetActionSet()->GetName(), *POIActions[i]->GetName(), i)
 
 				// Add to actions.
-				if (POIActions[i]->CheckAvailability(this))
+				if (POIActions[i]->IsAvailable(this))
 				{
 					bool bAchieveGoal = POIActions[i]->IsGoalAchieved(Goal);
 
@@ -315,7 +315,7 @@ float USP_AIPlannerComponent::QueryTimeBeforeConstructPlan_Implementation() cons
 {
 	if (LOD)
 	{
-		SP_RCHECK(LOD->IsLODActive(), DefaultTimeBeforeConstructPlan, "LOD inactive!")
+		SP_RCHECK(LOD->IsLODActive(), Super::QueryTimeBeforeConstructPlan_Implementation(), "LOD inactive!")
 		return LOD->GetTimeBeforeConstructPlan();
 	}
 

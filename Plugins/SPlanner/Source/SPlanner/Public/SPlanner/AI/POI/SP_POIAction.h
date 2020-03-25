@@ -33,5 +33,5 @@ public:
 	/** Whether Goal is in AchievedGoals */
 	bool IsGoalAchieved(const USP_Goal* Goal) const;
 
-	bool CheckAvailability(const USP_PlannerComponent* Planner) const override;
+	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
 };

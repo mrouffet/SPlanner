@@ -58,4 +58,11 @@ public:
 
 	/** Getter of LODLevel */
 	float GetLODLevel() const;
+
+	/**
+	*	Compute the new LODLevel.
+	*	Called in TickComponent().
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|LOD")
+	virtual void ComputeLODLevel();
 };

@@ -22,9 +22,9 @@ bool USP_POIAction::IsGoalAchieved(const USP_Goal* Goal) const
 	return AchievedGoals.Find(Goal) != INDEX_NONE;
 }
 
-bool USP_POIAction::CheckAvailability(const USP_PlannerComponent* Planner) const
+bool USP_POIAction::IsAvailable(const USP_PlannerComponent* Planner) const
 {
-	if (!Super::CheckAvailability(Planner))
+	if (!Super::IsAvailable(Planner))
 		return false;
 
 	return ServedGoals.Find(Planner->GetGoal()) != INDEX_NONE || AchievedGoals.Find(Planner->GetGoal()) != INDEX_NONE;

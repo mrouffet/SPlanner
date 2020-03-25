@@ -6,20 +6,12 @@
 
 #include <SPlanner/Base/Action/SP_ActionStep.h>
 
-//#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
-
-//FSP_ActionBase::FSP_ActionBase(USP_ActionStep* InStep, ESP_ActionGenerationType InGenerationType) :
-//	Step{ InStep },
-//	GenerationType{ InGenerationType }
-//{
-//}
-
-bool USP_ActionBase::CheckAvailability(const USP_PlannerComponent* Planner) const
+bool USP_ActionBase::IsAvailable(const USP_PlannerComponent* Planner) const
 {
 	SP_RCHECK_NULLPTR(Step, false)
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	return Step->CheckAvailability(Planner);
+	return Step->IsAvailable(Planner);
 }
 
 #if WITH_EDITOR

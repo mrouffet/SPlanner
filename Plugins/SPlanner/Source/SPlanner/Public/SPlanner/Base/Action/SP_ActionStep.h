@@ -23,13 +23,13 @@ class SPLANNER_API USP_ActionStep : public USP_DataAsset
 	
 protected:
 	/** Additionnal condition to validate. */
-	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner|Decorator")
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
 	TArray<USP_Decorator*> Decorators;
 
 public:
 	/** Check action availability for Planner. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task")
-	virtual bool CheckAvailability(const USP_PlannerComponent* Planner) const;
+	virtual bool IsAvailable(const USP_PlannerComponent* Planner) const;
 
 	/**
 	*	The pre-condition of the step.

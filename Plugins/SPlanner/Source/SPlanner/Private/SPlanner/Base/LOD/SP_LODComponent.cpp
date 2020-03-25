@@ -6,6 +6,7 @@
 
 USP_LODComponent::USP_LODComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 bool USP_LODComponent::IsLODActive() const
@@ -17,39 +18,8 @@ float USP_LODComponent::GetLODLevel() const
 	return LODLevel;
 }
 
-void USP_LODComponent::FillObjects_Implementation()
+void USP_LODComponent::ComputeLODLevel()
 {
-	const APlayerController* const LocalPlayerController = GetWorld()->GetFirstPlayerController();
-	SP_CHECK_NULLPTR(LocalPlayerController)
-
-	const APawn* const LocalPlayerPawn = LocalPlayerController->GetPawn();
-	SP_CHECK_NULLPTR(LocalPlayerPawn)
-	SP_CHECK_NULLPTR(LocalPlayerPawn->GetRootComponent())
-
-	Objects.Add(LocalPlayerPawn->GetRootComponent());
-}
-
-void USP_LODComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (GetOwnerRole() != ROLE_SimulatedProxy)
-		FillObjects();
-	else
-		SetComponentTickEnabled(false); // Never tick on simulated.
-}
-void USP_LODComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	if (GetOwnerRole() != ROLE_SimulatedProxy)
-		Objects.Empty();
-}
-
-void USP_LODComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	SP_CHECK(Objects.Num(), "No Objects registered!")
 
 	float ClosestSqrDist = FLT_MAX;
@@ -92,4 +62,40 @@ void USP_LODComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 			OnActive.Broadcast();
 		}
 	}
+}
+
+void USP_LODComponent::FillObjects_Implementation()
+{
+	const APlayerController* const LocalPlayerController = GetWorld()->GetFirstPlayerController();
+	SP_CHECK_NULLPTR(LocalPlayerController)
+
+	const APawn* const LocalPlayerPawn = LocalPlayerController->GetPawn();
+	SP_CHECK_NULLPTR(LocalPlayerPawn)
+	SP_CHECK_NULLPTR(LocalPlayerPawn->GetRootComponent())
+
+	Objects.Add(LocalPlayerPawn->GetRootComponent());
+}
+
+void USP_LODComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetOwnerRole() != ROLE_SimulatedProxy)
+		FillObjects();
+	else
+		SetComponentTickEnabled(false); // Never tick on simulated.
+}
+void USP_LODComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (GetOwnerRole() != ROLE_SimulatedProxy)
+		Objects.Empty();
+}
+
+void USP_LODComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	ComputeLODLevel();
 }

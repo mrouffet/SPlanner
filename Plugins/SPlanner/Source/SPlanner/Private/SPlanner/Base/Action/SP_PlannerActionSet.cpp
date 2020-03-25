@@ -39,7 +39,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 			SP_SCCHECK(BeginActions[i], "%s.BeginActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
 			SP_SCCHECK(BeginActions[i]->Step, "%s.BeginActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
 
-			if (BeginActions[i]->CheckAvailability(Planner))
+			if (BeginActions[i]->IsAvailable(Planner))
 				Result.BeginActions.Add(FSP_PlannerAction::Make(Planner, BeginActions[i]));
 		}
 
@@ -57,7 +57,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 				SP_SCCHECK(CoreActions[i], "%s.CoreActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
 				SP_SCCHECK(CoreActions[i]->Step, "%s.CoreActions[ %d ]->Step is nullptr!", *ActionSet->GetName(), i)
 
-				if (CoreActions[i]->CheckAvailability(Planner))
+				if (CoreActions[i]->IsAvailable(Planner))
 					Result.Actions.Add(FSP_PlannerAction::Make(Planner, CoreActions[i]));
 			}
 		}
@@ -72,7 +72,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 				SP_SCCHECK(EndActions[i], "%s.EndActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
 				SP_SCCHECK(EndActions[i]->Step, "%s.EndActions[ %d ]->Step is nullptr!", *ActionSet->GetName(), i)
 
-				if (EndActions[i]->CheckAvailability(Planner))
+				if (EndActions[i]->IsAvailable(Planner))
 				{
 					Result.Actions.Add(FSP_PlannerAction::Make(Planner, EndActions[i], true));
 					bCanBeAchieved = true;
@@ -108,7 +108,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 			SP_SCCHECK(ForcedActions[i], "%s.ForcedActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
 			SP_SCCHECK(ForcedActions[i]->Step, "%s.ForcedActions[ %d ]->Step is nullptr!", *ActionSet->GetName(), i)
 
-			if (ForcedActions[i]->CheckAvailability(Planner))
+			if (ForcedActions[i]->IsAvailable(Planner))
 				ForcedPlannerActions.Add(FSP_PlannerAction::Make(Planner, ForcedActions[i], false, true));
 		}
 

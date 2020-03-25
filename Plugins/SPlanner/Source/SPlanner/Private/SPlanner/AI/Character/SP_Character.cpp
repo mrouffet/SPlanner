@@ -25,6 +25,7 @@ ASP_Character::ASP_Character(const FObjectInitializer& ObjectInitializer) : Supe
 
 	// POI.
 	POICollision = CreateDefaultSubobject<USphereComponent>(TEXT("POICollision"));
+	POICollision->SetupAttachment(RootComponent);
 	POICollision->SetSphereRadius(100.0f);
 
 	POICollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);

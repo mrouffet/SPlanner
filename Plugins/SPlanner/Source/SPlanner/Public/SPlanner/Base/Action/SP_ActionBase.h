@@ -28,12 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	ESP_ActionGenerationType GenerationType = ESP_ActionGenerationType::AGT_OnceInPlan;
 
-	//FSP_ActionBase() = default;
-	//FSP_ActionBase(USP_ActionStep* InStep, ESP_ActionGenerationType InGenerationType = ESP_ActionGenerationType::AGT_OnceInPlan);
-
 	/** Check Action and ActionStep availability. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner")
-	virtual bool CheckAvailability(const USP_PlannerComponent* Planner) const;
+	virtual bool IsAvailable(const USP_PlannerComponent* Planner) const;
 
 #if WITH_EDITOR
 	/**

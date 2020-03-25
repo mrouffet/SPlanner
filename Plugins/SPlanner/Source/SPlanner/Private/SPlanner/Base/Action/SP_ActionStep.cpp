@@ -12,7 +12,7 @@
 #include <SPlanner/Base/Decorator/SP_PlannerDecorator.h>
 #include <SPlanner/Base/Decorator/SP_PlannerDecoratorFlag.h>
 
-bool USP_ActionStep::CheckAvailability(const USP_PlannerComponent* Planner) const
+bool USP_ActionStep::IsAvailable(const USP_PlannerComponent* Planner) const
 {
 	for (int i = 0; i < Decorators.Num(); ++i)
 	{
