@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <Animation/AnimCurveTypes.h>
-
 #include <SPlanner/Base/Action/SP_ActionBase.h>
 #include "SP_Action.generated.h"
 
@@ -24,13 +22,6 @@ public:
 	*/
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.
 	USP_FloatParam* Weight;
-
-	/**
-	*	The weight multiplier to apply over times added to plan.
-	*	Require GenerationType == ESP_ActionGenerationType::AGT_RandomWeight.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "GenerationType == ESP_ActionGenerationType::AGT_RandomWeight"))
-	FRuntimeFloatCurve WeightMultiplier;
 
 	USP_Action(const FObjectInitializer& ObjectInitializer);
 };

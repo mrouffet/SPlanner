@@ -3,14 +3,13 @@
 #include <SPlanner/AI/Decorator/Impl/SP_TimeOutAIDecorator.h>
 
 #include <SPlanner/Misc/SP_FlagHelper.h>
-
-#include <SPlanner/AI/Planner/SP_AIFloatParam.h>
+#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
 
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecoratorFlag.h>
 
 USP_TimeOutAIDecorator::USP_TimeOutAIDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	TimeOutParam = CreateDefaultSubobject<USP_AIFloatParam>("TimeOutParam");
+	TimeOutParam = CreateDefaultSubobject<USP_FloatParam>("TimeOutParam");
 	TimeOutParam->DefaultValue = 5.0f;
 
 	SP_SET_FLAG(ValidateMask, ESP_AIPlannerDecoratorFlag::DF_Tick);

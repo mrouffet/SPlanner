@@ -14,5 +14,4 @@ class SPLANNER_API USP_Task : public USP_Action
 	GENERATED_BODY()
 
 public:
-	USP_Task(const FObjectInitializer& ObjectInitializer);
 };

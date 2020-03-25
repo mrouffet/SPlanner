@@ -7,7 +7,6 @@
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecorator.h>
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecoratorFlag.h>
 
-#include <SPlanner/AI/Planner/SP_AIFloatParam.h>
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 

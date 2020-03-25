@@ -9,7 +9,7 @@
 #include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_Formation.generated.h"
 
-class USP_AIFloatParam;
+class USP_FloatParam;
 
 class USP_Decorator;
 
@@ -74,7 +74,7 @@ protected:
 	*	LOD Level will be computed from formation's lead actor.
 	*/
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
-	USP_AIFloatParam* Weight = nullptr;
+	USP_FloatParam* Weight = nullptr;
 
 	/** Compute the base direction. */
 	virtual FVector ComputeBaseDirection(const FSP_FormationSetInfos& SetInfos);
@@ -96,6 +96,8 @@ protected:
 	virtual void ConstructPointByPoint(FSP_FormationInfos& Infos);
 
 public:
+	USP_Formation(const FObjectInitializer& ObjectInitializer);
+
 	/** Getter of FormationFocusType. */
 	ESP_FormationFocusType GetFormationFocusType() const;
 

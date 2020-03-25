@@ -5,7 +5,7 @@
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecorator.h>
 #include "SP_TimeOutAIDecorator.generated.h"
 
-class USP_AIFloatParam;
+class USP_FloatParam;
 
 /**
  *	SPlanner decorator check time out.
@@ -22,7 +22,7 @@ protected:
 
 	/** The time before failing. */
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.
-	USP_AIFloatParam* TimeOutParam;
+	USP_FloatParam* TimeOutParam;
 
 	/** Internal implementation of Validate. */
 	bool Validate_Internal_Implementation(const UObject* Object) override;

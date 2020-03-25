@@ -4,11 +4,20 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+
+#include <SPlanner/Base/Action/SP_PlannerAction.h>
 #include <SPlanner/Base/Decorator/SP_Decorator.h>
 
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-#include <SPlanner/AI/Planner/SP_AIFloatParam.h>
+USP_Formation::USP_Formation(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	// Default Weight.
+	Weight = CreateDefaultSubobject<USP_FloatParam>("Weight");
+	Weight->DefaultValue = 1.0f;
+}
 
 ESP_FormationFocusType USP_Formation::GetFormationFocusType() const
 {

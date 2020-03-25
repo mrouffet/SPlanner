@@ -123,7 +123,6 @@ public:
 	/**
 	*	The maximum planner depth while building a plan.
 	*	Plan generation complexity: O(!n), n = MaxPlannerDepth.
-	*	Get overridden by SP_PlannerLODComponent.
 	*/
 	UPROPERTY(Config, EditAnywhere)
 	uint8 DefaultMaxPlannerDepth = 7u;
@@ -131,7 +130,6 @@ public:
 	/**
 	*	Minimum time to wait before constructing a new plan.
 	*	Use <= 0 to compute instantly.
-	*	Get overridden by SP_PlannerLODComponent.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
 	float DefaultTimeBeforeConstructPlan = -1.0f;

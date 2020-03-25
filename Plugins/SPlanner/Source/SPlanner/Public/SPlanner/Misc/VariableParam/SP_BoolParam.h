@@ -2,12 +2,32 @@
 
 #pragma once
 
-#include <SPlanner/Misc/VariableAsset/SP_BoolAsset.h>
-
 #include <SPlanner/Misc/VariableParam/SP_VariableParam.h>
 #include "SP_BoolParam.generated.h"
 
-UENUM(BlueprintType, Category = "SPlanner|Misc|Param")
+/**
+*	bool parameter struct implementation.
+*/
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Misc|Param|Bool")
+class SPLANNER_API USP_BoolParam : public USP_VariableParam
+{
+	GENERATED_BODY()
+
+public:
+	/** The default value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
+	bool DefaultValue = false;
+
+	/**
+	*	Getter of value using Curve with valid LODLevel, otherwise Default.
+	*	Multiply with all InputWeights.
+	*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner")
+	bool Query(const UObject* Outer = nullptr) const;
+};
+
+
+UENUM(BlueprintType, Category = "SPlanner|Misc|Param|Bool")
 enum class ESP_BoolInputMethod : uint8
 {
 	/** Apply using AND operator. */
@@ -18,43 +38,4 @@ enum class ESP_BoolInputMethod : uint8
 
 	/** Apply using XOR operator. */
 	BIM_XOR					UMETA(DisplayName = "XOR"),
-};
-
-USTRUCT(BlueprintType, Category = "SPlanner|Misc|VariableParam")
-struct SPLANNER_API FSP_BoolInputPair
-{
-	GENERATED_BODY()
-
-	/** The input bool value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_BoolAsset* Input = nullptr;
-
-	/** The method to apply Input. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	ESP_BoolInputMethod Method = ESP_BoolInputMethod::BIM_OR;
-};
-
-/**
-*	bool parameter struct implementation.
-*/
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Misc|VariableParam")
-class SPLANNER_API USP_BoolParam : public USP_VariableParam
-{
-	GENERATED_BODY()
-
-public:
-	/** The default value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
-	bool DefaultValue = false;
-
-	/** Additionnal input values. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
-	TArray<FSP_BoolInputPair> InputPairs;
-
-	/**
-	*	Getter of value using Curve with valid LODLevel, otherwise Default.
-	*	Multiply with all InputWeights.
-	*/
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner")
-	bool Query(const UObject* Outer = nullptr) const;
 };

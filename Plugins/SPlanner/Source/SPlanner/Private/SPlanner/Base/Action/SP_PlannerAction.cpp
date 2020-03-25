@@ -4,7 +4,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+#include <SPlanner/Misc/VariableParam/SP_FloatCurveParam.h>
 
 #include <SPlanner/Base/Action/SP_Action.h>
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
@@ -13,10 +13,21 @@ FSP_PlannerAction FSP_PlannerAction::Make(const USP_PlannerComponent* Planner, c
 {
 	SP_SRCHECK_NULLPTR(Action, FSP_PlannerAction())
 
+	USP_FloatCurveParamInfos* WeightInfos = nullptr;
+
+	// Should create float curve infos. TODO: CLEAN.
+	if (Cast<USP_FloatCurveParam>(Action->Weight))
+	{
+		WeightInfos = NewObject<USP_FloatCurveParamInfos>();
+
+		WeightInfos->CurveTime = 0;
+		WeightInfos->Outer = Planner;
+	}
+
 	return FSP_PlannerAction
 	{
 		Action,
-		Action->Weight->Query(Planner) * FMath::FRand(), /** Do not Add Action->WeightMultiplier, TimeNumInPlan == 0. */
+		(WeightInfos ? Action->Weight->Query(WeightInfos) : Action->Weight->Query(Planner))  * FMath::FRand(),
 		bInAchievePlan,
 		bInIsForced
 	};
@@ -24,10 +35,21 @@ FSP_PlannerAction FSP_PlannerAction::Make(const USP_PlannerComponent* Planner, c
 
 FSP_PlannerAction FSP_PlannerAction::Make(const USP_PlannerComponent* Planner, const FSP_PlannerAction& Other)
 {
+	USP_FloatCurveParamInfos* WeightInfos = nullptr;
+
+	// Should create float curve infos. TODO: CLEAN.
+	if (Cast<USP_FloatCurveParam>(Other.Handle->Weight))
+	{
+		WeightInfos = NewObject<USP_FloatCurveParamInfos>();
+
+		WeightInfos->Outer = Planner;
+		WeightInfos->CurveTime = Other.TimesNumInPlan + 1;
+	}
+
 	return FSP_PlannerAction
 	{
 		Other.Handle,
-		Other.Handle->Weight->Query(Planner) * FMath::FRand() * Other.Handle->WeightMultiplier.GetRichCurveConst()->Eval(Other.TimesNumInPlan + 1),
+		(WeightInfos ? Other.Handle->Weight->Query(WeightInfos) : Other.Handle->Weight->Query(Planner))  * FMath::FRand(),
 		Other.bAchievePlan,
 		Other.bIsForced,
 		Other.TimesNumInPlan + 1

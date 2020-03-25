@@ -9,6 +9,4 @@ USP_Action::USP_Action(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	// Default Weight.
 	Weight = CreateDefaultSubobject<USP_FloatParam>("Weight");
 	Weight->DefaultValue = 1.0f;
-
-	WeightMultiplier.GetRichCurve()->AddKey(0.0f, 1.0f);
 }
