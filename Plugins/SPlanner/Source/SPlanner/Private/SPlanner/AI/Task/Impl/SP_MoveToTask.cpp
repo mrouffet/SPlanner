@@ -98,6 +98,7 @@ FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
 		SP_LOG(Error, "Bad Target!")
 
 	MoveRequest.SetCanStrafe(bCanStrafe);
+	MoveRequest.SetProjectGoalLocation(true);
 	MoveRequest.SetUsePathfinding(bUsePathfinding);
 	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 

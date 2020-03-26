@@ -4,10 +4,12 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Misc/SP_FlagHelper.h>
 #include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
 
 #include <SPlanner/Base/Action/SP_PlannerAction.h>
 #include <SPlanner/Base/Decorator/SP_Decorator.h>
+#include <SPlanner/Base/Decorator/SP_DecoratorFlag.h>
 
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>

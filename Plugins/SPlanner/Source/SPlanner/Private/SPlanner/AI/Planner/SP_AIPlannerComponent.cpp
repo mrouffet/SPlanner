@@ -167,7 +167,7 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 
 		AskNewPlan();
 	}
-	else if (++CurrentPlanIndex == Plan.Num()) // Succeed and No other task left.
+	else if (++CurrentPlanIndex >= Plan.Num()) // Succeed and No other task left.
 	{
 		PlanState = ESP_PlanState::PS_Finished;
 

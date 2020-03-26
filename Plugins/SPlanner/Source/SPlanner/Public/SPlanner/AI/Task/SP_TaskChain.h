@@ -20,11 +20,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Chain")
 	TArray<USP_TaskStep*> Tasks;
 
-	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos) override;
-
-	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
-	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
-	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
 
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
@@ -33,6 +29,12 @@ protected:
 	bool PostCondition_Implementation(USP_PlanGenInfos* Infos) const override;
 
 	bool ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const override;
+
+	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos) override;
+
+	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
 	USP_TaskChain(const FObjectInitializer& ObjectInitializer);

@@ -37,4 +37,7 @@ protected:
 	bool Validate_Internal_Implementation(const UObject* Object) override;
 
 	bool PreCondition_Validate_Internal_Implementation(const USP_PlanGenInfos* Infos) override;
+
+public:
+	USP_DistanceAIDecorator(const FObjectInitializer& ObjectInitializer);
 };

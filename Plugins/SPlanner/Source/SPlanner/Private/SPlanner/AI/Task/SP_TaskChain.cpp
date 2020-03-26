@@ -9,16 +9,6 @@ USP_TaskChain::USP_TaskChain(const FObjectInitializer& ObjectInitializer) : Supe
 	TaskInfosClass = USP_TaskChainInfos::StaticClass();
 }
 
-void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
-{
-	Super::OnNotify(Planner, Notify, TaskInfos);
-
-	USP_TaskChainInfos* const Infos = Cast<USP_TaskChainInfos>(TaskInfos);
-	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskChainInfos")
-
-	Tasks[Infos->Index]->OnNotify(Planner, Notify, Infos->TaskInfos);
-}
-
 bool USP_TaskChain::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Infos)
@@ -35,7 +25,7 @@ bool USP_TaskChain::PreCondition_Implementation(const USP_PlanGenInfos* Infos) c
 
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
-		SP_RCHECK_NULLPTR(Tasks[i], false)
+		SP_CCHECK_NULLPTR(Tasks[i], false)
 
 		if (!Tasks[i]->PreCondition(Infos) || !Tasks[i]->PostCondition(NonConstPlanGenInfos))
 		{
@@ -52,7 +42,7 @@ bool USP_TaskChain::PreCondition_Implementation(const USP_PlanGenInfos* Infos) c
 	// Reset NonConstPlanGenInfos to initial value.
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
-		SP_RCHECK_NULLPTR(Tasks[i], false)
+		SP_CCHECK_NULLPTR(Tasks[i], false)
 
 		Tasks[i]->ResetPostCondition(NonConstPlanGenInfos);
 	}
@@ -67,7 +57,7 @@ bool USP_TaskChain::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
-		SP_RCHECK_NULLPTR(Tasks[i], false)
+		SP_CCHECK_NULLPTR(Tasks[i], false)
 
 		// Precondition has already been checked.
 		if (!Tasks[i]->PostCondition(Infos))
@@ -91,12 +81,38 @@ bool USP_TaskChain::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) c
 
 	for (int i = 0; i < Tasks.Num(); ++i)
 	{
-		SP_RCHECK_NULLPTR(Tasks[i], false)
+		SP_CCHECK_NULLPTR(Tasks[i], false)
 
 		Tasks[i]->ResetPostCondition(Infos);
 	}
 
 	return true;
+}
+
+bool USP_TaskChain::IsAvailable(const USP_PlannerComponent* Planner) const
+{
+	if (!Super::IsAvailable(Planner))
+		return false;
+
+	for (int i = 0; i < Tasks.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Tasks[i])
+
+		if (!Tasks[i]->IsAvailable(Planner))
+			return false;
+	}
+
+	return true;
+}
+
+void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
+{
+	Super::OnNotify(Planner, Notify, TaskInfos);
+
+	USP_TaskChainInfos* const Infos = Cast<USP_TaskChainInfos>(TaskInfos);
+	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskChainInfos")
+
+	Tasks[Infos->Index]->OnNotify(Planner, Notify, Infos->TaskInfos);
 }
 
 bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)

@@ -18,6 +18,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Chain")
 	TArray<USP_ActionStep*> Steps;
 
+	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
+
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
 

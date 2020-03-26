@@ -10,6 +10,15 @@
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
 
+#include <SPlanner/AI/Decorator/SP_AIPlannerDecoratorFlag.h>
+
+
+USP_DistanceAIDecorator::USP_DistanceAIDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	SP_SET_FLAG(ValidateMask, ESP_PlannerDecoratorFlag::DF_PreCondition);
+	SP_ADD_FLAG(ValidateMask, ESP_AIPlannerDecoratorFlag::DF_Begin);
+}
+
 bool USP_DistanceAIDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
 	SP_DECORATOR_SUPER_VALIDATE(Object)

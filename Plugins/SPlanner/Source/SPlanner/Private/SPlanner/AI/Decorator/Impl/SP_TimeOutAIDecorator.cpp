@@ -2,6 +2,8 @@
 
 #include <SPlanner/AI/Decorator/Impl/SP_TimeOutAIDecorator.h>
 
+#include <SPlanner/Debug/SP_Debug.h>
+
 #include <SPlanner/Misc/SP_FlagHelper.h>
 #include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
 
@@ -9,9 +11,6 @@
 
 USP_TimeOutAIDecorator::USP_TimeOutAIDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	TimeOutParam = CreateDefaultSubobject<USP_FloatParam>("TimeOutParam");
-	TimeOutParam->DefaultValue = 5.0f;
-
 	SP_SET_FLAG(ValidateMask, ESP_AIPlannerDecoratorFlag::DF_Tick);
 
 #if WITH_EDITOR
@@ -22,6 +21,7 @@ USP_TimeOutAIDecorator::USP_TimeOutAIDecorator(const FObjectInitializer& ObjectI
 bool USP_TimeOutAIDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
 	SP_DECORATOR_SUPER_VALIDATE(Object)
+	SP_RCHECK_NULLPTR(TimeOutParam, false)
 
 	float TimeOut = TimeOutParam->Query(this);
 
@@ -38,4 +38,10 @@ bool USP_TimeOutAIDecorator::Tick_Validate_Internal_Implementation(float DeltaSe
 	CurrentTime += DeltaSeconds;
 
 	return Super::Tick_Validate_Internal_Implementation(DeltaSeconds, Planner, TaskInfos);
+}
+
+void USP_TimeOutAIDecorator::OnValidationFailure_Implementation(const UObject* Object)
+{
+	// Reset for next use.
+	CurrentTime = 0.0f;
 }

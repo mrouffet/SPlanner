@@ -57,10 +57,13 @@ void USP_LODComponent::ComputeLODLevel()
 		if (LODLevel < 0.0f)
 		{
 			// Previously out of range.
+			
+			LODLevel = NewLODLevel; // Set before broadcast.
 
-			LODLevel = NewLODLevel;
 			OnActive.Broadcast();
 		}
+		else
+			LODLevel = NewLODLevel;
 	}
 }
 
