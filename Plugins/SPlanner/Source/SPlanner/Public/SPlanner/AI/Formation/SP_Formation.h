@@ -96,8 +96,6 @@ protected:
 	virtual void ConstructPointByPoint(FSP_FormationInfos& Infos);
 
 public:
-	USP_Formation(const FObjectInitializer& ObjectInitializer);
-
 	/** Getter of FormationFocusType. */
 	ESP_FormationFocusType GetFormationFocusType() const;
 

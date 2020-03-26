@@ -5,6 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
+#include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
 bool USP_PlannerDecorator::PreCondition_Validate(const USP_PlanGenInfos* Infos)
 {

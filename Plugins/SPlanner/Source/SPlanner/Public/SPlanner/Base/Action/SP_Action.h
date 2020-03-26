@@ -22,6 +22,4 @@ public:
 	*/
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.
 	USP_FloatParam* Weight;
-
-	USP_Action(const FObjectInitializer& ObjectInitializer);
 };

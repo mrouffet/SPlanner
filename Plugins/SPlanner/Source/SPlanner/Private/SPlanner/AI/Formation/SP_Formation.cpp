@@ -12,13 +12,6 @@
 #include <SPlanner/AI/Formation/SP_FormationSet.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-USP_Formation::USP_Formation(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
-	// Default Weight.
-	Weight = CreateDefaultSubobject<USP_FloatParam>("Weight");
-	Weight->DefaultValue = 1.0f;
-}
-
 ESP_FormationFocusType USP_Formation::GetFormationFocusType() const
 {
 	return FormationFocusType;
