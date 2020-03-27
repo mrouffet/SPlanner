@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Engine/DataAsset.h>
+#include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_POIActionSet.generated.h"
 
 class USP_POIAction;
@@ -11,7 +11,7 @@ class USP_POIAction;
  *	Set of Planner POI Action.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action")
-class SPLANNER_API USP_POIActionSet : public UDataAsset
+class SPLANNER_API USP_POIActionSet : public USP_DataAsset
 {
 	GENERATED_BODY()
 

@@ -12,7 +12,7 @@ class USP_Goal;
 *	Planner POI Action.
 *	Pair task and weight.
 */
-UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, Category = "SPlanner|POI")
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, Category = "SPlanner|POI")
 class USP_POIAction : public USP_Action
 {
 	GENERATED_BODY()
@@ -28,7 +28,7 @@ protected:
 
 public:
 	/** Getter of Task. */
-	USP_TaskStep* GetTask() const;
+	USP_TaskStep* GetTaskStep() const;
 
 	/** Whether Goal is in AchievedGoals */
 	bool IsGoalAchieved(const USP_Goal* Goal) const;

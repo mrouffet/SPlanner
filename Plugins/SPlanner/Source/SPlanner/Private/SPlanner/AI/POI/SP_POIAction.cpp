@@ -8,7 +8,7 @@
 
 #include <SPlanner/AI/Task/SP_TaskStep.h>
 
-USP_TaskStep* USP_POIAction::GetTask() const
+USP_TaskStep* USP_POIAction::GetTaskStep() const
 {
 	SP_SRCHECK_NULLPTR(Cast<USP_TaskStep>(Step), nullptr)
 

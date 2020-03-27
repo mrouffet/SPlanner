@@ -204,7 +204,7 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(bool* bCanBe
 			for (int i = 0; i < POIActions.Num(); ++i)
 			{
 				SP_CCHECK(POIActions[i], "%s: POI [ %d ] nullptr!", *POIZone->GetPOIs()[j]->GetActionSet()->GetName(), i)
-				SP_CCHECK(POIActions[i]->GetTask(), "%s: POI \"%s\" [%d] Task nullptr!",
+				SP_CCHECK(POIActions[i]->GetTaskStep(), "%s: POI \"%s\" [%d] TaskStep nullptr!",
 					*POIZone->GetPOIs()[j]->GetActionSet()->GetName(), *POIActions[i]->GetName(), i)
 
 				// Add to actions.
