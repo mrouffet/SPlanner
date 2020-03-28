@@ -63,6 +63,14 @@ protected:
 
 	bool IsInBox_Internal(const APawn* Pawn, const FVector& BoxLocalExtent, const FVector& Location) const;
 
+	/** Check whether Min box's extent are valid. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	bool HasValidMinBox() const;
+
+	/** Check whether Max box's extent are valid. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	bool HasValidMaxBox() const;
+
 	/** Check whether Location is in Pawn's Min Box. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
 	bool IsInMinBox(const APawn* Pawn, const FVector& InLocation) const;

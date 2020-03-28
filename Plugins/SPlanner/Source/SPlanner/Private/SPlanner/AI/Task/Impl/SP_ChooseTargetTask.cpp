@@ -34,6 +34,15 @@ FVector USP_ChooseTargetTask::GetFOVMaxExtent(const APawn* Pawn) const
 	return Pawn->GetActorRotation().RotateVector(MaxLocalExtent);
 }
 
+bool USP_ChooseTargetTask::HasValidMinBox() const
+{
+	return MinLocalExtent.X > 0.0f || MinLocalExtent.Y > 0.0f || MinLocalExtent.Z > 0.0f;
+}
+bool USP_ChooseTargetTask::HasValidMaxBox() const
+{
+	return MaxLocalExtent.X > 0.0f || MaxLocalExtent.Y > 0.0f || MaxLocalExtent.Z > 0.0f;
+}
+
 bool USP_ChooseTargetTask::IsInBox_Internal(const APawn* Pawn, const FVector& BoxLocalExtent, const FVector& InLocation) const
 {
 	const FVector FOVCenter = GetFOVCenter(Pawn);

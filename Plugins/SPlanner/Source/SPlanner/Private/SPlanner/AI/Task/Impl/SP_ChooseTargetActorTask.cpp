@@ -19,7 +19,7 @@ bool USP_ChooseTargetActorTask::Predicate_Implementation(const USP_AIPlannerComp
 
 	const FVector ActorLocation = Actor->GetActorLocation();
 
-	if (IsInMinBox(Pawn, ActorLocation) || !IsInMaxBox(Pawn, ActorLocation))
+	if ((HasValidMinBox() && IsInMinBox(Pawn, ActorLocation)) || (HasValidMaxBox() && !IsInMaxBox(Pawn, ActorLocation)))
 		return false;
 
 	if (bTargetVisible)
@@ -43,60 +43,63 @@ AActor* USP_ChooseTargetActorTask::Choose_Implementation(const USP_AIPlannerComp
 {
 	SP_RCHECK_NULLPTR(Planner, nullptr)
 
+	const APawn* const Pawn = Planner->GetPawn();
+	SP_RCHECK_NULLPTR(Planner, nullptr)
+
+	const FVector PawnLocation = Pawn->GetActorLocation();
+
 	switch (Method)
 	{
-	case ESP_ChooseTargetActorMethod::CTM_Nearest:
-	{
-		float ClosestSqrDist = FLT_MAX;
-		AActor* Target = nullptr;
-		FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
-
-		for (int i = 0; i < Actors.Num(); ++i)
+		case ESP_ChooseTargetActorMethod::CTM_Nearest:
 		{
-			SP_CCHECK_NULLPTR(Actors[i])
+			AActor* Target = nullptr;
+			float ClosestSqrDist = FLT_MAX;
 
-			float SqrDist = FVector::DistSquared(PlannerLocation, Actors[i]->GetActorLocation());
-
-			if (SqrDist < ClosestSqrDist)
+			for (int i = 0; i < Actors.Num(); ++i)
 			{
-				SqrDist = ClosestSqrDist;
-				Target = Actors[i];
+				SP_CCHECK_NULLPTR(Actors[i])
+
+				float SqrDist = FVector::DistSquared(PawnLocation, Actors[i]->GetActorLocation());
+
+				if (SqrDist < ClosestSqrDist)
+				{
+					ClosestSqrDist = SqrDist;
+					Target = Actors[i];
+				}
 			}
+
+			return Target;
 		}
-
-		return Target;
-	}
-	case ESP_ChooseTargetActorMethod::CTM_Furthest:
-	{
-		float FurthestSqrDist = FLT_MAX;
-		AActor* Target = nullptr;
-		FVector PlannerLocation = Planner->GetOwner()->GetActorLocation();
-
-		for (int i = 0; i < Actors.Num(); ++i)
+		case ESP_ChooseTargetActorMethod::CTM_Furthest:
 		{
-			SP_CCHECK_NULLPTR(Actors[i])
+			AActor* Target = nullptr;
+			float FurthestSqrDist = FLT_MAX;
 
-			float SqrDist = FVector::DistSquared(PlannerLocation, Actors[i]->GetActorLocation());
-
-			if (SqrDist > FurthestSqrDist)
+			for (int i = 0; i < Actors.Num(); ++i)
 			{
-				SqrDist = FurthestSqrDist;
-				Target = Actors[i];
+				SP_CCHECK_NULLPTR(Actors[i])
+
+				float SqrDist = FVector::DistSquared(PawnLocation, Actors[i]->GetActorLocation());
+
+				if (SqrDist > FurthestSqrDist)
+				{
+					FurthestSqrDist = SqrDist;
+					Target = Actors[i];
+				}
 			}
+
+			return Target;
 		}
+		default:
+			SP_LOG(Warning, "ChooseTargetActorMethod not supported yet!")
+		case ESP_ChooseTargetActorMethod::CTM_Random:
+		{
+			// Empty Targets.
+			if (!Actors.Num())
+				return nullptr;
 
-		return Target;
-	}
-	default:
-		SP_LOG(Warning, "ChooseTargetActorMethod not supported yet!")
-	case ESP_ChooseTargetActorMethod::CTM_Random:
-	{
-		// Empty Targets.
-		if (!Actors.Num())
-			return nullptr;
-
-		return Actors[FMath::RandRange(0, Actors.Num() - 1)];
-	}
+			return Actors[FMath::RandRange(0, Actors.Num() - 1)];
+		}
 	}
 }
 
