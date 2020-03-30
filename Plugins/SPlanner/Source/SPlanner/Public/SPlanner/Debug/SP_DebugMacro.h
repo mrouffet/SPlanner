@@ -18,17 +18,23 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 /** Log console with object name, file name, line, and function name. */
 #define SP_LOG(Verbosity, Str, ...)\
 	{\
-		if(UFunction* OwnerFunction = this->GetClass()->FindFunctionByName("GetOwner"))\
+		if(this && this->IsValidLowLevel())\
 		{\
-			AActor* OwnerActor = nullptr;\
-			const_cast<std::remove_cv<std::remove_reference<decltype(*this)>::type>::type&>(*this).ProcessEvent(OwnerFunction, &OwnerActor);\
-			if(OwnerActor)\
-				UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s.%s -- %s:%d in %s:\n\t" Str), *OwnerActor->GetName(), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
-			else\
-				UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s -- %s:%d in %s:\n\t" Str), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
+			if(UClass* const ThisClass = this->GetClass())\
+			{\
+				if(UFunction* OwnerFunction = ThisClass->FindFunctionByName("GetOwner"))\
+				{\
+					AActor* OwnerActor = nullptr;\
+					const_cast<std::remove_cv<std::remove_reference<decltype(*this)>::type>::type&>(*this).ProcessEvent(OwnerFunction, &OwnerActor);\
+					if(OwnerActor)\
+						UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s.%s -- %s:%d in %s:\n\t" Str), *OwnerActor->GetName(), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
+					else\
+						UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s -- %s:%d in %s:\n\t" Str), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
+				}\
+				else\
+					UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s -- %s:%d in %s:\n\t" Str), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
+			}\
 		}\
-		else\
-			UE_LOG(LogSP_Debug, Verbosity, TEXT("Object:%s -- %s:%d in %s:\n\t" Str), *GetName(), SP_WFILE_NAME, __LINE__, SP_WFUNCTION_NAME, ##__VA_ARGS__)\
 	}
 
 
