@@ -52,6 +52,10 @@ public:
 
 	USP_LODComponent(const FObjectInitializer& ObjectInitializer);
 
+	/** Enable or disable behavior. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner")
+	void SetEnableBehavior(bool bEnable);
+
 	/** Whether this LOD is active or every Objects are out of range. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|LOD")
 	bool IsLODActive() const;

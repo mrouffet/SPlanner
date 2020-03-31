@@ -47,7 +47,7 @@ bool USP_PlannerComponent::IsBehaviorEnabled() const
 {
 	return PlanState != ESP_PlanState::PS_Inactive;
 }
-void USP_PlannerComponent::SetEnableBehavior(bool bEnable)
+void USP_PlannerComponent::SetEnableBehavior_Implementation(bool bEnable)
 {
 	if (bEnable)
 		OnActive_Internal();

@@ -203,7 +203,7 @@ public:
 	*	Enable or disable behavior.
 	*	Call OnActive / OnInactive.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner")
 	void SetEnableBehavior(bool bEnable);
 
 	/** Getter of Goal. */

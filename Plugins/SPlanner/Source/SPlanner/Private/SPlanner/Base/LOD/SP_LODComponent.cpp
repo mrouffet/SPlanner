@@ -79,6 +79,16 @@ void USP_LODComponent::FillObjects_Implementation()
 	Objects.Add(LocalPlayerPawn->GetRootComponent());
 }
 
+void USP_LODComponent::SetEnableBehavior_Implementation(bool bEnable)
+{
+	SetComponentTickEnabled(bEnable);
+
+	if(bEnable)
+		ComputeLODLevel();
+	else
+		LODLevel = -1.0f;
+}
+
 void USP_LODComponent::BeginPlay()
 {
 	Super::BeginPlay();
