@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Misc/VariableParam/SP_BoolInputsParam.h>
+#include <SPlanner/Misc/VariableParam/Bool/SP_BoolInputsParam.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 

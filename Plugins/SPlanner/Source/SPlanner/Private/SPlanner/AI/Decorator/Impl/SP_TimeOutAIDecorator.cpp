@@ -5,7 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Misc/SP_FlagHelper.h>
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecoratorFlag.h>
 

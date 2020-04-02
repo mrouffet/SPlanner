@@ -1,26 +1,26 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Misc/VariableParam/SP_IntParams.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatParams.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-int USP_IntParams::Query_Implementation(const UObject* Outer) const
+float USP_FloatParams::Query_Implementation(const UObject* Outer) const
 {
-	int Value = Super::Query_Implementation(Outer);
+	float Value = Super::Query_Implementation(Outer);
 
 	// Compute average inputs.
-	int AverageInput = 0.0f;
+	float AverageInput = 0.0f;
 
 	// Multiply by average input.
 	if (Inputs.Num())
 	{
-		int Input = 0.0f;
+		float Input = 0.0f;
 
 		for (int i = 0; i < Inputs.Num(); ++i)
 		{
 			SP_CCHECK_NULLPTR(Inputs[i])
 
-			Input += Inputs[i]->QueryInt(Outer);
+			Input += Inputs[i]->QueryFloat(Outer);
 		}
 
 		AverageInput = Input / Inputs.Num();

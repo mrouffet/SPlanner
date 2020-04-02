@@ -2,7 +2,7 @@
 
 #include <SPlanner/Base/Decorator/Impl/SP_BoolDecorator.h>
 
-#include <SPlanner/Misc/VariableParam/SP_BoolParam.h>
+#include <SPlanner/Misc/VariableParam/Bool/SP_BoolParam.h>
 
 bool USP_BoolDecorator::Validate_Internal_Implementation(const UObject* Object)
 {

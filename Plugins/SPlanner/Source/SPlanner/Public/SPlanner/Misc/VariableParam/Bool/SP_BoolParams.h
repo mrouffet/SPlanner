@@ -2,19 +2,17 @@
 
 #pragma once
 
-#include <SPlanner/Misc/VariableAsset/SP_BoolAsset.h>
-
-#include <SPlanner/Misc/VariableParam/SP_BoolParam.h>
-#include "SP_BoolInputsParam.generated.h"
+#include <SPlanner/Misc/VariableParam/Bool/SP_BoolParam.h>
+#include "SP_BoolParams.generated.h"
 
 USTRUCT(BlueprintType, Category = "SPlanner|Misc|Param|Bool")
-struct SPLANNER_API FSP_BoolInputAssetPair
+struct SPLANNER_API FSP_BoolInputParamPair
 {
 	GENERATED_BODY()
 
 	/** The input bool value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_BoolAsset* Input = nullptr;
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
+	USP_ScalarParam* Input = nullptr;
 
 	/** The method to apply Input. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
@@ -25,7 +23,7 @@ struct SPLANNER_API FSP_BoolInputAssetPair
 *	bool parameter struct implementation.
 */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Misc|Param|Bool")
-class SPLANNER_API USP_BoolInputsParam : public USP_BoolParam
+class SPLANNER_API USP_BoolParams : public USP_BoolParam
 {
 	GENERATED_BODY()
 
@@ -35,5 +33,5 @@ protected:
 public:
 	/** Additionnal input values. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
-	TArray<FSP_BoolInputAssetPair> InputPairs;
+	TArray<FSP_BoolInputParamPair> InputPairs;
 };

@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Misc/VariableParam/SP_FloatCurveParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatCurveParam.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
@@ -23,9 +23,12 @@ float USP_FloatCurveParam::Query_Implementation(const UObject* Outer) const
 	}
 	else
 	{
-		SP_LOG(Warning, "Outer is not of type USP_FloatCurveParamInfos")
-
 		Value = Super::Query_Implementation(Outer);
+
+		SP_RCHECK_NULLPTR(MultiplierXValue, Value)
+
+		if (!Multiplier.GetRichCurveConst()->IsEmpty())
+			Value *= Multiplier.GetRichCurveConst()->Eval(MultiplierXValue->Query(Outer));
 	}
 
 	return Value;

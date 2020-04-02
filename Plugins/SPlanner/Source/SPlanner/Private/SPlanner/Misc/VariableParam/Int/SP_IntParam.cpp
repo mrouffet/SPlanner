@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Misc/VariableParam/SP_IntParam.h>
+#include <SPlanner/Misc/VariableParam/Int/SP_IntParam.h>
 
 int USP_IntParam::Query_Implementation(const UObject* Outer) const
 {

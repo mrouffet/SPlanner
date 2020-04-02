@@ -4,7 +4,7 @@
 
 #include <Curves/CurveFloat.h>
 
-#include <SPlanner/Misc/VariableParam/SP_FloatCurveParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatCurveParam.h>
 #include "SP_AILODFloatCurveParam.generated.h"
 
 /**

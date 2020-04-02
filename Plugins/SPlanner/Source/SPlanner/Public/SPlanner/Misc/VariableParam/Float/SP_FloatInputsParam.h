@@ -4,7 +4,7 @@
 
 #include <SPlanner/Misc/VariableAsset/SP_FloatAsset.h>
 
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 #include "SP_FloatInputsParam.generated.h"
 
 /**

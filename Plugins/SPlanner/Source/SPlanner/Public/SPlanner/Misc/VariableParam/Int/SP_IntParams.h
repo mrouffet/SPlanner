@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/Misc/VariableParam/SP_IntParam.h>
+#include <SPlanner/Misc/VariableParam/Int/SP_IntParam.h>
 #include "SP_IntParams.generated.h"
 
 /**

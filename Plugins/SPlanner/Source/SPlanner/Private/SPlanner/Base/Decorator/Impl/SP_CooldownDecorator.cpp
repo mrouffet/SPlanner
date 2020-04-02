@@ -2,7 +2,7 @@
 
 #include <SPlanner/Base/Decorator/Impl/SP_CooldownDecorator.h>
 
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 
 void USP_CooldownDecorator::SetCooldown(const UObject* Object)
 {

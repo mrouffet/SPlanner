@@ -1,10 +1,10 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Misc/VariableParam/SP_IntInputsParam.h>
+#include <SPlanner/Misc/VariableParam/Int/SP_IntParams.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-int USP_IntInputsParam::Query_Implementation(const UObject* Outer) const
+int USP_IntParams::Query_Implementation(const UObject* Outer) const
 {
 	int Value = Super::Query_Implementation(Outer);
 
@@ -20,7 +20,7 @@ int USP_IntInputsParam::Query_Implementation(const UObject* Outer) const
 		{
 			SP_CCHECK_NULLPTR(Inputs[i])
 
-			Input += Inputs[i]->Get();
+			Input += Inputs[i]->QueryInt(Outer);
 		}
 
 		AverageInput = Input / Inputs.Num();

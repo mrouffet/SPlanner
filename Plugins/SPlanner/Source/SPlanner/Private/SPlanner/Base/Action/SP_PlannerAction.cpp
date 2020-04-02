@@ -4,7 +4,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Misc/VariableParam/SP_FloatCurveParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatCurveParam.h>
 
 #include <SPlanner/Base/Action/SP_Action.h>
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>

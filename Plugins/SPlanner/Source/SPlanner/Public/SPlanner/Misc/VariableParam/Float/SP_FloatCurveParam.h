@@ -4,7 +4,7 @@
 
 #include <Curves/CurveFloat.h>
 
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 #include "SP_FloatCurveParam.generated.h"
 
 /**
@@ -19,10 +19,11 @@ protected:
 	float Query_Implementation(const UObject* Outer) const override;
 
 public:
-	/**
-	*	The weight multiplier to apply over times added to plan.
-	*	Require GenerationType == ESP_ActionGenerationType::AGT_RandomWeight.
-	*/
+	/** The X value to use for Multiplier. */
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.
+	USP_FloatParam* MultiplierXValue = nullptr;
+
+	/** The multiplier to apply on DefaultValue. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	FRuntimeFloatCurve Multiplier;
 

@@ -6,8 +6,8 @@
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 
-#include <SPlanner/Misc/VariableParam/SP_BoolParam.h>
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
+#include <SPlanner/Misc/VariableParam/Bool/SP_BoolParam.h>
+#include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 
 ESP_PlanExecutionState USP_SetBlackboardValueTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
