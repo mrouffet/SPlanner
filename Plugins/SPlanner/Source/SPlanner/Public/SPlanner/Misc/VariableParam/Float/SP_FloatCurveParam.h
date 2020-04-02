@@ -21,7 +21,7 @@ protected:
 public:
 	/** The X value to use for Multiplier. */
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.
-	USP_FloatParam* MultiplierXValue = nullptr;
+	USP_ScalarParam* XAxisValue = nullptr;
 
 	/** The multiplier to apply on DefaultValue. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.

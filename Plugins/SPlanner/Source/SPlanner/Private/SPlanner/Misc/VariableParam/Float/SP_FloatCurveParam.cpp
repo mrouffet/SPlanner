@@ -25,10 +25,10 @@ float USP_FloatCurveParam::Query_Implementation(const UObject* Outer) const
 	{
 		Value = Super::Query_Implementation(Outer);
 
-		SP_RCHECK_NULLPTR(MultiplierXValue, Value)
+		SP_RCHECK_NULLPTR(XAxisValue, Value)
 
 		if (!Multiplier.GetRichCurveConst()->IsEmpty())
-			Value *= Multiplier.GetRichCurveConst()->Eval(MultiplierXValue->Query(Outer));
+			Value *= Multiplier.GetRichCurveConst()->Eval(XAxisValue->QueryFloat(Outer));
 	}
 
 	return Value;
