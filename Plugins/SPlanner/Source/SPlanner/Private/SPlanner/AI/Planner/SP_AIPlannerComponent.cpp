@@ -314,6 +314,10 @@ bool USP_AIPlannerComponent::OnInactive_Internal_Implementation()
 {
 	if(!Super::OnInactive_Internal_Implementation())
 		return false;
+	
+	// Blackboard can be null while planner is waiting for possess.
+	if(USP_AIBlackboardComponent* const AIBlackboard = Cast<USP_AIBlackboardComponent>(Blackboard))
+		AIBlackboard->Reset();
 
 	SetComponentTickEnabled(false);
 

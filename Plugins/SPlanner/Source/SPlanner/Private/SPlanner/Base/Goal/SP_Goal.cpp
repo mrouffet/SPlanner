@@ -4,25 +4,8 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
-#include <SPlanner/Misc/VariableAsset/SP_IntAsset.h>
-#include <SPlanner/Misc/VariableAsset/SP_FloatAsset.h>
-
 #include <SPlanner/Base/Director/SP_Director.h>
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
-
-bool USP_Goal::GetResetBlackboard() const
-{
-	return bResetBlackboard;
-}
-
-float USP_Goal::GetMinPlannerNum() const
-{
-	return MinPlannerNum;
-}
-float USP_Goal::GetMaxPlannerNum() const
-{
-	return MaxPlannerNum;
-}
 
 const TArray<USP_PlannerComponent*>& USP_Goal::GetPlanners() const
 {
@@ -33,19 +16,11 @@ bool USP_Goal::CanStart_Implementation(const USP_PlannerComponent* Planner) cons
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
-	// Maximum planners reached.
-	if (MaxPlannerNum > 0 && Planners.Num() >= MaxPlannerNum)
-		return false;
-
 	return true;
 }
-bool USP_Goal::CanLeave_Implementation(const USP_PlannerComponent* Planner) const
+bool USP_Goal::CanEnd_Implementation(const USP_PlannerComponent* Planner) const
 {
 	SP_RCHECK_NULLPTR(Planner, false)
-
-	// Minimum planners reached.
-	if (MinPlannerNum > 0 && Planners.Num() <= MinPlannerNum)
-		return false;
 
 	return true;
 }
@@ -59,12 +34,6 @@ void USP_Goal::OnStart_Implementation(USP_PlannerComponent* InPlanner)
 
 	if (Planners.Num() == 1)
 		ASP_Director::RegisterGoal(this);
-
-	if (OutputPlannerNum)
-		OutputPlannerNum->Set(Planners.Num());
-
-	if (OutputMaxRatio && MaxPlannerNum > 0)
-		OutputMaxRatio->Set(static_cast<float>(Planners.Num()) / MaxPlannerNum);
 }
 void USP_Goal::OnEnd_Implementation(USP_PlannerComponent* InPlanner)
 {
@@ -75,12 +44,6 @@ void USP_Goal::OnEnd_Implementation(USP_PlannerComponent* InPlanner)
 
 	if (Planners.Num() == 0)
 		ASP_Director::UnRegisterGoal(this);
-
-	if (OutputPlannerNum)
-		OutputPlannerNum->Set(Planners.Num());
-
-	if (OutputMaxRatio && MaxPlannerNum > 0)
-		OutputMaxRatio->Set(static_cast<float>(Planners.Num()) / MaxPlannerNum);
 }
 
 void USP_Goal::Reset_Implementation()
@@ -101,10 +64,10 @@ bool USP_Goal::CanTransitTo(const USP_PlannerComponent* Planner, const USP_Goal*
 
 	// Froam OldGoal to nullptr.
 	if (!NewGoal)
-		return OldGoal->CanLeave(Planner);
+		return OldGoal->CanEnd(Planner);
 
 
-	if (!OldGoal->CanLeave(Planner))
+	if (!OldGoal->CanEnd(Planner))
 		return false;
 
 

@@ -5,9 +5,6 @@
 #include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_Goal.generated.h"
 
-class USP_IntAsset;
-class USP_FloatAsset;
-
 class USP_PlannerComponent;
 
 /**
@@ -19,39 +16,6 @@ class SPLANNER_API USP_Goal : public USP_DataAsset
 	GENERATED_BODY()
 
 protected:
-	/** Whether blackboard must be reset when planner start this goal. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	bool bResetBlackboard = true;
-
-	/**
-	*	Minimum planner executing this goal.
-	*	Use < 0 for unlimited.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	int MinPlannerNum = -1;
-
-	/**
-	*	Maximum planner executing this goal.
-	*	Use < 0 for unlimited.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	int MaxPlannerNum = -1;
-
-	/**
-	*	Output Planners.Num() into a SP_IntAsset.
-	*	Set nullptr to not use.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	USP_IntAsset* OutputPlannerNum = nullptr;
-
-	/**
-	*	Output planner num / MaxPlannerNum ratio into a SP_FloatAsset.
-	*	Require MaxPlannerNum > 0.
-	*	Set nullptr to not use.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
-	USP_FloatAsset* OutputMaxRatio = nullptr;
-
 	/** All planner registered (currently using this goal). */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Goal")
 	TArray<USP_PlannerComponent*> Planners;
@@ -90,22 +54,13 @@ protected:
 
 	/** Whether Planner can leave this goal. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "SPlanner|Goal|Out")
-	bool CanLeave(const USP_PlannerComponent* Planner) const;
+	bool CanEnd(const USP_PlannerComponent* Planner) const;
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
 public:
-	/** Getter of bResetBlackboard. */
-	bool GetResetBlackboard() const;
-
-	/** Getter of MinPlannerNum*/
-	float GetMinPlannerNum() const;
-
-	/** Getter of MaxPlannerNum*/
-	float GetMaxPlannerNum() const;
-
 	/** Getter of Planners. */
 	const TArray<USP_PlannerComponent*>& GetPlanners() const;
 
@@ -117,7 +72,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Goal")
 	void OnEnd(USP_PlannerComponent* Planner);
 
-	/** Reset this formation set. */
+	/** Reset this goal. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Goal")
 	void Reset();
 

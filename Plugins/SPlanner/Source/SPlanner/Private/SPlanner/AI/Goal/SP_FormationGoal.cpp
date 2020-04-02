@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Formation/SP_FormationGoal.h>
+#include <SPlanner/AI/Goal/SP_FormationGoal.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
@@ -20,9 +20,9 @@ bool USP_FormationGoal::CanStart_Implementation(const USP_PlannerComponent* Plan
 
 	return FormationSet->CanAdd(AIPlanner);
 }
-bool USP_FormationGoal::CanLeave_Implementation(const USP_PlannerComponent* Planner) const
+bool USP_FormationGoal::CanEnd_Implementation(const USP_PlannerComponent* Planner) const
 {
-	if (!Super::CanLeave_Implementation(Planner))
+	if (!Super::CanEnd_Implementation(Planner))
 		return false;
 
 	SP_RCHECK_NULLPTR(FormationSet, false)

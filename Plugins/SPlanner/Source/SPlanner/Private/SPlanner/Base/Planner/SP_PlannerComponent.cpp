@@ -84,14 +84,6 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal, bool bForce)
 		OldGoal->OnEnd(this);
 	if (Goal)
 	{
-		// Blackboard must be reset to start this goal.
-		if (Goal->GetResetBlackboard())
-		{
-			SP_CHECK_NULLPTR(Blackboard)
-			Blackboard->Reset();
-		}
-
-		// Start after reset.
 		Goal->OnStart(this);
 
 		// Out dated plan: Do not ask again if already / still waiting for computation.
@@ -362,8 +354,6 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 	// Blackboard can be null while planner is waiting for possess.
 	if (Blackboard)
 	{
-		Blackboard->Reset();
-
 		// End goal manually because PlanState is set to Inactive.
 		if (Goal)
 			Goal->OnEnd(this);

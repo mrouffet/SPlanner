@@ -33,8 +33,6 @@ protected:
 	UPROPERTY()
 	TMap<FName, USP_AIBlackboardKey*> Keys;
 
-	void Reset_Implementation() override;
-
 	void InitializeBlackboard_Implementation() override;
 	void UnInitializeBlackboard_Implementation() override;
 
@@ -139,4 +137,8 @@ public:
 	/** Reset the value to default (Blackboard Asset). */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
 	void ResetValue(const FName& EntryName);
+
+	/** Reset this blackboard. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
+	void Reset();
 };

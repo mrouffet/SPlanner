@@ -43,8 +43,4 @@ public:
 	/** Forward Getter of action set depending on Goal. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard")
 	USP_ActionSet* GetActionSet(USP_Goal* Goal);
-
-	/** Reset this blackboard. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
-	void Reset();
 };

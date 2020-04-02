@@ -239,8 +239,6 @@ void USP_AIBlackboardComponent::ResetValue(const FName& EntryName)
 
 void USP_AIBlackboardComponent::Reset_Implementation()
 {
-	Super::Reset_Implementation();
-
 	USP_AIBlackboardAsset* const AIBlackboardAsset = Cast<USP_AIBlackboardAsset>(BlackboardAsset);
 	SP_CHECK(AIBlackboardAsset, "AIBlackboardAsset nullptr! Blackboard asset must be of type USP_AIBlackboardAsset.")
 

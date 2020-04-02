@@ -28,10 +28,6 @@ void USP_BlackboardComponent::UnInitializeBlackboard_Implementation()
 {
 }
 
-void USP_BlackboardComponent::Reset_Implementation()
-{
-}
-
 void USP_BlackboardComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
