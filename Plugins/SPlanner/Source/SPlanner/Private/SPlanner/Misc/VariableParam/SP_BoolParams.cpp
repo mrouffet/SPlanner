@@ -15,13 +15,13 @@ bool USP_BoolParams::Query_Implementation(const UObject* Outer) const
 		switch (InputPairs[i].Method)
 		{
 		case ESP_BoolInputMethod::BIM_AND:
-			Value &= InputPairs[i].Input->Query(Outer);
+			Value &= InputPairs[i].Input->QueryBool(Outer);
 			break;
 		case ESP_BoolInputMethod::BIM_OR:
-			Value |= InputPairs[i].Input->Query(Outer);
+			Value |= InputPairs[i].Input->QueryBool(Outer);
 			break;
 		case ESP_BoolInputMethod::BIM_XOR:
-			Value ^= InputPairs[i].Input->Query(Outer);
+			Value ^= InputPairs[i].Input->QueryBool(Outer);
 			break;
 		default:
 			SP_LOG(Warning, "ESP_BoolInputMethod [%d] not supported yet!", static_cast<int>(InputPairs[i].Method))

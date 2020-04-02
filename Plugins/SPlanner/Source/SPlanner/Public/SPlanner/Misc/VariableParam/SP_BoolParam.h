@@ -2,26 +2,28 @@
 
 #pragma once
 
-#include <SPlanner/Misc/VariableParam/SP_VariableParam.h>
+#include <SPlanner/Misc/VariableParam/SP_ScalarParam.h>
 #include "SP_BoolParam.generated.h"
 
 /**
 *	bool parameter struct implementation.
 */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Misc|Param|Bool")
-class SPLANNER_API USP_BoolParam : public USP_VariableParam
+class SPLANNER_API USP_BoolParam : public USP_ScalarParam
 {
 	GENERATED_BODY()
+
+protected:
+	bool QueryBool_Implementation(const UObject* Outer) const override final;
+	int QueryInt_Implementation(const UObject* Outer) const override final;
+	float QueryFloat_Implementation(const UObject* Outer) const override final;
 
 public:
 	/** The default value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	bool DefaultValue = false;
 
-	/**
-	*	Getter of value using Curve with valid LODLevel, otherwise Default.
-	*	Multiply with all InputWeights.
-	*/
+	/** Getter of value. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner")
 	bool Query(const UObject* Outer = nullptr) const;
 };

@@ -2,19 +2,19 @@
 
 #pragma once
 
-#include <SPlanner/Misc/VariableParam/SP_FloatParam.h>
-#include "SP_FloatParams.generated.h"
+#include <SPlanner/Misc/VariableParam/SP_IntParam.h>
+#include "SP_IntParams.generated.h"
 
 /**
-*	float parameter struct implementation.
+*	bool parameter struct implementation.
 */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Misc|Param|Float")
-class SPLANNER_API USP_FloatParams : public USP_FloatParam
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Misc|Param|Int")
+class SPLANNER_API USP_IntParams : public USP_IntParam
 {
 	GENERATED_BODY()
 
 protected:
-	float Query_Implementation(const UObject* Outer) const override;
+	int Query_Implementation(const UObject* Outer) const override;
 
 public:
 	/**

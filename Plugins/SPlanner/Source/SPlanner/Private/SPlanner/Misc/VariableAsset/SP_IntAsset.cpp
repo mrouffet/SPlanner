@@ -1,13 +1,13 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Misc/VariableAsset/SP_BoolAsset.h>
+#include <SPlanner/Misc/VariableAsset/SP_IntAsset.h>
 
-bool USP_BoolAsset::Get() const
+int USP_IntAsset::Get() const
 {
 	return Handle;
 }
 
-void USP_BoolAsset::Set(bool Value)
+void USP_IntAsset::Set(int Value)
 {
 	// Same value.
 	if (Value == Handle)
@@ -19,11 +19,11 @@ void USP_BoolAsset::Set(bool Value)
 }
 
 #if WITH_EDITOR
-void USP_BoolAsset::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void USP_IntAsset::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	if (PropertyChangedEvent.GetPropertyName() == "Handle")
+	if(PropertyChangedEvent.GetPropertyName() == "Handle")
 		OnValueChange.Broadcast(Handle);
 }
 #endif

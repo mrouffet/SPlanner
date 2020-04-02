@@ -11,8 +11,8 @@ struct SPLANNER_API FSP_BoolInputParamPair
 	GENERATED_BODY()
 
 	/** The input bool value. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
-	USP_BoolParam* Input = nullptr;
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "SPlanner")
+	USP_ScalarParam* Input = nullptr;
 
 	/** The method to apply Input. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")

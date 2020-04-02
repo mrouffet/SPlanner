@@ -23,6 +23,7 @@ void USP_FloatAsset::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	OnValueChange.Broadcast(Handle);
+	if (PropertyChangedEvent.GetPropertyName() == "Handle")
+		OnValueChange.Broadcast(Handle);
 }
 #endif
