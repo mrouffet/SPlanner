@@ -354,9 +354,8 @@ bool USP_PlannerComponent::OnInactive_Internal_Implementation()
 	if (PlanState == ESP_PlanState::PS_Inactive)
 		return false;
 
-	// Try cancel plan, otherwise stop cosntruct timer.
-	if(!CancelPlan())
-		GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
+	CancelPlan();
+	GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
 
 	PlanState = ESP_PlanState::PS_Inactive;
 
@@ -429,6 +428,14 @@ void USP_PlannerComponent::UninitializeComponent()
 	// Unregister from Director. Check valid instance: Director could have been destroyed first during scene travel or quit game.
 	if (bAutoRegisterInDirector && ASP_Director::GetInstance())
 		ASP_Director::UnRegisterPlanner(this);
+}
+
+void USP_PlannerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// Ensure timer clean.
+	GetWorld()->GetTimerManager().ClearTimer(ConstructPlanTimer);
 }
 
 #if WITH_EDITOR

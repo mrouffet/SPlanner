@@ -119,6 +119,8 @@ protected:
 	void InitializeComponent() override;
 	void UninitializeComponent() override;
 
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 public:
 	/**
 	*	The maximum planner depth while building a plan.
