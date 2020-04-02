@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetActorTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetActorTask.h>
 
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
 

@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_MoveToTask.h>
+#include <SPlanner/AI/Task/Impl/MoveTo/SP_MoveToTask.h>
 
 #include <Components/CapsuleComponent.h>
 

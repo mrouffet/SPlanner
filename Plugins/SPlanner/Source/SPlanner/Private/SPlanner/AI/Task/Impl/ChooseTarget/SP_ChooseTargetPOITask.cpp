@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetPOITask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetPOITask.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>

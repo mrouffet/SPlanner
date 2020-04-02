@@ -3,41 +3,37 @@
 #pragma once
 
 #include <SPlanner/AI/Task/SP_TaskStep.h>
-#include "SP_IdleTask.generated.h"
+#include "SP_IdleBaseTask.generated.h"
 
 /**
- *	Idle task implementation.
+ *	Idle base task implementation.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_IdleTask : public USP_TaskStep
+class SPLANNER_API USP_IdleBaseTask : public USP_TaskStep
 {
 	GENERATED_BODY()
 	
 protected:
-	/** The minimum idle time. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
-	float MinTime = 0.5f;
-
-	/** The maximum idle time. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
-	float MaxTime = 3.0f;
+	/** Generate the time for the task. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Task|Idle")
+	float GenerateTime(const USP_AIPlannerComponent* Planner);
 
 	bool Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	USP_IdleTask(const FObjectInitializer& ObjectInitializer);
+	USP_IdleBaseTask(const FObjectInitializer& ObjectInitializer);
 };
 
 
 /** Task info implementation for USP_IdleTask. */
 UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_IdleTaskInfos : public USP_TaskInfos
+class SPLANNER_API USP_IdleBaseTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()
 
 	// Only accessible by USP_IdleTask.
-	friend USP_IdleTask;
+	friend USP_IdleBaseTask;
 
 	float WaitTime = -1.0f;
 	float CurrTime = 0.0f;

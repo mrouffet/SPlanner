@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetTask.h>
 
 #if SP_DEBUG
 	#include <DrawDebugHelpers.h>

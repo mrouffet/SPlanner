@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetPlayerTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetPlayerTask.h>
 
 #include <GameFramework/PlayerState.h>
 #include <GameFramework/GameStateBase.h>

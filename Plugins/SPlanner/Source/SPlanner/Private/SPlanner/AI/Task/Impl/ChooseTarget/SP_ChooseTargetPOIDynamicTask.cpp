@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetPOIDynamicTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetPOIDynamicTask.h>
 
 #include <SPlanner/AI/POI/SP_POIComponent.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>

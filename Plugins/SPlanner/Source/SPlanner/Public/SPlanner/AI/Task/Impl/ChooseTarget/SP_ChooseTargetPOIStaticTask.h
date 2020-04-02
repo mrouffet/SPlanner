@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetPOITask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetPOITask.h>
 #include "SP_ChooseTargetPOIStaticTask.generated.h"
 
 /**

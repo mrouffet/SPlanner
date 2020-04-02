@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetTask.h>
 #include "SP_ChooseTargetActorTask.generated.h"
 
 /** The method to use to choose a target. */

@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetPOIStaticTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetPOIStaticTask.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 

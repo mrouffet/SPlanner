@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/Impl/SP_ChooseTargetActorTask.h>
+#include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetActorTask.h>
 #include "SP_ChooseTargetPOITask.generated.h"
 
 class USP_POIComponent;
