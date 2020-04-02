@@ -5,6 +5,9 @@
 #include <SPlanner/Framework/SP_DataAsset.h>
 #include "SP_Goal.generated.h"
 
+class USP_IntAsset;
+class USP_FloatAsset;
+
 class USP_PlannerComponent;
 
 /**
@@ -33,6 +36,21 @@ protected:
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
 	int MaxPlannerNum = -1;
+
+	/**
+	*	Output Planners.Num() into a SP_IntAsset.
+	*	Set nullptr to not use.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
+	USP_IntAsset* OutputPlannerNum = nullptr;
+
+	/**
+	*	Output planner num / MaxPlannerNum ratio into a SP_FloatAsset.
+	*	Require MaxPlannerNum > 0.
+	*	Set nullptr to not use.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Goal")
+	USP_FloatAsset* OutputMaxRatio = nullptr;
 
 	/** All planner registered (currently using this goal). */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Goal")

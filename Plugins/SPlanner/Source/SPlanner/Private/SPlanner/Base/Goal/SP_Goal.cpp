@@ -4,6 +4,9 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#include <SPlanner/Misc/VariableAsset/SP_IntAsset.h>
+#include <SPlanner/Misc/VariableAsset/SP_FloatAsset.h>
+
 #include <SPlanner/Base/Director/SP_Director.h>
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
@@ -56,6 +59,12 @@ void USP_Goal::OnStart_Implementation(USP_PlannerComponent* InPlanner)
 
 	if (Planners.Num() == 1)
 		ASP_Director::RegisterGoal(this);
+
+	if (OutputPlannerNum)
+		OutputPlannerNum->Set(Planners.Num());
+
+	if (OutputMaxRatio && MaxPlannerNum > 0)
+		OutputMaxRatio->Set(static_cast<float>(Planners.Num()) / MaxPlannerNum);
 }
 void USP_Goal::OnEnd_Implementation(USP_PlannerComponent* InPlanner)
 {
@@ -66,6 +75,12 @@ void USP_Goal::OnEnd_Implementation(USP_PlannerComponent* InPlanner)
 
 	if (Planners.Num() == 0)
 		ASP_Director::UnRegisterGoal(this);
+
+	if (OutputPlannerNum)
+		OutputPlannerNum->Set(Planners.Num());
+
+	if (OutputMaxRatio && MaxPlannerNum > 0)
+		OutputMaxRatio->Set(static_cast<float>(Planners.Num()) / MaxPlannerNum);
 }
 
 void USP_Goal::Reset_Implementation()
