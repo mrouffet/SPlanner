@@ -18,6 +18,33 @@ void USP_IntAsset::Set(int Value)
 	OnValueChange.Broadcast(Handle);
 }
 
+bool USP_IntAsset::GetBool() const
+{
+	return Get();
+}
+void USP_IntAsset::SetBool(bool InValue)
+{
+	Set(static_cast<int>(InValue));
+}
+
+int USP_IntAsset::GetInt() const
+{
+	return Get();
+}
+void USP_IntAsset::SetInt(int InValue)
+{
+	Set(InValue);
+}
+
+float USP_IntAsset::GetFloat() const
+{
+	return Get();
+}
+void USP_IntAsset::SetFloat(float InValue)
+{
+	Set(static_cast<int>(InValue));
+}
+
 #if WITH_EDITOR
 void USP_IntAsset::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

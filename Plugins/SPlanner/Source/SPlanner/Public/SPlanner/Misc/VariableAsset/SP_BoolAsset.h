@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/Misc/VariableAsset/SP_VariableAsset.h>
+#include <SPlanner/Misc/VariableAsset/SP_ScalarAsset.h>
 #include "SP_BoolAsset.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_BoolAssetEvent, bool, Value);
@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSP_BoolAssetEvent, bool, Value);
 *	Serialized bool asset.
 */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|VariableAsset")
-class SPLANNER_API USP_BoolAsset : public USP_VariableAsset
+class SPLANNER_API USP_BoolAsset : public USP_ScalarAsset
 {
 	GENERATED_BODY()
 
@@ -38,4 +38,14 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Asset")
 	void Set(bool Value);
+
+
+	bool GetBool() const override final;
+	void SetBool(bool InValue) override final;
+
+	int GetInt() const override final;
+	void SetInt(int InValue) override final;
+
+	float GetFloat() const override final;
+	void SetFloat(float InValue) override final;
 };
