@@ -289,6 +289,12 @@ bool USP_AIPlannerComponent::CancelPlan()
 		TaskInfos = nullptr;
 	}
 
+	// Reset keys with bShouldResetOnPlanCancel.
+	USP_AIBlackboardComponent* const AIBlackboard = Cast<USP_AIBlackboardComponent>(Blackboard);
+	SP_RCHECK_NULLPTR(AIBlackboard, false)
+
+	AIBlackboard->ResetPlanCancel();
+
 	return true;
 }
 

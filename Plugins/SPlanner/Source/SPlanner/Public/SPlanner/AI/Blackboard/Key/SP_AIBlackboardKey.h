@@ -15,7 +15,14 @@ class USP_AIBlackboardKey : public UObject
 {
 	GENERATED_BODY()
 
+protected:
+	/** Whether this key should be reset on plan cancelled. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bShouldResetOnPlanCancelled = false;
+
 public:
+	bool ShouldResetOnPlanCancelled() const;
+
 	/**
 	*	reset the value from the original key.
 	*	Must be overridden in children.

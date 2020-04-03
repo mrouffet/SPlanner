@@ -4,6 +4,11 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+bool USP_AIBlackboardKey::ShouldResetOnPlanCancelled() const
+{
+	return bShouldResetOnPlanCancelled;
+}
+
 void USP_AIBlackboardKey::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
 	SP_LOG(Error, "Must be overridden in children!")

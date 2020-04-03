@@ -255,6 +255,29 @@ void USP_AIBlackboardComponent::Reset_Implementation()
 		(*KeyPtr)->ResetValue(Entries[i].Key);
 	}
 }
+void USP_AIBlackboardComponent::ResetPlanCancel_Implementation()
+{
+	USP_AIBlackboardAsset* const AIBlackboardAsset = Cast<USP_AIBlackboardAsset>(BlackboardAsset);
+	SP_CHECK(AIBlackboardAsset, "AIBlackboardAsset nullptr! Blackboard asset must be of type USP_AIBlackboardAsset.")
+
+	const TArray<FSP_AIBlackboardEntry>& Entries = AIBlackboardAsset->GetEntries();
+
+	// Reset each entry.
+	for (int i = 0; i < Entries.Num(); ++i)
+	{
+		SP_CCHECK(Entries[i].Key, "Key nullptr! Entry with name [%s] is nullptr!", *Entries[i].Name.ToString())
+
+		if (!Entries[i].Key->ShouldResetOnPlanCancelled())
+			continue;
+
+		USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(Entries[i].Name);
+
+		SP_CCHECK(KeyPtr, "KeyPtr nullptr! Entry with name [%s] not registered!", *Entries[i].Name.ToString())
+		SP_CCHECK_NULLPTR(*KeyPtr)
+
+		(*KeyPtr)->ResetValue(Entries[i].Key);
+	}
+}
 
 void USP_AIBlackboardComponent::InitializeBlackboard_Implementation()
 {
