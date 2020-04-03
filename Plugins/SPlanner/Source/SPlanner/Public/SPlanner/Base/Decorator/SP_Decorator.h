@@ -17,9 +17,9 @@ class SPLANNER_API USP_Decorator : public USP_Object
 	GENERATED_BODY()
 	
 protected:
-	/** Whether the condition should be inverted (ie NOT condition). */
+	/** Whether the condition should be reversed (ie NOT condition). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
-	bool bInverseCondition = false;
+	bool bReversedCondition = false;
 
 	/** Mask to call validate. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Bitmask, BitmaskEnum = "ESP_DecoratorFlag_TEMPFIX")) // TODO: FIX.

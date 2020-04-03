@@ -25,7 +25,7 @@ bool USP_Decorator::Validate(const UObject* Object)
 	bool bInternalResult = Validate_Internal(Object);
 
 	// Inverse.
-	if (bInverseCondition)
+	if (bReversedCondition)
 		bInternalResult = !bInternalResult;
 
 	// Validation callback.
