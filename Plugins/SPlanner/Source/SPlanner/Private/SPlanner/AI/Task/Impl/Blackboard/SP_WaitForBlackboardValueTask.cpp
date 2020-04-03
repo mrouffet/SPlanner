@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/SP_SetBlackboardValueTask.h>
+#include <SPlanner/AI/Task/Impl/Blackboard/SP_WaitForBlackboardValueTask.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
@@ -9,7 +9,7 @@
 #include <SPlanner/Misc/VariableParam/Bool/SP_BoolParam.h>
 #include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 
-ESP_PlanExecutionState USP_SetBlackboardValueTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+ESP_PlanExecutionState USP_WaitForBlackboardValueTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
@@ -17,14 +17,20 @@ ESP_PlanExecutionState USP_SetBlackboardValueTask::Tick_Internal_Implementation(
 	SP_RCHECK_NULLPTR(Blackboard, ESP_PlanExecutionState::PES_Failed)
 
 	if (const USP_FloatParam* const FloatParam = Cast<USP_FloatParam>(Param))
-		Blackboard->SetFloat(EntryName, FloatParam->Query(Planner));
+	{
+		if(Blackboard->GetFloat(EntryName) == FloatParam->Query(Planner))
+			return ESP_PlanExecutionState::PES_Succeed;
+	}
 	else if (const USP_BoolParam* const BoolParam = Cast<USP_BoolParam>(Param))
-		Blackboard->SetBool(EntryName, BoolParam->Query(Planner));
+	{
+		if (Blackboard->GetBool(EntryName) == BoolParam->Query(Planner))
+			return ESP_PlanExecutionState::PES_Succeed;
+	}
 	else
 	{
 		SP_LOG(Error, "Param type not supported yet!")
 		return ESP_PlanExecutionState::PES_Failed;
 	}
 
-	return ESP_PlanExecutionState::PES_Succeed;
+	return ESP_PlanExecutionState::PES_Running;
 }
