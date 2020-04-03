@@ -11,5 +11,15 @@ float USP_IdleCurveTask::GenerateTime_Implementation(const USP_AIPlannerComponen
 	SP_RCHECK_NULLPTR(MinCurve, -1.0f)
 	SP_RCHECK_NULLPTR(MaxCurve, -1.0f)
 
-	return FMath::RandRange(MinCurve->Query(Planner), MinCurve->Query(MaxCurve));
+	float MinTime = MinCurve->Query(Planner);
+	float MaxTime = MaxCurve->Query(Planner);
+
+	SP_RCHECK(MinTime > 0.0f || MaxTime > 0.0f, 0.0f, "Invalid arguments: both MinTime and MaxTime are < 0.0f!")
+
+	if (MinTime < 0.0f)
+		return MaxTime;
+	else if (MaxTime < 0.0f)
+		return MinTime;
+
+	return FMath::RandRange(MinTime, MaxTime);
 }
