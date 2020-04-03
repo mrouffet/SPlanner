@@ -14,11 +14,17 @@ class SPLANNER_API USP_IdleTask : public USP_IdleBaseTask
 	GENERATED_BODY()
 	
 protected:
-	/** The minimum idle time. */
+	/**
+	* The minimum idle time.
+	* Set < 0.0f to not use.
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
 	float MinTime = 0.5f;
 
-	/** The maximum idle time. */
+	/**
+	* The maximum idle time.
+	* Set < 0.0f to not use.
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Idle")
 	float MaxTime = 3.0f;
 
