@@ -75,7 +75,7 @@ ESP_PlanExecutionState USP_ChooseTargetPOIDynamicTask::Tick_Internal_Implementat
 
 #if SP_DEBUG_EDITOR
 
-	DrawDebug(Planner, POI->GetComponentLocation());
+	DrawDebug(Planner, POI->GetOwner()->GetActorLocation());
 
 	SP_LOG_TASK_EXECUTE(Planner, "%s", *POI->GetOwner()->GetName())
 

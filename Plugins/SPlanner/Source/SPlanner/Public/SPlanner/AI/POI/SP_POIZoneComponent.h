@@ -8,10 +8,10 @@
 class USP_POIComponent;
 
 /**
- *	Implementation of planner interact zone.
+ *	Implementation of planner interact zone (attached to Pawn).
  *	Used to pickup POI action set.
  */
-UCLASS(BlueprintType, Blueprintable, DisplayName = "SP_POIZone", ClassGroup = "SPlanner|Zone|POI", meta = (BlueprintSpawnableComponent))
+UCLASS(BlueprintType, Blueprintable, DisplayName = "SP_POIZone", ClassGroup = "SPlanner|POI", meta = (BlueprintSpawnableComponent))
 class SPLANNER_API USP_POIZoneComponent : public USP_ZoneComponent
 {
 	GENERATED_BODY()
