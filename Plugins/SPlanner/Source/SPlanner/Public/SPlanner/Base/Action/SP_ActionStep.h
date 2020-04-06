@@ -31,6 +31,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task")
 	virtual bool IsAvailable(const USP_PlannerComponent* Planner) const;
 
+	/** Call PostExecution of Decorators. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action")
+	virtual void PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess);
+
 	/**
 	*	The pre-condition of the step.
 	*	Must return true to be added to the plan during generation.

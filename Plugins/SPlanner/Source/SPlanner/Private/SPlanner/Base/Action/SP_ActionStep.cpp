@@ -26,6 +26,16 @@ bool USP_ActionStep::IsAvailable(const USP_PlannerComponent* Planner) const
 	return true;
 }
 
+void USP_ActionStep::PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess)
+{
+	for (int i = 0; i < Decorators.Num(); ++i)
+	{
+		SP_CCHECK(Decorators[i], "Decorators[%d] nullptr!", i)
+
+		Decorators[i]->PostExecution(Planner, bExecutionSuccess);
+	}
+}
+
 bool USP_ActionStep::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {
 	SP_RCHECK_NULLPTR(Infos, false)

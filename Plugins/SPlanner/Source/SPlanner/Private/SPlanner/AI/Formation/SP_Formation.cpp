@@ -167,6 +167,14 @@ void USP_Formation::OnEnd_Implementation(const USP_FormationSet* FormationSet)
 {
 	SP_CHECK_NULLPTR(FormationSet)
 	SP_CHECK_NULLPTR(FormationSet->GetLeadActor())
+
+	/** Decorators post execution. */
+	for (int i = 0; i < Decorators.Num(); ++i)
+	{
+		SP_CCHECK(Decorators[i], "Decorators[%d] nullptr!", i)
+
+		Decorators[i]->PostExecution(FormationSet, true);
+	}
 }
 
 void USP_Formation::Reset_Implementation()

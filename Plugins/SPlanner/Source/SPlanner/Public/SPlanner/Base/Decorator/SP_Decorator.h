@@ -41,6 +41,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
 	void OnValidationFailure(const UObject* Object);
 
+	/** PostExecution implementation. */
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Decorator")
+	void PostExecution_Internal(const UObject* Object, bool bExecutionSuccess);
+
 #if WITH_EDITOR
 	/** Whether ValidateMask can be edited from Editor window. */
 	bool bCanEditValidateMask = true;
@@ -66,6 +70,13 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")
 	bool Available_Validate(const UObject* Object);
+
+	/**
+	*	Method to call after the execution of the decorator's object has ended.
+	*	Call PostExecution_Internal().
+	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")
+	void PostExecution(const UObject* Object, bool bExecutionSuccess = true);
 
 #if WITH_EDITOR
 	bool CanEditChange(const UProperty* InProperty) const override;

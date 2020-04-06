@@ -129,6 +129,8 @@ void USP_TaskStep::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskIn
 	{
 		TaskInfos->bForcedEnd = true;
 		End_Internal(&Planner, TaskInfos);
+
+		PostExecution(&Planner, false);
 	}
 }
 

@@ -59,6 +59,16 @@ void USP_Decorator::OnValidationFailure_Implementation(const UObject* Object)
 {
 }
 
+void USP_Decorator::PostExecution(const UObject* Object, bool bExecutionSuccess)
+{
+	PostExecution_Internal(Object, bExecutionSuccess);
+}
+void USP_Decorator::PostExecution_Internal_Implementation(const UObject* Object, bool bExecutionSuccess)
+{
+	SP_CHECK_NULLPTR(Object)
+}
+
+
 #if WITH_EDITOR
 bool USP_Decorator::CanEditChange(const UProperty* InProperty) const
 {

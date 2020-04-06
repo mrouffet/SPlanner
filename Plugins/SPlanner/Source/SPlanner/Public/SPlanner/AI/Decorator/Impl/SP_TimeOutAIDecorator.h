@@ -26,10 +26,9 @@ protected:
 
 	/** Internal implementation of Validate. */
 	bool Validate_Internal_Implementation(const UObject* Object) override;
+	void PostExecution_Internal_Implementation(const UObject* Object, bool bExecutionSuccess) override;
 
 	bool Tick_Validate_Internal_Implementation(float DeltaSeconds, const USP_AIPlannerComponent* Planner, const USP_TaskInfos* TaskInfos) override;
-
-	void OnValidationFailure_Implementation(const UObject* Object) override;
 
 public:
 	USP_TimeOutAIDecorator(const FObjectInitializer& ObjectInitializer);

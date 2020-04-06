@@ -31,6 +31,14 @@ bool USP_TimeOutAIDecorator::Validate_Internal_Implementation(const UObject* Obj
 	return true;
 }
 
+void USP_TimeOutAIDecorator::PostExecution_Internal_Implementation(const UObject* Object, bool bExecutionSuccess)
+{
+	Super::PostExecution_Internal_Implementation(Object, bExecutionSuccess);
+
+	// Reset for next use.
+	CurrentTime = 0.0f;
+}
+
 bool USP_TimeOutAIDecorator::Tick_Validate_Internal_Implementation(float DeltaSeconds,
 	const USP_AIPlannerComponent* Planner,
 	const USP_TaskInfos* TaskInfos)
@@ -38,10 +46,4 @@ bool USP_TimeOutAIDecorator::Tick_Validate_Internal_Implementation(float DeltaSe
 	CurrentTime += DeltaSeconds;
 
 	return Super::Tick_Validate_Internal_Implementation(DeltaSeconds, Planner, TaskInfos);
-}
-
-void USP_TimeOutAIDecorator::OnValidationFailure_Implementation(const UObject* Object)
-{
-	// Reset for next use.
-	CurrentTime = 0.0f;
 }

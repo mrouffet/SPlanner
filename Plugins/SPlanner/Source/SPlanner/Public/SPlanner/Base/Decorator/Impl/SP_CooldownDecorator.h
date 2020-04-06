@@ -34,6 +34,6 @@ protected:
 	void SetCooldown(const UObject* Object);
 
 	bool Validate_Internal_Implementation(const UObject* Object) override;
-	void OnValidationSuccess_Implementation(const UObject* Object) override;
-	void OnValidationFailure_Implementation(const UObject* Object) override;
+
+	void PostExecution_Internal_Implementation(const UObject* Object, bool bExecutionSuccess) override;
 };

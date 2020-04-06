@@ -24,19 +24,13 @@ bool USP_CooldownDecorator::Validate_Internal_Implementation(const UObject* Obje
 
 	float ObjectCoolDown = CooldownPtr ? *CooldownPtr - Object->GetWorld()->GetTimeSeconds() : -1.0f;
 
-	return ObjectCoolDown > 0.0f;
+	return ObjectCoolDown <= 0.0f;
 }
 
-void USP_CooldownDecorator::OnValidationSuccess_Implementation(const UObject* Object)
+void USP_CooldownDecorator::PostExecution_Internal_Implementation(const UObject* Object, bool bExecutionSuccess)
 {
-	Super::OnValidationSuccess_Implementation(Object);
+	Super::PostExecution_Internal_Implementation(Object, bExecutionSuccess);
 
-	SetCooldown(Object);
-}
-void USP_CooldownDecorator::OnValidationFailure_Implementation(const UObject* Object)
-{
-	Super::OnValidationFailure_Implementation(Object);
-
-	if (bUseCooldownOnFailed)
+	if(bExecutionSuccess || bUseCooldownOnFailed)
 		SetCooldown(Object);
 }

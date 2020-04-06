@@ -162,6 +162,8 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	// Process task result.
 	if (TickResult == ESP_PlanExecutionState::PES_Failed)
 	{
+		CurrentTask->PostExecution(this, false);
+
 		// Plan got invalid: ask a new one.
 		PlanState = ESP_PlanState::PS_Invalid;
 
@@ -169,6 +171,8 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	}
 	else if (++CurrentPlanIndex >= Plan.Num()) // Succeed and No other task left.
 	{
+		CurrentTask->PostExecution(this, true);
+
 		PlanState = ESP_PlanState::PS_Finished;
 
 		AskNewPlan();
