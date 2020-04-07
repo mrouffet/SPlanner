@@ -1,8 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/MoveTo/SP_MoveToTask.h>
-
-#include <Components/CapsuleComponent.h>
+#include <SPlanner/AI/Task/Impl/Move/SP_MoveToTask.h>
 
 #include <GameFramework/Character.h>
 #include <GameFramework/CharacterMovementComponent.h>
@@ -13,14 +11,44 @@
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
-
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
-
-#include <SPlanner/AI/POI/SP_POIComponent.h>
 
 USP_MoveToTask::USP_MoveToTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	TaskInfosClass = USP_MoveToTaskInfos::StaticClass();
+}
+
+void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
+{
+	if (ACharacter* Character = Cast<ACharacter>(Pawn))
+	{
+		UCharacterMovementComponent* const CharacterMovement = Character->GetCharacterMovement();
+		SP_CHECK_NULLPTR(CharacterMovement)
+
+			CharacterMovement->MaxWalkSpeed = NewSpeed;
+	}
+}
+
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
+{
+	FAIMoveRequest MoveRequest;
+
+	SP_RCHECK_NULLPTR(Target, MoveRequest)
+
+	 // Target position or non dynamic or frequency update.
+	if (Target->GetState() == ESP_TargetState::TS_Position || !bIsDynamic || DynamicUpdateFrequency > 0.0f)
+		MoveRequest.SetGoalLocation(Target->GetAnyPosition());
+	else if (AActor* GoalActor = Target->GetAnyActor())
+		MoveRequest.SetGoalActor(GoalActor);
+	else
+		SP_LOG(Error, "Bad Target!")
+
+	MoveRequest.SetCanStrafe(bCanStrafe);
+	MoveRequest.SetProjectGoalLocation(true);
+	MoveRequest.SetUsePathfinding(bUsePathfinding);
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
+
+	return MoveRequest;
 }
 
 bool USP_MoveToTask::HasReachedPosition(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
@@ -58,76 +86,6 @@ bool USP_MoveToTask::HasReachedPosition(ACharacter* Character, const FVector& Ta
 	return SqrMoveDist <= MinRadius;
 }
 
-bool USP_MoveToTask::IsTargetVisible(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const
-{
-	SP_RCHECK_NULLPTR(Planner, false)
-	SP_RCHECK_NULLPTR(Target, false)
-
-	APawn* const AIPawn = Planner->GetPawn();
-	SP_RCHECK(AIPawn, false, "AIPawn nullptr! Planner must be attached to a pawn!")
-
-		// Avoid Self or target collisions.
-	FHitResult HitInfos;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(AIPawn);
-
-	if (AActor* TargetActor = Target->GetAnyActor())
-		Params.AddIgnoredActor(TargetActor);
-
-	if (Planner->GetWorld()->LineTraceSingleByChannel(HitInfos,
-		AIPawn->GetActorLocation(),
-		Target->GetAnyPosition(),
-		ECollisionChannel::ECC_Visibility, Params))
-		return false;
-
-	return true;
-}
-
-FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
-{
-	FAIMoveRequest MoveRequest;
-
-	SP_RCHECK_NULLPTR(Target, MoveRequest)
-
-	 // Target position or non dynamic or frequency update.
-	if (Target->GetState() == ESP_TargetState::TS_Position || !bIsDynamic || DynamicUpdateFrequency > 0.0f)
-		MoveRequest.SetGoalLocation(Target->GetAnyPosition());
-	else if (AActor* GoalActor = Target->GetAnyActor())
-		MoveRequest.SetGoalActor(GoalActor);
-	else
-		SP_LOG(Error, "Bad Target!")
-
-	MoveRequest.SetCanStrafe(bCanStrafe);
-	MoveRequest.SetProjectGoalLocation(true);
-	MoveRequest.SetUsePathfinding(bUsePathfinding);
-	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
-
-	return MoveRequest;
-}
-
-float USP_MoveToTask::GetPawnSpeed_Implementation(APawn* Pawn)
-{
-	if (ACharacter* Character = Cast<ACharacter>(Pawn))
-	{
-		UCharacterMovementComponent* const CharacterMovement = Character->GetCharacterMovement();
-		SP_RCHECK_NULLPTR(CharacterMovement, false)
-
-		return CharacterMovement->MaxWalkSpeed;
-	}
-
-	return -1.0f;
-}
-void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
-{
-	if (ACharacter* Character = Cast<ACharacter>(Pawn))
-	{
-		UCharacterMovementComponent* const CharacterMovement = Character->GetCharacterMovement();
-		SP_CHECK_NULLPTR(CharacterMovement)
-
-		CharacterMovement->MaxWalkSpeed = NewSpeed;
-	}
-}
-
 void USP_MoveToTask::OnMoveCompleted_Implementation(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult)
 {
 	USP_MoveToTaskInfos* const Infos = RequestIDToTaskInfos[RequestID];
@@ -157,10 +115,6 @@ bool USP_MoveToTask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) 
 	const USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(Infos);
 	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
 
-	// Not already moved to.
-	if(!bAllowMultipleMoveTo && AIPlanGenInfos->IsFlagSet(ESP_AIPlanGenFlags::PG_PawnDirtyLocation))
-		return false;
-
 	// New target will be set.
 	if (AIPlanGenInfos->IsBlackboardFlagSet(TargetEntryName, ESP_AIBBPlanGenFlags::PG_Dirty))
 		return true;
@@ -174,38 +128,9 @@ bool USP_MoveToTask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
 
-	// Check valid target and has not already moved.
-	if (!Target->IsValid())
-		return false;
-
-	FVector TargetLocation = Target->GetAnyPosition();
-
-	if (bTargetVisible && !IsTargetVisible(AIPlanner, Target))
-		return false;
+	// Valid target checked in SP_MoveBaseTask.
 
 	return bPreconditionFailWhileAlreadyAtGoal ? !HasReachedPosition(AIPlanner, Target) : true;
-}
-bool USP_MoveToTask::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
-{
-	SP_ACTION_STEP_SUPER_POSTCONDITION(Infos)
-	
-	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(Infos);
-	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
-
-	AIPlanGenInfos->AddFlags(ESP_AIPlanGenFlags::PG_PawnDirtyLocation, ESP_AIPlanGenFlags::PG_PawnDirtyRotation);
-
-	return true;
-}
-bool USP_MoveToTask::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
-{
-	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Infos)
-
-	USP_AIPlanGenInfos* const AIPlanGenInfos = Cast<USP_AIPlanGenInfos>(Infos);
-	SP_RCHECK_NULLPTR(AIPlanGenInfos, false)
-	
-	AIPlanGenInfos->RemoveFlags(ESP_AIPlanGenFlags::PG_PawnDirtyLocation, ESP_AIPlanGenFlags::PG_PawnDirtyRotation);
-
-	return true;
 }
 
 bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
@@ -220,18 +145,6 @@ bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Plann
 
 	USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 	SP_RCHECK_NULLPTR(Target, false)
-
-	if (HasReachedPosition(Planner, Target))
-	{
-		Infos->ExecutionState = ESP_PlanExecutionState::PES_Succeed;
-		return true;
-	}
-
-	if (bTargetVisible && !IsTargetVisible(Planner, Target))
-	{
-		SP_LOG_TASK_EXECUTE(Planner, "Move request failed: Taget not visible.")
-		return false;
-	}
 
 	// Use AIController pathfinding MoveTo.
 	ASP_AIController* const Controller = Planner->GetController();

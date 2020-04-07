@@ -9,3 +9,8 @@ ASP_AIPath::ASP_AIPath(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	Spline = CreateDefaultSubobject<USP_SplineComponent>("Spline");
 	Spline->SetupAttachment(RootComponent);
 }
+
+USP_SplineComponent* ASP_AIPath::GetSpline() const
+{
+	return Spline;
+}

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/Impl/MoveTo/SP_MoveToTask.h>
+#include <SPlanner/AI/Task/Impl/Move/SP_MoveToTask.h>
 #include "SP_MoveToPOITask.generated.h"
 
 /**

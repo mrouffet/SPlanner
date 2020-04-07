@@ -21,4 +21,7 @@ protected:
 
 public:
 	ASP_AIPath(const FObjectInitializer& ObjectInitializer);
+
+	/** Getter of Spline. */
+	USP_SplineComponent* GetSpline() const;
 };

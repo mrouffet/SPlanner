@@ -1,12 +1,11 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/Impl/MoveTo/SP_MoveToPOITask.h>
+#include <SPlanner/AI/Task/Impl/Move/SP_MoveToPOITask.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
-
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
 
 bool USP_MoveToPOITask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
