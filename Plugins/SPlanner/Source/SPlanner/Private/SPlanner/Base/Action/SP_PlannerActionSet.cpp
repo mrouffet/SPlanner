@@ -3,7 +3,7 @@
 #include <SPlanner/Base/Action/SP_PlannerActionSet.h>
 
 #include <SPlanner/Base/Action/SP_Action.h>
-#include <SPlanner/Base/Action/SP_ActionStep.h>
+#include <SPlanner/Base/Action/SP_ActionImpl.h>
 
 TArray<FSP_PlannerAction>& FSP_PlannerActionSet::GetActionsFromDepth(uint8 Depth)
 {
@@ -37,7 +37,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 		for (int i = 0; i < BeginActions.Num(); ++i)
 		{
 			SP_SCCHECK(BeginActions[i], "%s.BeginActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
-			SP_SCCHECK(BeginActions[i]->Step, "%s.BeginActions[ %d ].Step is nullptr!", *ActionSet->GetName(), i)
+			SP_SCCHECK(BeginActions[i]->Impl, "%s.BeginActions[ %d ].Impl is nullptr!", *ActionSet->GetName(), i)
 
 			if (BeginActions[i]->IsAvailable(Planner))
 				Result.BeginActions.Add(FSP_PlannerAction::Make(Planner, BeginActions[i]));
@@ -55,7 +55,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 			for (int i = 0; i < CoreActions.Num(); ++i)
 			{
 				SP_SCCHECK(CoreActions[i], "%s.CoreActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
-				SP_SCCHECK(CoreActions[i]->Step, "%s.CoreActions[ %d ]->Step is nullptr!", *ActionSet->GetName(), i)
+				SP_SCCHECK(CoreActions[i]->Impl, "%s.CoreActions[ %d ]->Impl is nullptr!", *ActionSet->GetName(), i)
 
 				if (CoreActions[i]->IsAvailable(Planner))
 					Result.Actions.Add(FSP_PlannerAction::Make(Planner, CoreActions[i]));
@@ -70,7 +70,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 			for (int i = 0; i < EndActions.Num(); ++i)
 			{
 				SP_SCCHECK(EndActions[i], "%s.EndActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
-				SP_SCCHECK(EndActions[i]->Step, "%s.EndActions[ %d ]->Step is nullptr!", *ActionSet->GetName(), i)
+				SP_SCCHECK(EndActions[i]->Impl, "%s.EndActions[ %d ]->Impl is nullptr!", *ActionSet->GetName(), i)
 
 				if (EndActions[i]->IsAvailable(Planner))
 				{
@@ -106,7 +106,7 @@ FSP_PlannerActionSet FSP_PlannerActionSet::Make(const USP_PlannerComponent* Plan
 		for (int i = 0; i < ForcedActions.Num(); ++i)
 		{
 			SP_SCCHECK(ForcedActions[i], "%s.ForcedActions[ %d ] is nullptr!", *ActionSet->GetName(), i)
-			SP_SCCHECK(ForcedActions[i]->Step, "%s.ForcedActions[ %d ]->Step is nullptr!", *ActionSet->GetName(), i)
+			SP_SCCHECK(ForcedActions[i]->Impl, "%s.ForcedActions[ %d ]->Impl is nullptr!", *ActionSet->GetName(), i)
 
 			if (ForcedActions[i]->IsAvailable(Planner))
 				ForcedPlannerActions.Add(FSP_PlannerAction::Make(Planner, ForcedActions[i], false, true));

@@ -13,7 +13,7 @@
 
 class USP_Goal;
 
-class USP_ActionStep;
+class USP_ActionImpl;
 struct FSP_PlannerActionSet;
 
 class USP_BlackboardComponent;
@@ -47,7 +47,7 @@ protected:
 
 	/** The current executed plan. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_ActionStep*> Plan;
+	TArray<USP_ActionImpl*> Plan;
 
 	/**
 	*	The current plan state.
@@ -60,7 +60,7 @@ protected:
 	*	Set new plan to execute and update PlanState.
 	*	Executed on external thread.
 	*/
-	void SetNewPlan(TArray<USP_ActionStep*>&& Plan);
+	void SetNewPlan(TArray<USP_ActionImpl*>&& Plan);
 
 	/** Create the planner action set to generate the plan with. */
 	virtual FSP_PlannerActionSet CreatePlannerActionSet(bool* bCanBeAchievedPtr = nullptr) const;
@@ -219,7 +219,7 @@ public:
 	void SetGoal(USP_Goal* InGoal, bool bForce = false);
 
 	/** Getter of Plan. */
-	const TArray<USP_ActionStep*>& GetPlan() const;
+	const TArray<USP_ActionImpl*>& GetPlan() const;
 
 	/**
 	*	Cancel current executed plan.

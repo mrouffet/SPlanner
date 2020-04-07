@@ -8,7 +8,7 @@
 /**
  *	Set of Planner Action.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_TaskSet : public USP_ActionSet
 {
 	GENERATED_BODY()

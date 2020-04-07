@@ -31,7 +31,7 @@ public:
 };
 
 /** Task info implementation for USP_MoveToTask. */
-UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task|Move")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Task|Move")
 class SPLANNER_API USP_MoveAlongPathTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()

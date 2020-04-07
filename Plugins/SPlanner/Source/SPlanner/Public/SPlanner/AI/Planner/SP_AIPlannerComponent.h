@@ -7,7 +7,7 @@
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 #include "SP_AIPlannerComponent.generated.h"
 
-class USP_TaskStep;
+class USP_TaskImpl;
 
 class USP_AILODComponent;
 class USP_POIZoneComponent;
@@ -124,23 +124,23 @@ public:
 
 	/** Getter of the previous executed Task in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_TaskStep* GetPrevTask() const;
+	USP_TaskImpl* GetPrevTask() const;
 
 	/** Getter of previous executed Tasks in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	TArray<USP_TaskStep*> GetPrevTasks() const;
+	TArray<USP_TaskImpl*> GetPrevTasks() const;
 
 	/** Getter of current executed Task. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_TaskStep* GetCurrentTask() const;
+	USP_TaskImpl* GetCurrentTask() const;
 
 	/** Getter of the next Task to execute in Plan. */
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	USP_TaskStep* GetNextTask() const;
+	USP_TaskImpl* GetNextTask() const;
 
 	/** Getter of next Tasks to execute in Plan*/
 	UFUNCTION(BlueprintPure, Category = "SPlanner|Planner|AI")
-	TArray<USP_TaskStep*> GetNextTasks() const;
+	TArray<USP_TaskImpl*> GetNextTasks() const;
 
 	/** Notify by calling OnNotify(). */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner|AI")

@@ -4,7 +4,7 @@
 
 #include <SPlanner/Base/Action/SP_PlannerActionSet.h>
 
-class USP_ActionStep;
+class USP_ActionImpl;
 class USP_PlannerComponent;
 class USP_PlanGenInfos;
 

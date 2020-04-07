@@ -10,7 +10,7 @@
 #include <SPlanner/Base/Goal/SP_Goal.h>
 
 #include <SPlanner/Base/Action/SP_Action.h>
-#include <SPlanner/Base/Action/SP_ActionStep.h>
+#include <SPlanner/Base/Action/SP_ActionImpl.h>
 #include <SPlanner/Base/Action/SP_PlannerActionSet.h>
 
 #include <SPlanner/Base/Blackboard/SP_BlackboardComponent.h>
@@ -106,7 +106,7 @@ void USP_PlannerComponent::SetGoal(USP_Goal* InGoal, bool bForce)
 	OnGoalChange.Broadcast(this, OldGoal, Goal);
 }
 
-const TArray<USP_ActionStep*>& USP_PlannerComponent::GetPlan() const
+const TArray<USP_ActionImpl*>& USP_PlannerComponent::GetPlan() const
 {
 	// Plan is not thread safe while PlanState != ESP_PlanState::PS_Valid.
 	SP_RCHECK(PlanState == ESP_PlanState::PS_Valid, Plan, "Invalid plan: performing unsafe operation!")
@@ -125,7 +125,7 @@ bool USP_PlannerComponent::CancelPlan()
 	return true;
 }
 
-void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionStep*>&& InPlan)
+void USP_PlannerComponent::SetNewPlan(TArray<USP_ActionImpl*>&& InPlan)
 {
 #if SP_DEBUG
 	if (PlanState == ESP_PlanState::PS_Valid)

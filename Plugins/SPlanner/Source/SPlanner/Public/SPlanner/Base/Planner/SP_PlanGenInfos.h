@@ -7,7 +7,7 @@
 #include <UObject/Object.h>
 #include "SP_PlanGenInfos.generated.h"
 
-class USP_ActionStep;
+class USP_ActionImpl;
 
 /**
 *	Implementation of structure infos for plan generation.
@@ -32,7 +32,7 @@ public:
 
 	/** Output plan after generation. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
-	TArray<USP_ActionStep*> OutPlan;
+	TArray<USP_ActionImpl*> OutPlan;
 
 	/** Setter of MaxDepth and Reserve OutPlan. */
 	void SetMaxDepth(int NewMaxDepth);

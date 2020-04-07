@@ -10,7 +10,7 @@ class USP_POIComponent;
 /**
  *	Choose target implementation with POI spec.
  */
-UCLASS(Abstract, BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Target")
+UCLASS(Abstract, BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Target")
 class SPLANNER_API USP_ChooseTargetPOITask : public USP_ChooseTargetActorTask
 {
 	GENERATED_BODY()

@@ -28,14 +28,14 @@ protected:
 public:
 	/**
 	*	Begin validate implementation.
-	*	Called by SP_TaskStep while this decorator is in BeginDecorators list.
+	*	Called by SP_TaskImpl while this decorator is in BeginDecorators list.
 	*	Call Begin_Validate_Internal.
 	*/
 	bool Begin_Validate(const USP_AIPlannerComponent* Planner, const USP_TaskInfos* TaskInfos);
 
 	/**
 	*	Tick validate implementation.
-	*	Called by SP_TaskStep while this decorator is in TickDecorators list.
+	*	Called by SP_TaskImpl while this decorator is in TickDecorators list.
 	*	Call Tick_Validate_Internal.
 	*/
 	bool Tick_Validate(float DeltaSeconds, const USP_AIPlannerComponent* Planner, const USP_TaskInfos* TaskInfos);

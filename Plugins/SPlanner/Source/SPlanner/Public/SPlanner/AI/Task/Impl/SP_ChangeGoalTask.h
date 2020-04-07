@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 #include "SP_ChangeGoalTask.generated.h"
 
 class USP_Goal;
@@ -10,8 +10,8 @@ class USP_Goal;
 /**
  *	Task to change planner goal.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Goal")
-class SPLANNER_API USP_ChangeGoalTask : public USP_TaskStep
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Goal")
+class SPLANNER_API USP_ChangeGoalTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 	

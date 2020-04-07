@@ -17,7 +17,7 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 {
 	Super::ConstructDichotomy(Infos);
 
-	const float AngleStep = 360.0f / Infos.PlannerInfos.Num();
+	const float AngleImpl = 360.0f / Infos.PlannerInfos.Num();
 
 	if (bUseLeadForwardAsReference)
 	{
@@ -27,7 +27,7 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 			float CurrAngleNoise = FMath::FRandRange(-1.0f, 1.0f) * AngleNoise;
 			float CurrDistNoise = FMath::FRandRange(-1.0f, 1.0f) * DistanceNoise;
 
-			Infos.PlannerInfos[i].Offset = FRotator(0.0f, AngleStep * i + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
+			Infos.PlannerInfos[i].Offset = FRotator(0.0f, AngleImpl * i + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
 		}
 
 		return;
@@ -46,7 +46,7 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 		SP_CCHECK_NULLPTR(Infos.PlannerInfos[i].Planner->GetPawn())
 
 		// Desired angle.
-		float Angle = AngleStep * i;
+		float Angle = AngleImpl * i;
 
 		// Correction from planner input angle.
 		float AngleDiff = Infos.PlannerInfos[i].Angle - Angle;
@@ -71,8 +71,8 @@ void USP_CircleFormation::ConstructPointByPoint(FSP_FormationInfos& Infos)
 {
 	Super::ConstructPointByPoint(Infos);
 
-	float AngleStep = 360.0f / MaxNum;
-	float BaseAngle = -AngleStep * (Infos.PlannerInfos.Num() - 1) / 2.0f;
+	float AngleImpl = 360.0f / MaxNum;
+	float BaseAngle = -AngleImpl * (Infos.PlannerInfos.Num() - 1) / 2.0f;
 
 	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
 	{
@@ -80,6 +80,6 @@ void USP_CircleFormation::ConstructPointByPoint(FSP_FormationInfos& Infos)
 		float CurrDistNoise = FMath::FRandRange(-1.0f, 1.0f) * DistanceNoise;
 
 		Infos.PlannerInfos[i].Offset =
-			FRotator(0.0f, BaseAngle + AngleStep * i + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
+			FRotator(0.0f, BaseAngle + AngleImpl * i + CurrAngleNoise, 0.0f).RotateVector(Infos.BaseDirection) * (Radius + CurrDistNoise);
 	}
 }

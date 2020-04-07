@@ -5,7 +5,7 @@
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Action/SP_Action.h>
-#include <SPlanner/Base/Action/SP_ActionStep.h>
+#include <SPlanner/Base/Action/SP_ActionImpl.h>
 #include <SPlanner/Base/Action/SP_PlannerAction.h>
 
 #include <SPlanner/Base/Planner/SP_PlanGenInfos.h>
@@ -30,11 +30,11 @@ bool SP_PlannerEngine::LinearConstruct_Internal(USP_PlanGenInfos* Infos, uint8 C
 		FSP_PlannerAction Action = Actions[i];
 
 		// invalid pre-condition or post condition.
-		if (!Action.Handle->Step->PreCondition(Infos) || !Action.Handle->Step->PostCondition(Infos))
+		if (!Action.Handle->Impl->PreCondition(Infos) || !Action.Handle->Impl->PostCondition(Infos))
 			continue;
 
 		// Add steps to current plan.
-		Infos->OutPlan.Add(Action.Handle->Step);
+		Infos->OutPlan.Add(Action.Handle->Impl);
 
 		// Remove from source set.
 		Actions.RemoveAt(i);

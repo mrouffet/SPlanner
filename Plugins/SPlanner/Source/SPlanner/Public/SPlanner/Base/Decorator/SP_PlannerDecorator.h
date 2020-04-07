@@ -24,7 +24,7 @@ protected:
 public:
 	/**
 	*	PreCondition validate implementation.
-	*	Called by SP_TaskStep while this decorator is in PreConditionDecorators list.
+	*	Called by SP_TaskImpl while this decorator is in PreConditionDecorators list.
 	*	Call PreCondition_Validate_Internal.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Decorator")

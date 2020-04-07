@@ -10,7 +10,7 @@ class USP_FloatCurveParam;
 /**
  *	Idle task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_IdleCurveTask : public USP_IdleBaseTask
 {
 	GENERATED_BODY()

@@ -2,28 +2,28 @@
 
 #pragma once
 
-#include <SPlanner/Base/Action/SP_ActionStep.h>
-#include "SP_ActionStepChain.generated.h"
+#include <SPlanner/Base/Action/SP_ActionImpl.h>
+#include "SP_ActionImplChain.generated.h"
 
 /**
  *	Chain of action step.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action")
-class SPLANNER_API USP_ActionStepChain : public USP_ActionStep
+class SPLANNER_API USP_ActionImplChain : public USP_ActionImpl
 {
 	GENERATED_BODY()
 
 protected:
 	/** The handled action steps. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Chain")
-	TArray<USP_ActionStep*> Steps;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Action|Chain")
+	TArray<USP_ActionImpl*> Impls;
 
 	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
 
-	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
+	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Impls). */
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
 
-	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
+	/** The post-condition of the action (ie: chain of all post-condition of Impls). */
 	bool PostCondition_Implementation(USP_PlanGenInfos* Infos) const override;
 
 	bool ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const override;

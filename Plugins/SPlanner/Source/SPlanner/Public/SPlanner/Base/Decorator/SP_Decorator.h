@@ -9,7 +9,7 @@
 
 /**
  *	SPlanner decorator base implementation.
- *	Decorator are additionnal conditions, which must be validated for a SP_TaskStep to be executed.
+ *	Decorator are additionnal conditions, which must be validated for a SP_TaskImpl to be executed.
  */
 UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator")
 class SPLANNER_API USP_Decorator : public USP_Object

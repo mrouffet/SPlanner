@@ -8,7 +8,7 @@
 /**
 *	Task implementation for plan generation.
 */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_Task : public USP_Action
 {
 	GENERATED_BODY()

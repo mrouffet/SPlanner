@@ -8,8 +8,8 @@
 #include <SPlanner/AI/Task/SP_TaskNotification.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerNotify.h>
 
-#include <SPlanner/Base/Action/SP_ActionStep.h>
-#include "SP_TaskStep.generated.h"
+#include <SPlanner/Base/Action/SP_ActionImpl.h>
+#include "SP_TaskImpl.generated.h"
 
 class USP_TaskInfos;
 class USP_AIPlannerComponent;
@@ -17,14 +17,14 @@ class USP_AIPlannerComponent;
 /**
  *	AI Planner task base.
  */
-UCLASS(Abstract, Blueprintable, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_TaskStep : public USP_ActionStep
+UCLASS(Abstract, Blueprintable, ClassGroup = "SPlanner|Task")
+class SPLANNER_API USP_TaskImpl : public USP_ActionImpl
 {
 	GENERATED_BODY()
 
 protected:
 	// Allow TaskChain to call OnNotify().
-	friend class USP_TaskChain;
+	friend class USP_ChainTask;
 
 	/**
 	*	The task infos class to instantiate.
@@ -44,7 +44,7 @@ protected:
 	ESP_TaskNotification NotifyAction = ESP_TaskNotification::TNA_TimeOut;
 
 	/** Callback method bound to planner. */
-	UFUNCTION(Category = "SPlanner|Action|Task")
+	UFUNCTION(Category = "SPlanner|Task")
 	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos);
 
 	/** Init the Notify callback and base execution state. */
@@ -54,21 +54,21 @@ protected:
 	*	The begin internal implementation of the task.
 	*	Called by Begin().
 	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName = "Begin", Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Begin", Category = "SPlanner|Task")
 	bool Begin_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 	/**
 	*	The tick internal implementation of the task.
 	*	Called by Tick().
 	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName = "Tick", Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Tick", Category = "SPlanner|Task")
 	ESP_PlanExecutionState Tick_Internal(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 	/**
 	*	The end implementation of the task.
 	*	Called by End().
 	*/
-	UFUNCTION(BlueprintNativeEvent, DisplayName = "End", Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "End", Category = "SPlanner|Task")
 	bool End_Internal(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
 
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
@@ -76,7 +76,7 @@ protected:
 	bool ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const override;
 
 public:
-	USP_TaskStep(const FObjectInitializer& ObjectInitializer);
+	USP_TaskImpl(const FObjectInitializer& ObjectInitializer);
 
 	/** Instantiate the TaskInfos for this task. */
 	USP_TaskInfos* InstantiateInfos(UObject* Outer = static_cast<UObject*>(GetTransientPackage()));
@@ -96,14 +96,14 @@ public:
 };
 
 
-/** Task info implementation for USP_TaskStep. */
-UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
+/** Task info implementation for USP_TaskImpl. */
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_TaskInfos : public UObject
 {
 	GENERATED_BODY()
 
-	// Only accessible by USP_TaskStep.
-	friend USP_TaskStep;
+	// Only accessible by USP_TaskImpl.
+	friend USP_TaskImpl;
 
 	ESP_PlanExecutionState BaseExecutionState = ESP_PlanExecutionState::PES_Succeed;
 

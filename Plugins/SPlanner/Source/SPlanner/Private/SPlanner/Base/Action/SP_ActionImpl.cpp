@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/Base/Action/SP_ActionStep.h>
+#include <SPlanner/Base/Action/SP_ActionImpl.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
@@ -12,7 +12,7 @@
 #include <SPlanner/Base/Decorator/SP_PlannerDecorator.h>
 #include <SPlanner/Base/Decorator/SP_PlannerDecoratorFlag.h>
 
-bool USP_ActionStep::IsAvailable(const USP_PlannerComponent* Planner) const
+bool USP_ActionImpl::IsAvailable(const USP_PlannerComponent* Planner) const
 {
 	for (int i = 0; i < Decorators.Num(); ++i)
 	{
@@ -26,7 +26,7 @@ bool USP_ActionStep::IsAvailable(const USP_PlannerComponent* Planner) const
 	return true;
 }
 
-void USP_ActionStep::PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess)
+void USP_ActionImpl::PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess)
 {
 	for (int i = 0; i < Decorators.Num(); ++i)
 	{
@@ -36,7 +36,7 @@ void USP_ActionStep::PostExecution(const USP_PlannerComponent* Planner, bool bEx
 	}
 }
 
-bool USP_ActionStep::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
+bool USP_ActionImpl::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {
 	SP_RCHECK_NULLPTR(Infos, false)
 	SP_RCHECK_NULLPTR(Infos->Planner, false)
@@ -61,7 +61,7 @@ bool USP_ActionStep::PreCondition_Implementation(const USP_PlanGenInfos* Infos) 
 
 	return true;
 }
-bool USP_ActionStep::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
+bool USP_ActionImpl::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 {
 	SP_RCHECK_NULLPTR(Infos, false)
 	SP_RCHECK_NULLPTR(Infos->Planner, false)
@@ -69,7 +69,7 @@ bool USP_ActionStep::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 	return true;
 }
 
-bool USP_ActionStep::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
+bool USP_ActionImpl::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
 {
 	SP_RCHECK_NULLPTR(Infos, false)
 	SP_RCHECK_NULLPTR(Infos->Planner, false)

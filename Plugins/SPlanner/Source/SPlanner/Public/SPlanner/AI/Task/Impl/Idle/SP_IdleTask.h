@@ -8,7 +8,7 @@
 /**
  *	Idle task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_IdleTask : public USP_IdleBaseTask
 {
 	GENERATED_BODY()

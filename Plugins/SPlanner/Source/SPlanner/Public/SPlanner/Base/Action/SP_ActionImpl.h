@@ -5,7 +5,7 @@
 #include <SPlanner/Base/Action/SP_ActionMacro.h>
 
 #include <SPlanner/Framework/SP_DataAsset.h>
-#include "SP_ActionStep.generated.h"
+#include "SP_ActionImpl.generated.h"
 
 class USP_Decorator;
 
@@ -17,7 +17,7 @@ class USP_PlannerComponent;
  *	The planner generate a plan of SP_Action, composed of SP_ActionSet.
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = "SPlanner|Action")
-class SPLANNER_API USP_ActionStep : public USP_DataAsset
+class SPLANNER_API USP_ActionImpl : public USP_DataAsset
 {
 	GENERATED_BODY()
 	
@@ -28,7 +28,7 @@ protected:
 
 public:
 	/** Check action availability for Planner. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Action")
 	virtual bool IsAvailable(const USP_PlannerComponent* Planner) const;
 
 	/** Call PostExecution of Decorators. */

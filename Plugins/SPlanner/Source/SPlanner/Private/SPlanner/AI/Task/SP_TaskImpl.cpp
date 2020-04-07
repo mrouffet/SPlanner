@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 
 #include <SPlanner/Misc/SP_FlagHelper.h>
 
@@ -10,12 +10,12 @@
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-USP_TaskStep::USP_TaskStep(const FObjectInitializer& ObjectInitializer)
+USP_TaskImpl::USP_TaskImpl(const FObjectInitializer& ObjectInitializer)
 {
 	TaskInfosClass = USP_TaskInfos::StaticClass();
 }
 
-void USP_TaskStep::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
+void USP_TaskImpl::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
 {
 	SP_CHECK_NULLPTR(Planner)
 	SP_CHECK_NULLPTR(TaskInfos)
@@ -36,12 +36,12 @@ void USP_TaskStep::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify
 		break;
 	}
 }
-void USP_TaskStep::InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+void USP_TaskImpl::InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_CHECK_NULLPTR(Planner)
 
 	// Always bind to allow OnNotify() override.
-	Planner->OnNotifyTask.AddDynamic(this, &USP_TaskStep::OnNotify);
+	Planner->OnNotifyTask.AddDynamic(this, &USP_TaskImpl::OnNotify);
 
 	if (!NotifyMask)
 		return;
@@ -59,7 +59,7 @@ void USP_TaskStep::InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* Ta
 	}
 }
 
-USP_TaskInfos* USP_TaskStep::InstantiateInfos(UObject* Outer)
+USP_TaskInfos* USP_TaskImpl::InstantiateInfos(UObject* Outer)
 {
 	SP_RCHECK_NULLPTR(Outer, nullptr)
 	SP_RCHECK_NULLPTR(TaskInfosClass, nullptr)
@@ -67,7 +67,7 @@ USP_TaskInfos* USP_TaskStep::InstantiateInfos(UObject* Outer)
 	return NewObject<USP_TaskInfos>(Outer, TaskInfosClass);
 }
 
-bool USP_TaskStep::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
+bool USP_TaskImpl::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Infos)
 
@@ -76,7 +76,7 @@ bool USP_TaskStep::PreCondition_Implementation(const USP_PlanGenInfos* Infos) co
 
 	return true;
 }
-bool USP_TaskStep::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
+bool USP_TaskImpl::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Infos)
 
@@ -85,7 +85,7 @@ bool USP_TaskStep::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 
 	return true;
 }
-bool USP_TaskStep::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
+bool USP_TaskImpl::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Infos)
 
@@ -95,7 +95,7 @@ bool USP_TaskStep::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) co
 	return true;
 }
 
-ESP_PlanExecutionState USP_TaskStep::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
+ESP_PlanExecutionState USP_TaskImpl::Tick(float DeltaSeconds, USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_RCHECK_NULLPTR(TaskInfos, ESP_PlanExecutionState::PES_Failed)
 
@@ -121,7 +121,7 @@ ESP_PlanExecutionState USP_TaskStep::Tick(float DeltaSeconds, USP_AIPlannerCompo
 	// Return either tick has succeeded or failed.
 	return InternalState;
 }
-void USP_TaskStep::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
+void USP_TaskImpl::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_CHECK_NULLPTR(TaskInfos)
 
@@ -134,7 +134,7 @@ void USP_TaskStep::Cancel(USP_AIPlannerComponent& Planner, USP_TaskInfos* TaskIn
 	}
 }
 
-bool USP_TaskStep::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+bool USP_TaskImpl::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 	SP_RCHECK_NULLPTR(TaskInfos, false)
@@ -167,7 +167,7 @@ bool USP_TaskStep::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner
 
 	return true;
 }
-ESP_PlanExecutionState USP_TaskStep::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+ESP_PlanExecutionState USP_TaskImpl::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_RCHECK_NULLPTR(Planner, ESP_PlanExecutionState::PES_Failed)
 	SP_RCHECK_NULLPTR(TaskInfos, ESP_PlanExecutionState::PES_Failed)
@@ -194,12 +194,12 @@ ESP_PlanExecutionState USP_TaskStep::Tick_Internal_Implementation(float DeltaSec
 
 	return TaskInfos->BaseExecutionState;
 }
-bool USP_TaskStep::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+bool USP_TaskImpl::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_RCHECK_NULLPTR(Planner, false)
 
 	if(TaskInfos->bUseNotify && TaskInfos->bHasBegun)
-		Planner->OnNotifyTask.RemoveDynamic(this, &USP_TaskStep::OnNotify);
+		Planner->OnNotifyTask.RemoveDynamic(this, &USP_TaskImpl::OnNotify);
 
 	return true;
 }

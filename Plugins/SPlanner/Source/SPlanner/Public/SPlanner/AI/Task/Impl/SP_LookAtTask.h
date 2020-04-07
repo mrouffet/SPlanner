@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 #include "SP_LookAtTask.generated.h"
 
 class USP_Target;
@@ -10,8 +10,8 @@ class USP_Target;
 /**
  *	Look at task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Target")
-class SPLANNER_API USP_LookAtTask : public USP_TaskStep
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Target")
+class SPLANNER_API USP_LookAtTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 	
@@ -55,7 +55,7 @@ public:
 
 
 /** Task info implementation for USP_LookAtTask. */
-UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_LookAtTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()

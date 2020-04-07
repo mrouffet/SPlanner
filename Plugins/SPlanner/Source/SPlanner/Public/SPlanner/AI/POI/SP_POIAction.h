@@ -5,7 +5,7 @@
 #include <SPlanner/Base/Action/SP_Action.h>
 #include "SP_POIAction.generated.h"
 
-class USP_TaskStep;
+class USP_TaskImpl;
 class USP_Goal;
 
 /**
@@ -28,7 +28,7 @@ protected:
 
 public:
 	/** Getter of Task. */
-	USP_TaskStep* GetTaskStep() const;
+	USP_TaskImpl* GetTaskImpl() const;
 
 	/** Whether Goal is in AchievedGoals */
 	bool IsGoalAchieved(const USP_Goal* Goal) const;

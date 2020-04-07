@@ -8,7 +8,7 @@
 /**
  *	Target nearest player task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Target")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Target")
 class SPLANNER_API USP_ChooseTargetPlayerTask : public USP_ChooseTargetActorTask
 {
 	GENERATED_BODY()

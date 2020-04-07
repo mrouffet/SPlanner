@@ -2,30 +2,30 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
-#include "SP_TaskChain.generated.h"
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
+#include "SP_ChainTask.generated.h"
 
 /**
  *	Chain of Tasks.
  *	Only the cooldown of TaskChain is used by planner.
  *	Cooldown of every tasks in Tasks are not used.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_TaskChain : public USP_TaskStep
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task")
+class SPLANNER_API USP_ChainTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 
 protected:
 	/** The handled tasks. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Chain")
-	TArray<USP_TaskStep*> Tasks;
+	TArray<USP_TaskImpl*> Tasks;
 
 	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
 
-	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Steps). */
+	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Impls). */
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
 
-	/** The post-condition of the action (ie: chain of all post-condition of Steps). */
+	/** The post-condition of the action (ie: chain of all post-condition of Impls). */
 	bool PostCondition_Implementation(USP_PlanGenInfos* Infos) const override;
 
 	bool ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const override;
@@ -37,18 +37,18 @@ protected:
 	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	USP_TaskChain(const FObjectInitializer& ObjectInitializer);
+	USP_ChainTask(const FObjectInitializer& ObjectInitializer);
 };
 
 
-/** Task info implementation for USP_TaskChain. */
-UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
-class USP_TaskChainInfos : public USP_TaskInfos
+/** Task info implementation for USP_ChainTask. */
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Task")
+class USP_ChainTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()
 
-	// Only accessible by USP_TaskChain.
-	friend USP_TaskChain;
+	// Only accessible by USP_ChainTask.
+	friend USP_ChainTask;
 
 	int Index = 0;
 

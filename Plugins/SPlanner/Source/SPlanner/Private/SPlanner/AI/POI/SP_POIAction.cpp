@@ -6,13 +6,13 @@
 
 #include <SPlanner/Base/Planner/SP_PlannerComponent.h>
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 
-USP_TaskStep* USP_POIAction::GetTaskStep() const
+USP_TaskImpl* USP_POIAction::GetTaskImpl() const
 {
-	SP_SRCHECK_NULLPTR(Cast<USP_TaskStep>(Step), nullptr)
+	SP_SRCHECK_NULLPTR(Cast<USP_TaskImpl>(Impl), nullptr)
 
-	return Cast<USP_TaskStep>(Step);
+	return Cast<USP_TaskImpl>(Impl);
 }
 
 bool USP_POIAction::IsGoalAchieved(const USP_Goal* Goal) const

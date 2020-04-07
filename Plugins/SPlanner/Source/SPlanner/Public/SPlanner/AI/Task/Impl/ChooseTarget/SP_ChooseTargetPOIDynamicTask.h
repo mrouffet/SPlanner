@@ -8,7 +8,7 @@
 /**
  *	Choose target implementation with dynamic POI spec.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Target")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Target")
 class SPLANNER_API USP_ChooseTargetPOIDynamicTask : public USP_ChooseTargetPOITask
 {
 	GENERATED_BODY()
@@ -27,7 +27,7 @@ protected:
 	bool bIgnorePOIActorType = false;
 
 	/** Predicate to validate to choose a POI. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task|Target")
 	bool PredicatePOI(const USP_AIPlannerComponent* Planner, const USP_POIComponent* POI) const;
 
 	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;

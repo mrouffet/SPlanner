@@ -13,7 +13,7 @@ class USP_MoveToTaskInfos;
 /**
  *	MoveTo implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Move")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Move")
 class SPLANNER_API USP_MoveToTask : public USP_MoveBaseTask
 {
 	GENERATED_BODY()
@@ -60,7 +60,7 @@ protected:
 	bool bPreconditionFailWhileAlreadyAtGoal = true;
 
 	/** Child implementation to set pawn speed during MoveTo. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|MoveTo")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task|MoveTo")
 	void SetPawnSpeed(APawn* Pawn, float NewPawnSpeed);
 
 	/** Check if owner actor has reached its target. */
@@ -79,7 +79,7 @@ protected:
 	bool HasReachedPosition(ACharacter* Character, const FVector& TargetPosition) const;
 
 	/** Callback when a movement is completed by the AI Controller. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Move")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task|Move")
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 	/** Implementation of move request creation. */
@@ -96,7 +96,7 @@ public:
 };
 
 /** Task info implementation for USP_MoveToTask. */
-UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task|Move")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Task|Move")
 class SPLANNER_API USP_MoveToTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()

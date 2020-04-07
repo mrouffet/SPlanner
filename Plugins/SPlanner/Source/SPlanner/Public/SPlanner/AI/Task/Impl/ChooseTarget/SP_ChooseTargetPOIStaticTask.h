@@ -8,7 +8,7 @@
 /**
  *	Choose target implementation with static POI spec.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Target")
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Target")
 class SPLANNER_API USP_ChooseTargetPOIStaticTask : public USP_ChooseTargetPOITask
 {
 	GENERATED_BODY()

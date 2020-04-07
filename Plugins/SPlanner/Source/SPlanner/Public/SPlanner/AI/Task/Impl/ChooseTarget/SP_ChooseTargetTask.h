@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 #include "SP_ChooseTargetTask.generated.h"
 
 /**
  *	Base implementation of ChooseTarget task.
  */
-UCLASS(Abstract, ClassGroup = "SPlanner|Action|Task|Target")
-class SPLANNER_API USP_ChooseTargetTask : public USP_TaskStep
+UCLASS(Abstract, ClassGroup = "SPlanner|Task|Target")
+class SPLANNER_API USP_ChooseTargetTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 	
@@ -64,19 +64,19 @@ protected:
 	bool IsInBox_Internal(const APawn* Pawn, const FVector& BoxLocalExtent, const FVector& Location) const;
 
 	/** Check whether Min box's extent are valid. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task|Target")
 	bool HasValidMinBox() const;
 
 	/** Check whether Max box's extent are valid. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task|Target")
 	bool HasValidMaxBox() const;
 
 	/** Check whether Location is in Pawn's Min Box. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task|Target")
 	bool IsInMinBox(const APawn* Pawn, const FVector& InLocation) const;
 
 	/** Check whether Location is in Pawn's Max Box. */
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task|Target")
 	bool IsInMaxBox(const APawn* Pawn, const FVector& InLocation) const;
 
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
@@ -89,14 +89,14 @@ protected:
 
 public:
 	/** Get the World FOV center using Pawn and LocalOffset. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Task|Target")
 	FVector GetFOVCenter(const APawn* Pawn) const;
 
 	/** Get the World FOV min extent using MinLocalExtent. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Task|Target")
 	FVector GetFOVMinExtent(const APawn* Pawn) const;
 
 	/** Get the World FOV min extent using MaxLocalExtent. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Action|Task|Target")
+	UFUNCTION(BlueprintPure, Category = "SPlanner|Task|Target")
 	FVector GetFOVMaxExtent(const APawn* Pawn) const;
 };

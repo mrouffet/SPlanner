@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 #include "SP_MoveBaseTask.generated.h"
 
 /**
  *	MoveTo implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task|Move")
-class SPLANNER_API USP_MoveBaseTask : public USP_TaskStep
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Move")
+class SPLANNER_API USP_MoveBaseTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 	
@@ -31,7 +31,7 @@ protected:
 	float PawnSpeed = -1.0f;
 
 	/** Child implementation to get pawn speed. */
-	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Action|Task|Move")
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task|Move")
 	float GetPawnSpeed(APawn* Pawn);
 
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;

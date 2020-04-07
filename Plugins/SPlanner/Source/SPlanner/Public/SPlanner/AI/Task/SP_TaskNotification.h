@@ -7,7 +7,7 @@
 /**
 *	How task should react to notification.
 */
-UENUM(BlueprintType, Category = "SPlanner|Action|Task")
+UENUM(BlueprintType, Category = "SPlanner|Task")
 enum class ESP_TaskNotification : uint8
 {
 	/** Start tick, notify cause timeout. */

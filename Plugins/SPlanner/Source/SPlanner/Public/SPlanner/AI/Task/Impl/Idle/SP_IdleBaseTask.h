@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <SPlanner/AI/Task/SP_TaskStep.h>
+#include <SPlanner/AI/Task/SP_TaskImpl.h>
 #include "SP_IdleBaseTask.generated.h"
 
 /**
  *	Idle base task implementation.
  */
-UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Action|Task")
-class SPLANNER_API USP_IdleBaseTask : public USP_TaskStep
+UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task")
+class SPLANNER_API USP_IdleBaseTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 	
@@ -27,7 +27,7 @@ public:
 
 
 /** Task info implementation for USP_IdleTask. */
-UCLASS(BlueprintType, ClassGroup = "SPlanner|Action|Task")
+UCLASS(BlueprintType, ClassGroup = "SPlanner|Task")
 class SPLANNER_API USP_IdleBaseTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()

@@ -1,15 +1,15 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Task/SP_TaskChain.h>
+#include <SPlanner/AI/Task/Impl/SP_ChainTask.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
-USP_TaskChain::USP_TaskChain(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+USP_ChainTask::USP_ChainTask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	TaskInfosClass = USP_TaskChainInfos::StaticClass();
+	TaskInfosClass = USP_ChainTaskInfos::StaticClass();
 }
 
-bool USP_TaskChain::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
+bool USP_ChainTask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Infos)
 
@@ -49,7 +49,7 @@ bool USP_TaskChain::PreCondition_Implementation(const USP_PlanGenInfos* Infos) c
 
 	return true;
 }
-bool USP_TaskChain::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
+bool USP_ChainTask::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_POSTCONDITION(Infos)
 
@@ -73,7 +73,7 @@ bool USP_TaskChain::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 
 	return true;
 }
-bool USP_TaskChain::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
+bool USP_ChainTask::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_RESET_POSTCONDITION(Infos)
 
@@ -89,7 +89,7 @@ bool USP_TaskChain::ResetPostCondition_Implementation(USP_PlanGenInfos* Infos) c
 	return true;
 }
 
-bool USP_TaskChain::IsAvailable(const USP_PlannerComponent* Planner) const
+bool USP_ChainTask::IsAvailable(const USP_PlannerComponent* Planner) const
 {
 	if (!Super::IsAvailable(Planner))
 		return false;
@@ -105,22 +105,22 @@ bool USP_TaskChain::IsAvailable(const USP_PlannerComponent* Planner) const
 	return true;
 }
 
-void USP_TaskChain::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
+void USP_ChainTask::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
 {
 	Super::OnNotify(Planner, Notify, TaskInfos);
 
-	USP_TaskChainInfos* const Infos = Cast<USP_TaskChainInfos>(TaskInfos);
-	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_TaskChainInfos")
+	USP_ChainTaskInfos* const Infos = Cast<USP_ChainTaskInfos>(TaskInfos);
+	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_ChainTaskInfos")
 
 	Tasks[Infos->Index]->OnNotify(Planner, Notify, Infos->TaskInfos);
 }
 
-bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+bool USP_ChainTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_BEGIN(Planner, TaskInfos)
 
-	USP_TaskChainInfos* const Infos = Cast<USP_TaskChainInfos>(TaskInfos);
-	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_TaskChainInfos")
+	USP_ChainTaskInfos* const Infos = Cast<USP_ChainTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_ChainTaskInfos")
 
 	SP_RCHECK(Tasks.Num(), false, "Empty tasks!")
 	SP_RCHECK(Tasks[0], false, "Task[0] is nullptr!")
@@ -130,12 +130,12 @@ bool USP_TaskChain::Begin_Internal_Implementation(USP_AIPlannerComponent* Planne
 
 	return true;
 }
-ESP_PlanExecutionState USP_TaskChain::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+ESP_PlanExecutionState USP_ChainTask::Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_TICK(DeltaSeconds, Planner, TaskInfos)
 
-	USP_TaskChainInfos* const Infos = Cast<USP_TaskChainInfos>(TaskInfos);
-	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_TaskChainInfos")
+	USP_ChainTaskInfos* const Infos = Cast<USP_ChainTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, ESP_PlanExecutionState::PES_Failed, "Infos nullptr! TaskInfos must be of type USP_ChainTaskInfos")
 
 	SP_RCHECK(Infos->Index < Tasks.Num(), ESP_PlanExecutionState::PES_Failed, "Index out of range!")
 	SP_RCHECK(Tasks[Infos->Index], ESP_PlanExecutionState::PES_Failed, "Task [%d] is nullptr!", Infos->Index)
@@ -159,12 +159,12 @@ ESP_PlanExecutionState USP_TaskChain::Tick_Internal_Implementation(float DeltaSe
 
 	return ESP_PlanExecutionState::PES_Running;
 }
-bool USP_TaskChain::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+bool USP_ChainTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
 {
 	SP_TASK_SUPER_END(Planner, TaskInfos)
 
-	USP_TaskChainInfos* const Infos = Cast<USP_TaskChainInfos>(TaskInfos);
-	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_TaskChainInfos")
+	USP_ChainTaskInfos* const Infos = Cast<USP_ChainTaskInfos>(TaskInfos);
+	SP_RCHECK(Infos, false, "Infos nullptr! TaskInfos must be of type USP_ChainTaskInfos")
 
 	if (Infos->bForcedEnd)
 	{
