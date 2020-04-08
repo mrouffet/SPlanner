@@ -10,6 +10,9 @@
 UENUM(BlueprintType, Meta = (Bitflags), Category = "SPlanner|AI")
 enum class ESP_AIPlannerNotify : uint8
 {
+	/** Notify when Planner's pawn enter a trigger. */
+	NP_Trigger					UMETA(DisplayName = "Trigger"),
+
 	/** Notify when joined formation change. */
 	NP_FormationChange			UMETA(DisplayName = "FormationChange"),
 };
