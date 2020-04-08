@@ -4,6 +4,7 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+/*
 FVector USP_SplineComponent::GenerateNoiseAtPoint(int32 PointIndex) const
 {
 	SP_RCHECK((PointIndex >= 0 && PointIndex < Noises.Num()), FVector::ZeroVector, "PointIndex [%d] out of range [0, %d[", PointIndex, Noises.Num())
@@ -77,3 +78,40 @@ void USP_SplineComponent::PostEditChangeChainProperty(FPropertyChangedChainEvent
 		Noises.RemoveAt(Noises.Num() - 1);
 }
 #endif
+*/
+
+float USP_SplineComponent::GetDistanceBetweenPoints(int32 StartPointIndex, int32 EndPointIndex)
+{
+	if (!IsClosedLoop())
+	{
+		float StartDistance = GetDistanceAlongSplineAtSplinePoint(StartPointIndex);
+		float EndDistance = GetDistanceAlongSplineAtSplinePoint(EndPointIndex);
+
+		return EndDistance - StartDistance;
+	}
+
+	// Swap
+	if (StartPointIndex > EndPointIndex)
+	{
+		int temp = StartPointIndex;
+		StartPointIndex = EndPointIndex;
+		EndPointIndex = temp;
+	}
+
+	int PointNum = GetNumberOfSplinePoints();
+
+	if (StartPointIndex >= PointNum)
+		StartPointIndex -= PointNum;
+	else if(StartPointIndex < 0)
+		StartPointIndex += PointNum;
+
+	if (EndPointIndex >= PointNum)
+		EndPointIndex -= PointNum;
+	else if (EndPointIndex < 0)
+		EndPointIndex += PointNum;
+
+	float StartDistance = GetDistanceAlongSplineAtSplinePoint(StartPointIndex);
+	float EndDistance = EndPointIndex != 0 ? GetDistanceAlongSplineAtSplinePoint(EndPointIndex) : GetSplineLength();
+
+	return EndDistance - StartDistance;
+}

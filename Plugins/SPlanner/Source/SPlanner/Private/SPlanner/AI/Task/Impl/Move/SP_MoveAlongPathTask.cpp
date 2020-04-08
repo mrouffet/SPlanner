@@ -2,7 +2,7 @@
 
 #include <SPlanner/AI/Task/Impl/Move/SP_MoveAlongPathTask.h>
 
-#include <GameFramework/PawnMovementComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
@@ -18,14 +18,29 @@ USP_MoveAlongPathTask::USP_MoveAlongPathTask(const FObjectInitializer& ObjectIni
 	TaskInfosClass = USP_MoveAlongPathTaskInfos::StaticClass();
 }
 
-void USP_MoveAlongPathTask::SetMovementComponentEnabled_Implementation(APawn* Pawn, bool bEnabled)
+void USP_MoveAlongPathTask::ApplyLocation_Implementation(APawn* Pawn, const FVector& NewLocation)
 {
 	SP_CHECK_NULLPTR(Pawn)
 
-	UPawnMovementComponent* const MovementComponent = Pawn->GetMovementComponent();
-	SP_CHECK_NULLPTR(MovementComponent)
+	if(bUseMovementComponent)
+		Pawn->AddMovementInput(NewLocation - Pawn->GetActorLocation());
+	else
+		Pawn->SetActorLocation(NewLocation);
+}
+void USP_MoveAlongPathTask::ApplyRotation_Implementation(APawn* Pawn, const FRotator& NewRotation)
+{
+	SP_CHECK_NULLPTR(Pawn)
+	
+	if (bUseMovementComponent)
+	{
+		FRotator DeltaRotation = NewRotation - Pawn->GetActorRotation();
 
-	MovementComponent->SetComponentTickEnabled(bEnabled);
+		Pawn->AddControllerPitchInput(DeltaRotation.Pitch);
+		Pawn->AddControllerYawInput(DeltaRotation.Yaw);
+		Pawn->AddControllerRollInput(DeltaRotation.Roll);
+	}
+	else
+		Pawn->SetActorRotation(NewRotation);
 }
 
 bool USP_MoveAlongPathTask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
@@ -50,7 +65,7 @@ bool USP_MoveAlongPathTask::PreCondition_Implementation(const USP_PlanGenInfos* 
 		return false;
 
 	// POI must be of type SP_AIPath.
-	return Cast<ASP_AIPath>(Target->GetActor());
+	return Cast<ASP_AIPath>(Target->GetAnyActor());
 }
 
 bool USP_MoveAlongPathTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
@@ -75,10 +90,8 @@ bool USP_MoveAlongPathTask::Begin_Internal_Implementation(USP_AIPlannerComponent
 	USP_SplineComponent* const Spline = Path->GetSpline();
 	SP_RCHECK_NULLPTR(Spline, false)
 
-	Infos->InputKey = Spline->FindInputKeyClosestToWorldLocation(AIPawn->GetActorLocation());
-
-	if (bDisableMovementComponent)
-		SetMovementComponentEnabled(AIPawn, false);
+	Infos->InputKey = Infos->StartInputKey = Spline->FindInputKeyClosestToWorldLocation(AIPawn->GetActorLocation());
+	Infos->DirectionSign = DirectionSign == 0.0f ? (FMath::RandBool() ? 1.0f : -1.0f) : DirectionSign;
 
 	return true;
 }
@@ -107,29 +120,36 @@ ESP_PlanExecutionState USP_MoveAlongPathTask::Tick_Internal_Implementation(float
 	float Speed = PawnSpeed <= 0.0f ? GetPawnSpeed(AIPawn) : PawnSpeed;
 	Infos->InputKey += DeltaSeconds * Speed / Spline->GetSplineLength() * Infos->DirectionSign;
 
-	// End of spline.
-	if(Infos->InputKey <= 0.0f || Infos->InputKey >= Spline->GetSplineLength())
+	if (Spline->IsClosedLoop())
+	{
+		// Modulo spline length.
+		if (Infos->InputKey <= 0.0f)
+		{
+			Infos->bHasLooped = true;
+			Infos->InputKey += Spline->GetNumberOfSplinePoints();
+		}
+		else if (Infos->InputKey >= Spline->GetNumberOfSplinePoints())
+		{
+			Infos->bHasLooped = true;
+			Infos->InputKey -= Spline->GetNumberOfSplinePoints();
+		}
+	}
+	else if (Infos->InputKey <= 0.0f || Infos->InputKey >= Spline->GetSplineLength()) // End of spline.
 		return ESP_PlanExecutionState::PES_Succeed;
 
-	const FVector NewLocation = Spline->GetLocationAtSplineInputKey(Infos->InputKey, ESplineCoordinateSpace::World);
-	const FRotator NewRotation = Spline->GetRotationAtSplineInputKey(Infos->InputKey, ESplineCoordinateSpace::World);
+	// No else (do not depend on Spline->IsClosedLoop()).
+	if (!bLoopSpline && Infos->bHasLooped &&
+		!((Infos->DirectionSign > 0.0f) ^ (Infos->InputKey > Infos->StartInputKey))) // Both direction and inputkey comparison must have the same sign.
+			return ESP_PlanExecutionState::PES_Succeed;
 
-	AIPawn->SetActorLocation(NewLocation);
-	AIPawn->SetActorRotation(NewRotation);
+	const FVector NewLocation = Spline->GetLocationAtSplineInputKey(Infos->InputKey, ESplineCoordinateSpace::World);
+	FRotator NewRotation = Spline->GetRotationAtSplineInputKey(Infos->InputKey, ESplineCoordinateSpace::World);
+
+	if (Infos->DirectionSign < 0.0f)
+		NewRotation = NewRotation.GetInverse();
+
+	ApplyLocation(AIPawn, NewLocation);
+	ApplyRotation(AIPawn, NewRotation);
 
 	return ESP_PlanExecutionState::PES_Running;
-}
-bool USP_MoveAlongPathTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
-{
-	SP_TASK_SUPER_END(Planner, TaskInfos)
-
-	if (bDisableMovementComponent)
-	{
-		APawn* const AIPawn = Planner->GetPawn();
-		SP_RCHECK_NULLPTR(AIPawn, false)
-
-		SetMovementComponentEnabled(AIPawn, true);
-	}
-
-	return true;
 }
