@@ -16,7 +16,7 @@ class SPLANNER_API USP_MoveBaseTask : public USP_TaskImpl
 protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Move")
-	FName TargetEntryName = "MainTarget";
+	FName TargetEntryName = "None";
 
 	
 	/** Can move to again even if a previous move to has been set in plan. */
