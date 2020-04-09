@@ -17,8 +17,8 @@ class SPLANNER_API USP_TimeOutAIDecorator : public USP_AIPlannerDecorator
 	GENERATED_BODY()
 	
 protected:
-	/** Current time to check time out. */
-	float CurrentTime = -1.0f;
+	/** Times of all planners of this decorator to check time out. */
+	TMap<const UObject*, float> Times;
 
 	/** The time before failing. */
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly) // No category on EditInlineNew object.

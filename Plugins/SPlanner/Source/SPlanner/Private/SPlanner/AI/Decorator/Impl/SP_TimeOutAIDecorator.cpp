@@ -7,6 +7,7 @@
 #include <SPlanner/Misc/SP_FlagHelper.h>
 #include <SPlanner/Misc/VariableParam/Float/SP_FloatParam.h>
 
+#include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecoratorFlag.h>
 
 USP_TimeOutAIDecorator::USP_TimeOutAIDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -24,6 +25,7 @@ bool USP_TimeOutAIDecorator::Validate_Internal_Implementation(const UObject* Obj
 	SP_RCHECK_NULLPTR(TimeOutParam, false)
 
 	float TimeOut = TimeOutParam->Query(this);
+	const float& CurrentTime = Times.FindOrAdd(Object);
 
 	if (TimeOut > 0.0f && CurrentTime >= TimeOut)
 		return false;
@@ -35,14 +37,16 @@ void USP_TimeOutAIDecorator::PostExecution_Internal_Implementation(const UObject
 {
 	Super::PostExecution_Internal_Implementation(Object, bExecutionSuccess);
 
-	// Reset for next use.
-	CurrentTime = 0.0f;
+	// Reset for next use and avoid out of memory.
+	Times.Remove(Object);
 }
 
 bool USP_TimeOutAIDecorator::Tick_Validate_Internal_Implementation(float DeltaSeconds,
 	const USP_AIPlannerComponent* Planner,
 	const USP_TaskInfos* TaskInfos)
 {
+	float& CurrentTime = Times.FindOrAdd(Planner);
+
 	CurrentTime += DeltaSeconds;
 
 	return Super::Tick_Validate_Internal_Implementation(DeltaSeconds, Planner, TaskInfos);
