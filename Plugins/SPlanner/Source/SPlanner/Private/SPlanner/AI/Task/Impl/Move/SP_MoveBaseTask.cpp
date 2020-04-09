@@ -8,6 +8,9 @@
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
+#include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
+#include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
+
 float USP_MoveBaseTask::GetPawnSpeed_Implementation(APawn* Pawn)
 {
 	if (ACharacter* Character = Cast<ACharacter>(Pawn))
