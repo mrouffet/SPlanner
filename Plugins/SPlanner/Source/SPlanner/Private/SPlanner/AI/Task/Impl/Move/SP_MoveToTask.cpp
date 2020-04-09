@@ -5,6 +5,8 @@
 #include <GameFramework/Character.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
+#include <Components/CapsuleComponent.h>
+
 #include <SPlanner/AI/Controller/SP_AIController.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
@@ -25,7 +27,7 @@ void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
 		UCharacterMovementComponent* const CharacterMovement = Character->GetCharacterMovement();
 		SP_CHECK_NULLPTR(CharacterMovement)
 
-			CharacterMovement->MaxWalkSpeed = NewSpeed;
+		CharacterMovement->MaxWalkSpeed = NewSpeed;
 	}
 }
 

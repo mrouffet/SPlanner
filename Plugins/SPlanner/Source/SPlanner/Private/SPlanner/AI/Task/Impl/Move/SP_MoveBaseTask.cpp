@@ -2,7 +2,8 @@
 
 #include <SPlanner/AI/Task/Impl/Move/SP_MoveBaseTask.h>
 
-#include <Components/CapsuleComponent.h>
+#include <GameFramework/Character.h>
+#include <GameFramework/CharacterMovementComponent.h>
 
 #include <SPlanner/AI/Planner/SP_AIPlanGenInfos.h>
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
