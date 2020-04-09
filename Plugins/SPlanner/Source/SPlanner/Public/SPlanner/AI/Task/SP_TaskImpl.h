@@ -23,9 +23,6 @@ class SPLANNER_API USP_TaskImpl : public USP_ActionImpl
 	GENERATED_BODY()
 
 protected:
-	// Allow TaskChain to call OnNotify().
-	friend class USP_ChainTask;
-
 	/**
 	*	The task infos class to instantiate.
 	*	Value set in constructor in children implementations.
@@ -42,10 +39,6 @@ protected:
 	/** How the task should react to notifications. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Notify")
 	ESP_TaskNotification NotifyAction = ESP_TaskNotification::TNA_TimeOut;
-
-	/** Callback method bound to planner. */
-	UFUNCTION(Category = "SPlanner|Task")
-	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos);
 
 	/** Init the Notify callback and base execution state. */
 	void InitNotify(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
@@ -77,6 +70,10 @@ protected:
 
 public:
 	USP_TaskImpl(const FObjectInitializer& ObjectInitializer);
+
+	/** Callback method bound to planner. */
+	UFUNCTION(Category = "SPlanner|Task")
+	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos);
 
 	/** Instantiate the TaskInfos for this task. */
 	USP_TaskInfos* InstantiateInfos(UObject* Outer = static_cast<UObject*>(GetTransientPackage()));

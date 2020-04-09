@@ -3,20 +3,41 @@
 #pragma once
 
 #include <SPlanner/AI/Task/SP_TaskImpl.h>
-#include "SP_ChainTask.generated.h"
+#include "SP_ParallelTask.generated.h"
 
 /**
- *	Chain of Tasks.
+ *	Execute a 2 task simultaneously.
  */
 UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task")
-class SPLANNER_API USP_ChainTask : public USP_TaskImpl
+class SPLANNER_API USP_ParallelTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
 
 protected:
-	/** The handled tasks. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Chain")
-	TArray<USP_TaskImpl*> Tasks;
+	/**
+	*	The main task to execute.
+	*	This task end when main task end.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Parallel")
+	USP_TaskImpl* MainTask = nullptr;
+
+	/** The sub task to execute. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Parallel")
+	USP_TaskImpl* SubTask = nullptr;
+
+	/**
+	*	Whether check sub conditions to execute MainTask.
+	*	ie: SubTask must be available and valid to perform MainTask.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Parallel")
+	bool bUseSubCheck = false;
+
+	/**
+	*	Whether to loop the sub task while waiting for MainTask end.
+	*	Only loop on success.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Parallel")
+	bool bLoopSubTask = false;
 
 	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
 	void PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess) override;
@@ -34,7 +55,7 @@ protected:
 	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
 public:
-	USP_ChainTask(const FObjectInitializer& ObjectInitializer);
+	USP_ParallelTask(const FObjectInitializer& ObjectInitializer);
 
 	void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos) override;
 };
@@ -42,20 +63,25 @@ public:
 
 /** Task info implementation for USP_ChainTask. */
 UCLASS(BlueprintType, ClassGroup = "SPlanner|Task")
-class USP_ChainTaskInfos : public USP_TaskInfos
+class USP_ParallelTaskInfos : public USP_TaskInfos
 {
 	GENERATED_BODY()
 
-	// Only accessible by USP_ChainTask.
-	friend USP_ChainTask;
-
-	int Index = 0;
+	// Only accessible by USP_ParallelTask.
+	friend USP_ParallelTask;
 
 public:
 	/**
-	*	Current executed task infos.
+	*	Current main task infos.
 	*	Must be UPROPERTY() to avoid garbage collection.
 	*/
-	UPROPERTY(BlueprintReadOnly, Category = "SPlanner|Task|Chain")
-	USP_TaskInfos* TaskInfos = nullptr;
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner|Task|Parallel")
+	USP_TaskInfos* MainTaskInfos = nullptr;
+
+	/**
+	*	Current sub task infos.
+	*	Must be UPROPERTY() to avoid garbage collection.
+	*/
+	UPROPERTY(BlueprintReadOnly, Category = "SPlanner|Task|Parallel")
+	USP_TaskInfos* SubTaskInfos = nullptr;
 };
