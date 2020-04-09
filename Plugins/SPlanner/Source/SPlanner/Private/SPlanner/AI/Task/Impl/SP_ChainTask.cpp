@@ -104,6 +104,17 @@ bool USP_ChainTask::IsAvailable(const USP_PlannerComponent* Planner) const
 
 	return true;
 }
+void USP_ChainTask::PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess)
+{
+	Super::PostExecution(Planner, bExecutionSuccess);
+
+	for (int i = 0; i < Tasks.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Tasks[i])
+
+		Tasks[i]->PostExecution(Planner, bExecutionSuccess);
+	}
+}
 
 void USP_ChainTask::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos)
 {

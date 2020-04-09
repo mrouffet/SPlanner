@@ -19,6 +19,17 @@ bool USP_ActionImplChain::IsAvailable(const USP_PlannerComponent* Planner) const
 
 	return true;
 }
+void USP_ActionImplChain::PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess)
+{
+	Super::PostExecution(Planner, bExecutionSuccess);
+
+	for (int i = 0; i < Impls.Num(); ++i)
+	{
+		SP_CCHECK_NULLPTR(Impls[i])
+
+		Impls[i]->PostExecution(Planner, bExecutionSuccess);
+	}
+}
 
 bool USP_ActionImplChain::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {

@@ -19,6 +19,7 @@ protected:
 	TArray<USP_ActionImpl*> Impls;
 
 	bool IsAvailable(const USP_PlannerComponent* Planner) const override;
+	void PostExecution(const USP_PlannerComponent* Planner, bool bExecutionSuccess) override;
 
 	/** The pre-condition of the chain (ie: chain of pre-condition / post-condition through Impls). */
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
