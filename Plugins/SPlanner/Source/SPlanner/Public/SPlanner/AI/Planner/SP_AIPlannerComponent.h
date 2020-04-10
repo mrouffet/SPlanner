@@ -82,8 +82,6 @@ protected:
 	/** Check cooldown and call AskNewPlan after newly available task. */
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;
 
-	void SetEnableBehavior_Implementation(bool bEnable) override;
-
 	bool OnActive_Internal_Implementation() override;
 	bool OnInactive_Internal_Implementation() override;
 

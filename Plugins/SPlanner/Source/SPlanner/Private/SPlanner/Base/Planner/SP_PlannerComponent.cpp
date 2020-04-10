@@ -49,6 +49,9 @@ bool USP_PlannerComponent::IsBehaviorEnabled() const
 }
 void USP_PlannerComponent::SetEnableBehavior_Implementation(bool bEnable)
 {
+	if (IsBehaviorEnabled() == bEnable)
+		return;
+
 	if (bEnable)
 		OnActive_Internal();
 	else

@@ -302,15 +302,6 @@ bool USP_AIPlannerComponent::CancelPlan()
 	return true;
 }
 
-void USP_AIPlannerComponent::SetEnableBehavior_Implementation(bool bEnable)
-{
-	Super::SetEnableBehavior_Implementation(bEnable);
-
-	// Disable LOD.
-	if (LOD)
-		LOD->SetEnableBehavior(bEnable);
-}
-
 bool USP_AIPlannerComponent::OnActive_Internal_Implementation()
 {
 	if (!Super::OnActive_Internal_Implementation())

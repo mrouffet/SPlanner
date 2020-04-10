@@ -22,7 +22,7 @@ protected:
 
 	/**
 	*	The value to compare with Param.
-	*	Validate: Param > Threshold.
+	*	Validate: Param >= Threshold.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) // No category on EditInlineNew object.
 	int Threshold = 0;
