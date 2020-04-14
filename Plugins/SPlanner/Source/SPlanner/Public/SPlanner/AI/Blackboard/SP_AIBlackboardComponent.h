@@ -36,6 +36,9 @@ protected:
 	void InitializeBlackboard_Implementation() override;
 	void UnInitializeBlackboard_Implementation() override;
 
+	/** Properly reset a key's value. */
+	void ResetValue(const FName& EntryName, USP_AIBlackboardKey* Key, USP_AIBlackboardKey* OriginalKey);
+
 public:
 	/** Callback thrown on bool value change (SetBool()). */
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")

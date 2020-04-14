@@ -208,6 +208,25 @@ void USP_AIBlackboardComponent::SetObject(const FName& EntryName, USP_AIBlackboa
 	OnObjectValueChange.Broadcast(EntryName, Value);
 }
 
+void USP_AIBlackboardComponent::ResetValue(const FName& EntryName, USP_AIBlackboardKey* Key, USP_AIBlackboardKey* OriginalKey)
+{
+	Key->ResetValue(OriginalKey);
+
+	if (USP_AIBlackboardKey_Bool* const BoolKey = Cast<USP_AIBlackboardKey_Bool>(Key))
+		OnBoolValueChange.Broadcast(EntryName, BoolKey->GetValue());
+	else if (USP_AIBlackboardKey_Int* const IntKey = Cast<USP_AIBlackboardKey_Int>(Key))
+		OnIntValueChange.Broadcast(EntryName, IntKey->GetValue());
+	else if (USP_AIBlackboardKey_Float* const FloatKey = Cast<USP_AIBlackboardKey_Float>(Key))
+		OnFloatValueChange.Broadcast(EntryName, FloatKey->GetValue());
+	else if (USP_AIBlackboardKey_Vector* const VectorKey = Cast<USP_AIBlackboardKey_Vector>(Key))
+		OnVectorValueChange.Broadcast(EntryName, VectorKey->GetValue());
+	else if (USP_AIBlackboardKey_Rotator* const RotatorKey = Cast<USP_AIBlackboardKey_Rotator>(Key))
+		OnRotatorValueChange.Broadcast(EntryName, RotatorKey->GetValue());
+	else if (USP_AIBlackboardKey_Name* const NameKey = Cast<USP_AIBlackboardKey_Name>(Key))
+		OnFNameValueChange.Broadcast(EntryName, NameKey->GetValue());
+	else if(USP_AIBlackboardKey_Object* const ObjectKey = Cast<USP_AIBlackboardKey_Object>(Key))
+		OnObjectValueChange.Broadcast(EntryName, ObjectKey->GetValue());
+}
 void USP_AIBlackboardComponent::ResetValue(const FName& EntryName)
 {
 	USP_AIBlackboardAsset* const AIBlackboardAsset = Cast<USP_AIBlackboardAsset>(BlackboardAsset);
@@ -234,7 +253,7 @@ void USP_AIBlackboardComponent::ResetValue(const FName& EntryName)
 
 	SP_CHECK(OriginalKey, "Key with name %s not found in Blackboard %s", *EntryName.ToString(), *BlackboardAsset->GetName())
 
-	(*KeyPtr)->ResetValue(OriginalKey);
+	ResetValue(EntryName, *KeyPtr, OriginalKey);
 }
 
 void USP_AIBlackboardComponent::Reset_Implementation()
@@ -252,7 +271,7 @@ void USP_AIBlackboardComponent::Reset_Implementation()
 		SP_CCHECK(KeyPtr, "KeyPtr nullptr! Entry with name [%s] not registered!", *Entries[i].Name.ToString())
 		SP_CCHECK_NULLPTR(*KeyPtr)
 
-		(*KeyPtr)->ResetValue(Entries[i].Key);
+		ResetValue(Entries[i].Name, *KeyPtr, Entries[i].Key);
 	}
 }
 void USP_AIBlackboardComponent::ResetPlanFailed_Implementation()
@@ -275,7 +294,7 @@ void USP_AIBlackboardComponent::ResetPlanFailed_Implementation()
 		SP_CCHECK(KeyPtr, "KeyPtr nullptr! Entry with name [%s] not registered!", *Entries[i].Name.ToString())
 		SP_CCHECK_NULLPTR(*KeyPtr)
 
-		(*KeyPtr)->ResetValue(Entries[i].Key);
+		ResetValue(Entries[i].Name, *KeyPtr, Entries[i].Key);
 	}
 }
 void USP_AIBlackboardComponent::ResetPlanCancelled_Implementation()
@@ -298,7 +317,7 @@ void USP_AIBlackboardComponent::ResetPlanCancelled_Implementation()
 		SP_CCHECK(KeyPtr, "KeyPtr nullptr! Entry with name [%s] not registered!", *Entries[i].Name.ToString())
 		SP_CCHECK_NULLPTR(*KeyPtr)
 
-		(*KeyPtr)->ResetValue(Entries[i].Key);
+		ResetValue(Entries[i].Name, *KeyPtr, Entries[i].Key);
 	}
 }
 
