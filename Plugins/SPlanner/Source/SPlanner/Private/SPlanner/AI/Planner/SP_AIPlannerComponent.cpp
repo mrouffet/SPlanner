@@ -164,6 +164,8 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 	{
 		CurrentTask->PostExecution(this, false);
 
+		OnPlanFailed();
+
 		// Plan got invalid: ask a new one.
 		PlanState = ESP_PlanState::PS_Invalid;
 
@@ -177,6 +179,8 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 
 		AskNewPlan();
 	}
+	
+	// Else Plan not finished: do not ask a new one.
 }
 
 void USP_AIPlannerComponent::OnActiveLOD()
@@ -276,9 +280,9 @@ void USP_AIPlannerComponent::OnPlanConstructionFailed_Implementation(ESP_PlanErr
 	//GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this]{	AskNewPlan(); }, MinCooldown, false);
 	GetWorld()->GetTimerManager().SetTimer(ConstructPlanTimer, [this] {	AskNewPlan(); }, 0.5f, false);
 }
-bool USP_AIPlannerComponent::CancelPlan()
+bool USP_AIPlannerComponent::CancelPlan_Implementation()
 {
-	if (!Super::CancelPlan())
+	if (!Super::CancelPlan_Implementation())
 		return false;
 
 	// Task started.
@@ -297,9 +301,17 @@ bool USP_AIPlannerComponent::CancelPlan()
 	USP_AIBlackboardComponent* const AIBlackboard = Cast<USP_AIBlackboardComponent>(Blackboard);
 	SP_RCHECK_NULLPTR(AIBlackboard, false)
 
-	AIBlackboard->ResetPlanCancel();
+	AIBlackboard->ResetPlanCancelled();
 
 	return true;
+}
+
+void USP_AIPlannerComponent::OnPlanFailed_Implementation()
+{
+	USP_AIBlackboardComponent* const AIBlackboard = Cast<USP_AIBlackboardComponent>(Blackboard);
+	SP_CHECK_NULLPTR(AIBlackboard)
+
+	AIBlackboard->ResetPlanFailed();
 }
 
 bool USP_AIPlannerComponent::OnActive_Internal_Implementation()

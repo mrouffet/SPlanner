@@ -226,8 +226,8 @@ public:
 	*	Callback function called when a plan get cancelled (by setting new goal).
 	*	Return cancel succeed.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
-	virtual bool CancelPlan();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Planner")
+	bool CancelPlan();
 
 #if WITH_EDITOR
 	bool IsSelectedInEditor() const override;

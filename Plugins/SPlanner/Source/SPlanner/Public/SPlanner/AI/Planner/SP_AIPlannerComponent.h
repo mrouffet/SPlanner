@@ -82,6 +82,14 @@ protected:
 	/** Check cooldown and call AskNewPlan after newly available task. */
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;
 
+	/**
+	*	Cancel the current task of the Plan.
+	*	Use CurrentPlanIndex and Plan.
+	*	Called on main thread.
+	*/
+	bool CancelPlan_Implementation() override;
+
+
 	bool OnActive_Internal_Implementation() override;
 	bool OnInactive_Internal_Implementation() override;
 
@@ -166,12 +174,10 @@ public:
 		return Cast<T>(GetPawn());
 	}
 
-	/**
-	*	Cancel the current task of the Plan.
-	*	Use CurrentPlanIndex and Plan.
-	*	Called on main thread.
-	*/
-	bool CancelPlan() override;
+	
+	/** Callback function called when the plan execution failed. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Planner")
+	void OnPlanFailed();
 
 #if WITH_EDITOR
 	bool IsSelectedInEditor() const override;

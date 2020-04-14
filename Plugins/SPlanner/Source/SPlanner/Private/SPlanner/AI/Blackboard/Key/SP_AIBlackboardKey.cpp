@@ -4,6 +4,11 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+bool USP_AIBlackboardKey::ShouldResetOnPlanFailed() const
+{
+	return bShouldResetOnPlanFailed;
+}
+
 bool USP_AIBlackboardKey::ShouldResetOnPlanCancelled() const
 {
 	return bShouldResetOnPlanCancelled;

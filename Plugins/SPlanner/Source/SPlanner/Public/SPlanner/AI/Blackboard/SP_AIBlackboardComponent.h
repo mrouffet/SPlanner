@@ -143,9 +143,16 @@ public:
 	void Reset();
 
 	/**
+	*	Reset this blackboard due to a plan failed.
+	*	Reset only keys with bShouldResetOnPlanFailed = true.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
+	void ResetPlanFailed();
+
+	/**
 	*	Reset this blackboard due to a plan cancel.
 	*	Reset only keys with bShouldResetOnPlanCancel = true.
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Blackboard")
-	void ResetPlanCancel();
+	void ResetPlanCancelled();
 };

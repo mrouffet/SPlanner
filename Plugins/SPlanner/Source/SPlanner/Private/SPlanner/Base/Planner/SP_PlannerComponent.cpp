@@ -117,7 +117,7 @@ const TArray<USP_ActionImpl*>& USP_PlannerComponent::GetPlan() const
 	return Plan;
 }
 
-bool USP_PlannerComponent::CancelPlan()
+bool USP_PlannerComponent::CancelPlan_Implementation()
 {
 	// Must cancel a valid plan.
 	if (PlanState != ESP_PlanState::PS_Valid)
