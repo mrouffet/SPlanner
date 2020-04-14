@@ -14,7 +14,7 @@ UCLASS(BlueprintType, Blueprintable, ClassGroup = "SPlanner|Task|Target")
 class SPLANNER_API USP_LookAtTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
-	
+
 protected:
 	/** The entry name to access Target object in Blackboard. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
@@ -39,6 +39,9 @@ protected:
 	/** Whether roll is freeze.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Target")
 	bool bFreezeRoll = true;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task|Target")
+	void ApplyRotation(APawn* Pawn, const FRotator& Rotation);
 
 	FRotator ComputeTargetRotation(const USP_AIPlannerComponent* Planner, const USP_Target* Target) const;
 

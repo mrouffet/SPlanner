@@ -38,6 +38,13 @@ USP_LookAtTask::USP_LookAtTask(const FObjectInitializer& ObjectInitializer) : Su
 	TaskInfosClass = USP_LookAtTaskInfos::StaticClass();
 }
 
+void USP_LookAtTask::ApplyRotation_Implementation(APawn* Pawn, const FRotator& Rotation)
+{
+	SP_CHECK_NULLPTR(Pawn)
+
+	Pawn->SetActorRotation(Rotation);
+}
+
 bool USP_LookAtTask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) const
 {
 	SP_ACTION_STEP_SUPER_PRECONDITION(Infos)
@@ -121,7 +128,7 @@ ESP_PlanExecutionState USP_LookAtTask::Tick_Internal_Implementation(float DeltaS
 
 	if(bInstant)
 	{
-		Pawn->SetActorRotation(Infos->End);
+		ApplyRotation(Pawn, Infos->End);
 		return ESP_PlanExecutionState::PES_Succeed;
 	}
 
@@ -141,7 +148,7 @@ ESP_PlanExecutionState USP_LookAtTask::Tick_Internal_Implementation(float DeltaS
 
 	Infos->Alpha += DeltaSeconds * Speed;
 
-	Pawn->SetActorRotation(UKismetMathLibrary::RLerp(Infos->Start, Infos->End, Infos->Alpha, true));
+	ApplyRotation(Pawn, UKismetMathLibrary::RLerp(Infos->Start, Infos->End, Infos->Alpha, true));
 
 	return Infos->Alpha >= 1.0f ? ESP_PlanExecutionState::PES_Succeed : ESP_PlanExecutionState::PES_Running;
 }
