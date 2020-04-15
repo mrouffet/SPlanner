@@ -34,6 +34,9 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "SPlanner")
 	USP_AILODComponent* LOD = nullptr;
 
+	/** Timer used by Freeze(). */
+	FTimerHandle FrozenTimer;
+
 	/**
 	*	The current index in plan executed.
 	*	Avoid Plan.PopFront().
@@ -83,8 +86,7 @@ protected:
 	void OnPlanConstructionFailed_Implementation(ESP_PlanError PlanError) override;
 
 	/**
-	*	Cancel the current task of the Plan.
-	*	Use CurrentPlanIndex and Plan.
+	*	Cancel the current Plan.
 	*	Called on main thread.
 	*/
 	bool CancelPlan_Implementation() override;
@@ -178,6 +180,26 @@ public:
 	/** Callback function called when the plan execution failed. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Planner")
 	void OnPlanFailed();
+
+	/**
+	*	Freeze the planner behavior for Time.
+	*	Freeze behavior do not cancel the current plan.
+	*	Plan will continue on UnFreeze().
+	*	Use Time < 0.0f for infinite time (wait for UnFreeze call).
+	*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Planner")
+	void Freeze(float Time = -1.0f);
+
+	/**
+	*	Unfreeze the planner behavior.
+	*	Resume the previous computed plan.
+	*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Planner")
+	void UnFreeze();
+
+	/** Whether this planner is currently frozen. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
+	bool IsFrozen();
 
 #if WITH_EDITOR
 	bool IsSelectedInEditor() const override;

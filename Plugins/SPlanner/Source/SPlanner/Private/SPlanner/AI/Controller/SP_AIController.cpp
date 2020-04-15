@@ -34,51 +34,15 @@ USP_AIPlannerComponent* ASP_AIController::GetPlanner() const
 
 void ASP_AIController::SetEnableBehavior(bool bEnable)
 {
-	// Unfreeze for next enable.
-	if (!bEnable && IsFrozen())
-		UnFreeze();
-
-	// Already in good state.
-	if (bEnable == IsActorTickEnabled())
-		return;
-
 	Planner->SetEnableBehavior(bEnable);
-
-	SetActorTickEnabled(bEnable);
-}
-
-bool ASP_AIController::IsFrozen() const
-{
-	// Planner behavior must be enabled (otherwise planner is inactive and not frozen).
-
-	return !IsActorTickEnabled() && !Planner->IsComponentTickEnabled() && Planner->IsBehaviorEnabled();
 }
 void ASP_AIController::Freeze(float Time)
 {
-	SP_CHECK_NULLPTR(Planner)
-
-	SetActorTickEnabled(false);
-	Planner->SetComponentTickEnabled(false); // Call before CancelPlan to allow IsFrozen() check.
-
-	// Cancel current executed plan task.
-	if (Planner->IsComponentTickEnabled())
-		Planner->CancelPlan();
-
-	if (Time > 0.0f)
-		GetWorld()->GetTimerManager().SetTimer(FrozenTimer, this, &ASP_AIController::UnFreeze, Time, false);
+	Planner->Freeze();
 }
 void ASP_AIController::UnFreeze()
 {
-	if (!IsFrozen())
-	{
-		SP_LOG(Warning, "Try to UnFreeze a non-frozen planner.")
-		return;
-	}
-
-	GetWorld()->GetTimerManager().ClearTimer(FrozenTimer);
-
-	SetActorTickEnabled(true);
-	Planner->SetComponentTickEnabled(true);
+	Planner->UnFreeze();
 }
 
 void ASP_AIController::OnAskPlan_Implementation(USP_PlannerComponent* InPlanner)

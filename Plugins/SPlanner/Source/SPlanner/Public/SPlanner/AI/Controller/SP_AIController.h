@@ -51,10 +51,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
 	void SetEnableBehavior(bool bEnable);
 
-	/** Whether the planner behavior is frozen. */
-	UFUNCTION(BlueprintPure, Category = "SPlanner|Controller")
-	bool IsFrozen() const;
-
 	/**
 	*	Freeze the planner behavior for Time.
 	*	Freeze behavior do not cancel the current plan.
@@ -62,12 +58,12 @@ public:
 	*	Use Time < 0.0f for infinite time (wait for UnFreeze call).
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
-	virtual void Freeze(float Time = -1.0f);
+	void Freeze(float Time = -1.0f);
 
 	/**
 	*	Unfreeze the planner behavior.
 	*	Resume the previous computed plan.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Controller")
-	virtual void UnFreeze();
+	void UnFreeze();
 };

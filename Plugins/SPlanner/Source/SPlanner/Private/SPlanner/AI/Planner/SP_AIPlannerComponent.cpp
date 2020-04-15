@@ -2,6 +2,8 @@
 
 #include <SPlanner/AI/Planner/SP_AIPlannerComponent.h>
 
+#include <TimerManager.h>
+
 #include <SPlanner/Debug/SP_Debug.h>
 
 #include <SPlanner/Base/Goal/SP_Goal.h>
@@ -297,6 +299,8 @@ bool USP_AIPlannerComponent::CancelPlan_Implementation()
 		TaskInfos = nullptr;
 	}
 
+	PlanState = ESP_PlanState::PS_Invalid;
+
 	// Reset keys with bShouldResetOnPlanCancel.
 	USP_AIBlackboardComponent* const AIBlackboard = Cast<USP_AIBlackboardComponent>(Blackboard);
 	SP_RCHECK_NULLPTR(AIBlackboard, false)
@@ -304,6 +308,38 @@ bool USP_AIPlannerComponent::CancelPlan_Implementation()
 	AIBlackboard->ResetPlanCancelled();
 
 	return true;
+}
+
+void USP_AIPlannerComponent::Freeze_Implementation(float Time)
+{
+	// Task started.
+	if (TaskInfos)
+	{
+		SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
+
+		USP_TaskImpl* CurrentTask = Cast<USP_TaskImpl>(Plan[CurrentPlanIndex]);
+		SP_CHECK_NULLPTR(CurrentTask)
+
+		// Cancel current active task.
+		CurrentTask->Cancel(*this, TaskInfos);
+		TaskInfos = nullptr;
+	}
+
+	SetComponentTickEnabled(false);
+
+	if (Time > 0.0f)
+		GetWorld()->GetTimerManager().SetTimer(FrozenTimer, this, &USP_AIPlannerComponent::UnFreeze, Time, false);
+}
+void USP_AIPlannerComponent::UnFreeze_Implementation()
+{
+	SetComponentTickEnabled(true);
+
+	GetWorld()->GetTimerManager().ClearTimer(FrozenTimer);
+}
+
+bool USP_AIPlannerComponent::IsFrozen()
+{
+	return IsComponentTickEnabled() && PlanState == ESP_PlanState::PS_Valid;
 }
 
 void USP_AIPlannerComponent::OnPlanFailed_Implementation()
