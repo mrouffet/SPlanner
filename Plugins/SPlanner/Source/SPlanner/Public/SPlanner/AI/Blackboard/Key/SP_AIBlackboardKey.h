@@ -32,6 +32,12 @@ public:
 	bool ShouldResetOnPlanCancelled() const;
 
 	/**
+	*	Compare this key with an other key.
+	*	Must be overridden in children.
+	*/
+	virtual bool Compare(const USP_AIBlackboardKey* OtherKey) /* = 0 */;
+
+	/**
 	*	reset the value from the original key.
 	*	Must be overridden in children.
 	*/

@@ -68,6 +68,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SPlanner|Blackboar|AI")
 	FSP_AIBBObjectDelegate OnObjectValueChange;
 
+	/** Getter of key registered as EntryName. */
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")
+	USP_AIBlackboardKey* GetKey(const FName& EntryName) const;
 
 	/** Getter of bool value registered as EntryName. */
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI")

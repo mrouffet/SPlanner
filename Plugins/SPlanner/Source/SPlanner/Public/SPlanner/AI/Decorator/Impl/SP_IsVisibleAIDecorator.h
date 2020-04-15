@@ -8,7 +8,7 @@
 /**
  *	SPlanner decorator check blackboard entry is visible from pawn.
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator|AI")
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, DisplayName = "SP_IsVisible", ClassGroup = "SPlanner|Decorator|AI")
 class SPLANNER_API USP_IsVisibleAIDecorator : public USP_AIPlannerDecorator
 {
 	GENERATED_BODY()

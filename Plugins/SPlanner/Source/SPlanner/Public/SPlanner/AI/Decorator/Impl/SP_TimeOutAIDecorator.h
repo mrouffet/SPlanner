@@ -11,7 +11,7 @@ class USP_FloatParam;
  *	SPlanner decorator check time out.
  *	Validate fail after time limit.
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup = "SPlanner|Decorator|AI")
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, DisplayName = "SP_TimeOut", ClassGroup = "SPlanner|Decorator|AI")
 class SPLANNER_API USP_TimeOutAIDecorator : public USP_AIPlannerDecorator
 {
 	GENERATED_BODY()

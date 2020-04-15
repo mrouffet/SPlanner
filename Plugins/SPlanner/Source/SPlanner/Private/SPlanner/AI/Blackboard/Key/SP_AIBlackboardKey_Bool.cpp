@@ -16,6 +16,14 @@ void USP_AIBlackboardKey_Bool::SetValue(bool Value)
 	Handle = Value;
 }
 
+bool USP_AIBlackboardKey_Bool::Compare(const USP_AIBlackboardKey* OtherKey)
+{
+	const USP_AIBlackboardKey_Bool* CastedOther = Cast<USP_AIBlackboardKey_Bool>(OtherKey);
+
+	SP_RCHECK(CastedOther, false, "Other is not of type USP_AIBlackboardKey_Bool")
+
+	return Handle == CastedOther->Handle;
+}
 void USP_AIBlackboardKey_Bool::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
 	const USP_AIBlackboardKey_Bool* CastedOther = Cast<USP_AIBlackboardKey_Bool>(OriginalKey);

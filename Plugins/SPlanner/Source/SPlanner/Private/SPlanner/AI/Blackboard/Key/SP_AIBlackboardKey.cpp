@@ -14,6 +14,12 @@ bool USP_AIBlackboardKey::ShouldResetOnPlanCancelled() const
 	return bShouldResetOnPlanCancelled;
 }
 
+bool USP_AIBlackboardKey::Compare(const USP_AIBlackboardKey* OriginalKey)
+{
+	SP_LOG(Error, "Must be overridden in children!")
+
+	return false;
+}
 void USP_AIBlackboardKey::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
 	SP_LOG(Error, "Must be overridden in children!")

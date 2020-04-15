@@ -16,6 +16,14 @@ void USP_AIBlackboardKey_Float::SetValue(float Value)
 	Handle = Value;
 }
 
+bool USP_AIBlackboardKey_Float::Compare(const USP_AIBlackboardKey* OtherKey)
+{
+	const USP_AIBlackboardKey_Float* CastedOther = Cast<USP_AIBlackboardKey_Float>(OtherKey);
+
+	SP_RCHECK(CastedOther, false, "Other is not of type USP_AIBlackboardKey_Float")
+
+	return FMath::IsNearlyEqual(Handle, CastedOther->Handle);
+}
 void USP_AIBlackboardKey_Float::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
 	const USP_AIBlackboardKey_Float* CastedOther = Cast<USP_AIBlackboardKey_Float>(OriginalKey);

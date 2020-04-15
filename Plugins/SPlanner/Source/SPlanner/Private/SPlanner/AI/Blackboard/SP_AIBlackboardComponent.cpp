@@ -15,6 +15,15 @@
 #include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Name.h>
 #include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey_Object.h>
 
+USP_AIBlackboardKey* USP_AIBlackboardComponent::GetKey(const FName& EntryName) const
+{
+	USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(EntryName);
+
+	SP_RCHECK(KeyPtr, nullptr, "KeyPtr nullptr! Entry with name [%s] not registered!", *EntryName.ToString())
+
+	return *KeyPtr;
+}
+
 bool USP_AIBlackboardComponent::GetBool(const FName& EntryName) const
 {
 	const USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(EntryName);

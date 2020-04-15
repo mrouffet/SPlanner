@@ -16,6 +16,14 @@ void USP_AIBlackboardKey_Rotator::SetValue(const FRotator& Value)
 	Handle = Value;
 }
 
+bool USP_AIBlackboardKey_Rotator::Compare(const USP_AIBlackboardKey* OtherKey)
+{
+	const USP_AIBlackboardKey_Rotator* CastedOther = Cast<USP_AIBlackboardKey_Rotator>(OtherKey);
+
+	SP_RCHECK(CastedOther, false, "Other is not of type USP_AIBlackboardKey_Rotator")
+
+	return Handle == CastedOther->Handle;
+}
 void USP_AIBlackboardKey_Rotator::ResetValue(const USP_AIBlackboardKey* OriginalKey)
 {
 	const USP_AIBlackboardKey_Rotator* CastedOther = Cast<USP_AIBlackboardKey_Rotator>(OriginalKey);
