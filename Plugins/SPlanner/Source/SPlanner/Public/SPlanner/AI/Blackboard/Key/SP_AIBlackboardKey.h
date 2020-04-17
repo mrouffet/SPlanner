@@ -16,15 +16,22 @@ class USP_AIBlackboardKey : public UObject
 	GENERATED_BODY()
 
 protected:
-	/** Whether this key should be reset on plan failed. */
+	/** Whether this key should never be reset. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	bool bNeverReset = false;
+
+	/** Whether this key should be reset on plan failed. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "!bNeverReset"), Category = "SPlanner")
 	bool bShouldResetOnPlanFailed = false;
 
 	/** Whether this key should be reset on plan cancelled. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "!bNeverReset"), Category = "SPlanner")
 	bool bShouldResetOnPlanCancelled = false;
 
 public:
+	/** Getter of bNeverReset */
+	bool ShouldNeverReset() const;
+
 	/** Getter of bShouldResetOnPlanFailed */
 	bool ShouldResetOnPlanFailed() const;
 

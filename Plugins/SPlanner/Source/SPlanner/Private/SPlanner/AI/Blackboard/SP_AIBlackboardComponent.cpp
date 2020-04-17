@@ -280,7 +280,8 @@ void USP_AIBlackboardComponent::Reset_Implementation()
 		SP_CCHECK(KeyPtr, "KeyPtr nullptr! Entry with name [%s] not registered!", *Entries[i].Name.ToString())
 		SP_CCHECK_NULLPTR(*KeyPtr)
 
-		ResetValue(Entries[i].Name, *KeyPtr, Entries[i].Key);
+		if(!(*KeyPtr)->ShouldNeverReset())
+			ResetValue(Entries[i].Name, *KeyPtr, Entries[i].Key);
 	}
 }
 void USP_AIBlackboardComponent::ResetPlanFailed_Implementation()
@@ -295,7 +296,7 @@ void USP_AIBlackboardComponent::ResetPlanFailed_Implementation()
 	{
 		SP_CCHECK(Entries[i].Key, "Key nullptr! Entry with name [%s] is nullptr!", *Entries[i].Name.ToString())
 
-		if (!Entries[i].Key->ShouldResetOnPlanFailed())
+		if (Entries[i].Key->ShouldNeverReset() || !Entries[i].Key->ShouldResetOnPlanFailed())
 			continue;
 
 		USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(Entries[i].Name);
@@ -318,7 +319,7 @@ void USP_AIBlackboardComponent::ResetPlanCancelled_Implementation()
 	{
 		SP_CCHECK(Entries[i].Key, "Key nullptr! Entry with name [%s] is nullptr!", *Entries[i].Name.ToString())
 
-		if (!Entries[i].Key->ShouldResetOnPlanCancelled())
+		if (Entries[i].Key->ShouldNeverReset() || !Entries[i].Key->ShouldResetOnPlanCancelled())
 			continue;
 
 		USP_AIBlackboardKey* const* const KeyPtr = Keys.Find(Entries[i].Name);

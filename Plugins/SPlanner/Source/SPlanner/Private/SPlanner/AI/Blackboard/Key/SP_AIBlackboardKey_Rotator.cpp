@@ -36,7 +36,7 @@ USP_AIBlackboardKey* USP_AIBlackboardKey_Rotator::CreateInstance(USP_AIBlackboar
 {
 	SP_RCHECK_NULLPTR(Outer, nullptr)
 
-	USP_AIBlackboardKey_Rotator* NewInstance = NewObject<USP_AIBlackboardKey_Rotator>(Outer);
+	USP_AIBlackboardKey_Rotator* NewInstance = DuplicateObject(this, Outer);
 	NewInstance->Handle = Handle;
 
 	return NewInstance;

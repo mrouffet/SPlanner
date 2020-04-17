@@ -36,7 +36,7 @@ USP_AIBlackboardKey* USP_AIBlackboardKey_Int::CreateInstance(USP_AIBlackboardCom
 {
 	SP_RCHECK_NULLPTR(Outer, nullptr)
 
-	USP_AIBlackboardKey_Int* NewInstance = NewObject<USP_AIBlackboardKey_Int>(Outer);
+	USP_AIBlackboardKey_Int* NewInstance = DuplicateObject(this, Outer);
 	NewInstance->Handle = Handle;
 
 	return NewInstance;
