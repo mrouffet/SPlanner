@@ -50,6 +50,9 @@ protected:
 	UPROPERTY()
 	USP_TaskInfos* TaskInfos;
 
+	// Quick fix bool for LOD SetEnableBehavior.
+	bool bEnableFromLOD = false;
+
 	/**
 	*	Execute the current task of the Plan.
 	*	Use CurrentPlanIndex and Plan.
@@ -70,6 +73,8 @@ protected:
 	*/
 	UFUNCTION(Category = "SPlanner|Planner")
 	void OnInactiveLOD();
+
+	void SetEnableBehavior_Implementation(bool bEnable) override;
 
 	FSP_PlannerActionSet CreatePlannerActionSet(bool* bCanBeAchievedPtr = nullptr) const override;
 

@@ -69,6 +69,7 @@ protected:
 	*	Ask a new plan generation on external thread.
 	*	bInstantRequest force to ask without waiting for TimeBeforeConstructPlan (used when new goal is set).
 	*/
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Planner")
 	virtual void AskNewPlan(bool bInstantRequest = false);
 
 	/** Construct the plan for the plannable. */

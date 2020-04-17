@@ -187,11 +187,32 @@ void USP_AIPlannerComponent::ExecuteTask(float DeltaTime)
 
 void USP_AIPlannerComponent::OnActiveLOD()
 {
+	bEnableFromLOD = true;
 	SetEnableBehavior(true);
 }
 void USP_AIPlannerComponent::OnInactiveLOD()
 {
+	bEnableFromLOD = true;
 	SetEnableBehavior(false);
+}
+
+void USP_AIPlannerComponent::SetEnableBehavior_Implementation(bool bEnable)
+{
+	if (LOD && !bEnableFromLOD)
+	{
+		if (bEnable)
+		{
+			LOD->SetEnableBehavior(true);
+
+			// Only set LOD enable: will trigger Active / Inactive.
+			return;
+		}
+		else
+			LOD->SetEnableBehavior(false);
+	}
+
+	bEnableFromLOD = false;
+	Super::SetEnableBehavior_Implementation(bEnable);
 }
 
 FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(bool* bCanBeAchievedPtr) const
@@ -244,6 +265,13 @@ FSP_PlannerActionSet USP_AIPlannerComponent::CreatePlannerActionSet(bool* bCanBe
 
 void USP_AIPlannerComponent::AskNewPlan(bool bInstantRequest)
 {
+#if SP_DEBUG
+
+	if(LOD)
+		SP_CHECK(LOD->IsLODActive(), "Ask plan while LOD is inactive!")
+
+#endif
+
 	CurrentPlanIndex = 0;
 
 	Super::AskNewPlan(bInstantRequest);

@@ -17,7 +17,7 @@
 	// No Multithread in debug: easy breakpoint debug.
 	#define SP_MULTITHREAD 0
 
-	#define SP_WARNING_PLAN_GEN_FAILED 0
+	#define SP_WARNING_PLAN_GEN_FAILED 1
 
 #else
 
