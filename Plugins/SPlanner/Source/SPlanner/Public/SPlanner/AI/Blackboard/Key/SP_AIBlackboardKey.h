@@ -38,6 +38,9 @@ public:
 	/** Getter of bShouldResetOnPlanCancelled */
 	bool ShouldResetOnPlanCancelled() const;
 
+	/** Whether the entry value is valid. */
+	virtual bool IsValidEntry() const;
+
 	/**
 	*	Compare this key with an other key.
 	*	Must be overridden in children.

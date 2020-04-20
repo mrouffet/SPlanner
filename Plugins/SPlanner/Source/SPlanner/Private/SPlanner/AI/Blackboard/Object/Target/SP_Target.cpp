@@ -149,6 +149,12 @@ void USP_Target::Clear()
 	State = ESP_TargetState::TS_None;
 }
 
+bool USP_Target::IsValidObject() const
+{
+	return IsValid();
+}
+
+
 void USP_Target::Reset(USP_AIBlackboardObject* OriginalObject)
 {
 	SP_CHECK_NULLPTR(OriginalObject)

@@ -4,6 +4,11 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+bool USP_AIBlackboardObject::IsValidObject() const
+{
+	return true;
+}
+
 void USP_AIBlackboardObject::Reset(USP_AIBlackboardObject* OriginalObject)
 {
 	SP_LOG(Warning, "Method must be overridden in children!")

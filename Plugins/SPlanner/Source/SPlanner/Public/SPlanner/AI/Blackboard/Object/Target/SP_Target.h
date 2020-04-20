@@ -114,5 +114,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Target")
 	void Clear();
 
+	bool IsValidObject() const override;
+
 	void Reset(USP_AIBlackboardObject* OriginalObject) override;
 };

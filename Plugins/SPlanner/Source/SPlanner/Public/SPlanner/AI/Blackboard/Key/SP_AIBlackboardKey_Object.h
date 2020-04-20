@@ -28,6 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SPlanner|Blackboard|AI|Key")
 	void SetValue(USP_AIBlackboardObject* Value);
 
+	bool IsValidEntry() const override;
+
 	bool Compare(const USP_AIBlackboardKey* OtherKey) override final;
 	void ResetValue(const USP_AIBlackboardKey* OriginalKey) override final;
 	USP_AIBlackboardKey* CreateInstance(USP_AIBlackboardComponent* Outer) override final;

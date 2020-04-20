@@ -11,6 +11,9 @@ class SPLANNER_API USP_AIBlackboardObject : public UObject
 	GENERATED_BODY()
 
 public:
+	/** Whether this object is valid. */
+	virtual bool IsValidObject() const;
+
 	/**
 	*	Reset this object from original.
 	*	Must be overridden in children.

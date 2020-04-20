@@ -1,6 +1,6 @@
 // Copyright 2020 Maxime ROUFFET. All Rights Reserved.
 
-#include <SPlanner/AI/Decorator/Impl/SP_CheckBlackboardValueAIDecorator.h>
+#include <SPlanner/AI/Decorator/Impl/SP_BBEntryEqualAIDecorator.h>
 
 #include <SPlanner/Debug/SP_Debug.h>
 
@@ -9,7 +9,7 @@
 #include <SPlanner/AI/Blackboard/SP_AIBlackboardComponent.h>
 #include <SPlanner/AI/Blackboard/Key/SP_AIBlackboardKey.h>
 
-bool USP_CheckBlackboardValueAIDecorator::Validate_Internal_Implementation(const UObject* Object)
+bool USP_BBEntryEqualAIDecorator::Validate_Internal_Implementation(const UObject* Object)
 {
 	SP_DECORATOR_SUPER_VALIDATE(Object)
 

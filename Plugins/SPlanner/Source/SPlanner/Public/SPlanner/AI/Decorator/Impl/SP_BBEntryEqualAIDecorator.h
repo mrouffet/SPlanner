@@ -3,15 +3,15 @@
 #pragma once
 
 #include <SPlanner/AI/Decorator/SP_AIPlannerDecorator.h>
-#include "SP_CheckBlackboardValueAIDecorator.generated.h"
+#include "SP_BBEntryEqualAIDecorator.generated.h"
 
 class USP_AIBlackboardKey;
 
 /**
- *	SPlanner decorator check blackboard entry is visible from pawn.
+ *	SPlanner decorator check blackboard entry is equal with parameter.
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, DisplayName = "SP_CheckBlackboardValue", ClassGroup = "SPlanner|Decorator|AI")
-class SPLANNER_API USP_CheckBlackboardValueAIDecorator : public USP_AIPlannerDecorator
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, DisplayName = "SP_BBEntryEqual", ClassGroup = "SPlanner|Decorator|AI")
+class SPLANNER_API USP_BBEntryEqualAIDecorator : public USP_AIPlannerDecorator
 {
 	GENERATED_BODY()
 	

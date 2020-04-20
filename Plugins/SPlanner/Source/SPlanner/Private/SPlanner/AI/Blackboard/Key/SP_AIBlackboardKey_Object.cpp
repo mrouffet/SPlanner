@@ -17,6 +17,11 @@ void USP_AIBlackboardKey_Object::SetValue(USP_AIBlackboardObject* Value)
 	Handle = Value;
 }
 
+bool USP_AIBlackboardKey_Object::IsValidEntry() const
+{
+	return Handle && Handle->IsValidObject();
+}
+
 bool USP_AIBlackboardKey_Object::Compare(const USP_AIBlackboardKey* OtherKey)
 {
 	const USP_AIBlackboardKey_Object* CastedOther = Cast<USP_AIBlackboardKey_Object>(OtherKey);
