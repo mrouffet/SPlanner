@@ -7,6 +7,8 @@
 #include <SPlanner/AI/Task/Impl/Move/SP_MoveBaseTask.h>
 #include "SP_MoveToTask.generated.h"
 
+class ASP_AIController;
+
 class USP_Target;
 class USP_MoveToTaskInfos;
 
@@ -52,6 +54,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Move", meta=(EditCondition="bIsDynamic"))
 	float DynamicUpdateFrequency = -1.0f;
 
+	/** Whether destination should be projected on navmesh. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SPlanner|Task|Move")
+	bool bProjectOnNav = false;
+
+	/** Allowed extents of navmesh projection. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="bProjectOnNav"), Category = "SPlanner|Task|Move")
+	FVector ProjectExtents = FVector(250.0f, 250.0f, 250.0f);
+
 	/**
 	*	Whether precondition should fail if Pawn is already at goal.
 	*	Mostly use true, should use false when using Formation.
@@ -83,7 +93,7 @@ protected:
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type ExecResult);
 
 	/** Implementation of move request creation. */
-	virtual FAIMoveRequest CreateMoveRequest(const USP_Target* Target);
+	virtual FAIMoveRequest CreateMoveRequest(ASP_AIController* Controller, const USP_Target* Target);
 
 	bool PreCondition_Implementation(const USP_PlanGenInfos* Infos) const override;
 
@@ -108,7 +118,6 @@ class SPLANNER_API USP_MoveToTaskInfos : public USP_TaskInfos
 	FNavPathSharedPtr DebugPath;
 #endif
 
-	FAIMoveRequest MoveRequest;
 	AAIController* Controller = nullptr;
 
 	/** The saved previous pawn speed. */

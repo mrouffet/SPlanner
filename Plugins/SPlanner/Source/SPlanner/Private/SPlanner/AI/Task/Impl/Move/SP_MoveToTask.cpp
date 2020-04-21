@@ -2,6 +2,8 @@
 
 #include <SPlanner/AI/Task/Impl/Move/SP_MoveToTask.h>
 
+#include <NavigationSystem.h>
+
 #include <GameFramework/Character.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
@@ -31,11 +33,12 @@ void USP_MoveToTask::SetPawnSpeed_Implementation(APawn* Pawn, float NewSpeed)
 	}
 }
 
-FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
+FAIMoveRequest USP_MoveToTask::CreateMoveRequest(ASP_AIController* Controller, const USP_Target* Target)
 {
 	FAIMoveRequest MoveRequest;
 
 	SP_RCHECK_NULLPTR(Target, MoveRequest)
+	SP_RCHECK_NULLPTR(Controller, MoveRequest)
 
 	 // Target position or non dynamic or frequency update.
 	if (Target->GetState() == ESP_TargetState::TS_Position || !bIsDynamic || DynamicUpdateFrequency > 0.0f)
@@ -46,9 +49,20 @@ FAIMoveRequest USP_MoveToTask::CreateMoveRequest(const USP_Target* Target)
 		SP_LOG(Error, "Bad Target!")
 
 	MoveRequest.SetCanStrafe(bCanStrafe);
-	MoveRequest.SetProjectGoalLocation(true);
+	MoveRequest.SetProjectGoalLocation(true); // Always project on Z axis.
 	MoveRequest.SetUsePathfinding(bUsePathfinding);
 	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
+
+	if (bProjectOnNav)
+	{
+		UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(Controller->GetWorld());
+		const FNavAgentProperties& AgentProps = Controller->GetNavAgentPropertiesRef();
+
+		FNavLocation ProjectedLocation;
+
+		NavSys->ProjectPointToNavigation(MoveRequest.GetGoalLocation(), ProjectedLocation, ProjectExtents, &AgentProps);
+		MoveRequest.UpdateGoalLocation(ProjectedLocation);
+	}
 
 	return MoveRequest;
 }
@@ -154,13 +168,13 @@ bool USP_MoveToTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Plann
 
 
 	// Create MoveRequest.
-	Infos->MoveRequest = CreateMoveRequest(Target);
+	FAIMoveRequest MoveRequest = CreateMoveRequest(Controller, Target);
 
 	// Request movement.
 #if SP_DEBUG
-	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
+	FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest, &Infos->DebugPath);
 #else
-	FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
+	FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest);
 #endif
 
 	if (Request.Code == EPathFollowingRequestResult::Failed)
@@ -241,16 +255,16 @@ ESP_PlanExecutionState USP_MoveToTask::Tick_Internal_Implementation(float DeltaS
 			USP_Target* const Target = Blackboard->GetObject<USP_Target>(TargetEntryName);
 			SP_RCHECK_NULLPTR(Target, ESP_PlanExecutionState::PES_Failed)
 
-			Infos->MoveRequest.SetGoalLocation(Target->GetAnyPosition());
-
 			ASP_AIController* const Controller = Planner->GetController();
 			SP_RCHECK_NULLPTR(Controller, ESP_PlanExecutionState::PES_Failed)
 
+			FAIMoveRequest MoveRequest = CreateMoveRequest(Controller, Target);
+
 			// Request movement.
 			#if SP_DEBUG
-				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest, &Infos->DebugPath);
+				FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest, &Infos->DebugPath);
 			#else
-				FPathFollowingRequestResult Request = Controller->MoveTo(Infos->MoveRequest);
+				FPathFollowingRequestResult Request = Controller->MoveTo(MoveRequest);
 			#endif
 
 			if (Request.Code == EPathFollowingRequestResult::Failed)

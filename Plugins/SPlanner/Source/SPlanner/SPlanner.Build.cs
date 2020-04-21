@@ -24,6 +24,7 @@ public class SPlanner : ModuleRules
 				"CoreUObject",
 
 				"AIModule",
+				"NavigationSystem",
 			}
 		);
 
