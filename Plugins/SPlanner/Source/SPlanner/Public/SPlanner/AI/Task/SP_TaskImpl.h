@@ -71,6 +71,15 @@ protected:
 public:
 	USP_TaskImpl(const FObjectInitializer& ObjectInitializer);
 
+	/** Freeze implementation of the task. */
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Begin", Category = "SPlanner|Task")
+	void Freeze(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
+
+	/** UnFreeze implementation of the task. */
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Begin", Category = "SPlanner|Task")
+	void UnFreeze(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos);
+
+
 	/** Callback method bound to planner. */
 	UFUNCTION(Category = "SPlanner|Task")
 	virtual void OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotify Notify, USP_TaskInfos* TaskInfos);

@@ -349,8 +349,7 @@ void USP_AIPlannerComponent::Freeze_Implementation(float Time)
 		SP_CHECK_NULLPTR(CurrentTask)
 
 		// Cancel current active task.
-		CurrentTask->Cancel(*this, TaskInfos);
-		TaskInfos = nullptr;
+		CurrentTask->Freeze(this, TaskInfos);
 	}
 
 	SetComponentTickEnabled(false);
@@ -360,6 +359,18 @@ void USP_AIPlannerComponent::Freeze_Implementation(float Time)
 }
 void USP_AIPlannerComponent::UnFreeze_Implementation()
 {
+	// Task started.
+	if (TaskInfos)
+	{
+		SP_CHECK(CurrentPlanIndex >= 0 && CurrentPlanIndex < Plan.Num(), "Index [%d] out of range [0, %d[!", CurrentPlanIndex, Plan.Num())
+
+		USP_TaskImpl* CurrentTask = Cast<USP_TaskImpl>(Plan[CurrentPlanIndex]);
+		SP_CHECK_NULLPTR(CurrentTask)
+
+		// Cancel current active task.
+		CurrentTask->UnFreeze(this, TaskInfos);
+	}
+
 	SetComponentTickEnabled(true);
 
 	GetWorld()->GetTimerManager().ClearTimer(FrozenTimer);

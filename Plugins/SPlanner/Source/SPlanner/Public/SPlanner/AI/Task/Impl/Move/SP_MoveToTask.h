@@ -101,6 +101,9 @@ protected:
 	ESP_PlanExecutionState Tick_Internal_Implementation(float DeltaSeconds, USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 	bool End_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
 
+	void Freeze_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+	void UnFreeze_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos) override;
+
 public:
 	USP_MoveToTask(const FObjectInitializer& ObjectInitializer);
 };

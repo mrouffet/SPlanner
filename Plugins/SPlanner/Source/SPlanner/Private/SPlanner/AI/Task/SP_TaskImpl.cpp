@@ -203,3 +203,10 @@ bool USP_TaskImpl::End_Internal_Implementation(USP_AIPlannerComponent* Planner, 
 
 	return true;
 }
+
+void USP_TaskImpl::Freeze_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+{
+}
+void USP_TaskImpl::UnFreeze_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+{
+}

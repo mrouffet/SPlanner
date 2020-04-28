@@ -320,3 +320,17 @@ bool USP_MoveToTask::End_Internal_Implementation(USP_AIPlannerComponent* Planner
 
 	return true;
 }
+
+void USP_MoveToTask::Freeze_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+{
+	USP_MoveToTaskInfos* const Infos = Cast<USP_MoveToTaskInfos>(TaskInfos);
+	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_MoveToTaskInfos")
+
+	Infos->bForcedEnd = true;
+	
+	End_Internal(Planner, TaskInfos);
+}
+void USP_MoveToTask::UnFreeze_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
+{
+	Begin_Internal(Planner, TaskInfos);
+}
