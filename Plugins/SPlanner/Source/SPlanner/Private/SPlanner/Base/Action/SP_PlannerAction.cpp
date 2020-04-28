@@ -16,7 +16,7 @@ FSP_PlannerAction FSP_PlannerAction::Make(const USP_PlannerComponent* Planner, c
 	USP_FloatCurveParamInfos* WeightInfos = nullptr;
 
 	// Should create float curve infos. TODO: CLEAN.
-	if (Cast<USP_FloatCurveParam>(Action->Weight))
+	if (Action->GenerationType == ESP_ActionGenerationType::AGT_RandomWeight && Cast<USP_FloatCurveParam>(Action->Weight))
 	{
 		WeightInfos = NewObject<USP_FloatCurveParamInfos>();
 
@@ -35,10 +35,12 @@ FSP_PlannerAction FSP_PlannerAction::Make(const USP_PlannerComponent* Planner, c
 
 FSP_PlannerAction FSP_PlannerAction::Make(const USP_PlannerComponent* Planner, const FSP_PlannerAction& Other)
 {
+	SP_SRCHECK_NULLPTR(Other.Handle, FSP_PlannerAction())
+
 	USP_FloatCurveParamInfos* WeightInfos = nullptr;
 
 	// Should create float curve infos. TODO: CLEAN.
-	if (Cast<USP_FloatCurveParam>(Other.Handle->Weight))
+	if (Other.Handle->GenerationType == ESP_ActionGenerationType::AGT_RandomWeight && Cast<USP_FloatCurveParam>(Other.Handle->Weight))
 	{
 		WeightInfos = NewObject<USP_FloatCurveParamInfos>();
 
