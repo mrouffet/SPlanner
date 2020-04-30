@@ -32,7 +32,11 @@ bool USP_ChainTask::PreCondition_Implementation(const USP_PlanGenInfos* Infos) c
 			// PostCondition failed: Reset all previously set.
 
 			for (int j = i - 1; j >= 0; --j)
+			{
+				SP_CCHECK_NULLPTR(Tasks[j], false)
+
 				Tasks[j]->ResetPostCondition(NonConstPlanGenInfos);
+			}
 
 			return false;
 		}
@@ -65,7 +69,11 @@ bool USP_ChainTask::PostCondition_Implementation(USP_PlanGenInfos* Infos) const
 			// Post Condition failed: Reset all previously set.
 
 			for (int j = i - 1; j >= 0; --j)
+			{
+				SP_CCHECK_NULLPTR(Tasks[j], false)
+
 				Tasks[j]->ResetPostCondition(Infos);
+			}
 
 			return false;
 		}
