@@ -8,23 +8,21 @@ float USP_FloatParams::Query_Implementation(const UObject* Outer) const
 {
 	float Value = Super::Query_Implementation(Outer);
 
-	// Compute average inputs.
-	float AverageInput = 0.0f;
+	float TotalInput = 0.0f;
 
-	// Multiply by average input.
 	if (Inputs.Num())
 	{
-		float Input = 0.0f;
-
 		for (int i = 0; i < Inputs.Num(); ++i)
 		{
 			SP_CCHECK_NULLPTR(Inputs[i])
 
-			Input += Inputs[i]->QueryFloat(Outer);
+			TotalInput += Inputs[i]->QueryFloat(Outer);
 		}
 
-		AverageInput = Input / Inputs.Num();
+		// Compute average inputs.
+		if (bUseAverage)
+			TotalInput /= Inputs.Num();
 	}
 
-	return Value + AverageInput;
+	return Value + TotalInput;
 }

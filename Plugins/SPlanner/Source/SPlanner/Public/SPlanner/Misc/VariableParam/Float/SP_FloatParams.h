@@ -17,6 +17,10 @@ protected:
 	float Query_Implementation(const UObject* Outer) const override;
 
 public:
+	/** Whether to compute the average value of all inputs. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bUseAverage = false;
+
 	/**
 	*	Additionnal input values.
 	*	The average input value will be computed and then multiplied to the current value.

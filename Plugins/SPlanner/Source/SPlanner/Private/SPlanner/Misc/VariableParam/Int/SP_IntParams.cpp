@@ -8,23 +8,21 @@ int USP_IntParams::Query_Implementation(const UObject* Outer) const
 {
 	int Value = Super::Query_Implementation(Outer);
 
-	// Compute average inputs.
-	int AverageInput = 0.0f;
+	int TotalInput = 0;
 
-	// Multiply by average input.
 	if (Inputs.Num())
 	{
-		int Input = 0.0f;
-
 		for (int i = 0; i < Inputs.Num(); ++i)
 		{
 			SP_CCHECK_NULLPTR(Inputs[i])
 
-			Input += Inputs[i]->QueryInt(Outer);
+			TotalInput += Inputs[i]->QueryInt(Outer);
 		}
 
-		AverageInput = Input / Inputs.Num();
+		// Compute average inputs.
+		if (bUseAverage)
+			TotalInput /= Inputs.Num();
 	}
 
-	return Value + AverageInput;
+	return Value + TotalInput;
 }

@@ -18,6 +18,10 @@ class SPLANNER_API USP_FloatInputsParam : public USP_FloatParam
 	float Query_Implementation(const UObject* Outer) const override;
 
 public:
+	/** Whether to compute the average value of all inputs. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bUseAverage = false;
+
 	/**
 	*	Additionnal input values.
 	*	The average input value will be computed and then multiplied to the current value.
