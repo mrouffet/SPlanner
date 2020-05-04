@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType, ClassGroup = "SPlanner|Task|Notify")
 class SPLANNER_API USP_WaitForNotifyTask : public USP_TaskImpl
 {
 	GENERATED_BODY()
@@ -24,6 +24,7 @@ protected:
 public:
 	USP_WaitForNotifyTask(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable, Category = "SPlanner|Task|Notify")
 	void Notify();
 };
 
