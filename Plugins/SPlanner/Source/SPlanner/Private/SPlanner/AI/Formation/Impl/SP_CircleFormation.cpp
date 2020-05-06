@@ -60,6 +60,8 @@ void USP_CircleFormation::ConstructDichotomy(FSP_FormationInfos& Infos)
 	// Apply computed angles and total correction to offsets.
 	for (int i = 0; i < Infos.PlannerInfos.Num(); ++i)
 	{
+		SP_CCHECK(i < OffsetAngles.Num(), "OffsetAngles OutOfRange!")
+
 		float CurrAngleNoise = FMath::FRandRange(-1.0f, 1.0f) * AngleNoise;
 		float CurrDistNoise = FMath::FRandRange(-1.0f, 1.0f) * DistanceNoise;
 
