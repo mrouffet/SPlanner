@@ -131,7 +131,8 @@ void USP_ChainTask::OnNotify(USP_AIPlannerComponent* Planner, ESP_AIPlannerNotif
 	USP_ChainTaskInfos* const Infos = Cast<USP_ChainTaskInfos>(TaskInfos);
 	SP_CHECK(Infos, "Infos nullptr! TaskInfos must be of type USP_ChainTaskInfos")
 
-	Tasks[Infos->Index]->OnNotify(Planner, Notify, Infos->TaskInfos);
+	if (Infos->bSubHasStarted)
+		Tasks[Infos->Index]->OnNotify(Planner, Notify, Infos->TaskInfos);
 }
 
 bool USP_ChainTask::Begin_Internal_Implementation(USP_AIPlannerComponent* Planner, USP_TaskInfos* TaskInfos)
@@ -161,11 +162,13 @@ ESP_PlanExecutionState USP_ChainTask::Tick_Internal_Implementation(float DeltaSe
 
 	// Tick current task.
 	ESP_PlanExecutionState TickResult = Tasks[Infos->Index]->Tick(DeltaSeconds, *Planner, Infos->TaskInfos);
+	Infos->bSubHasStarted = true;
 
 	if (TickResult != ESP_PlanExecutionState::PES_Succeed)
 		return TickResult; // Failed or rurnning.
 
 	// Tick succeeded.
+	Infos->bSubHasStarted = false;
 
 	// All task ended with success.
 	if (++Infos->Index == Tasks.Num())

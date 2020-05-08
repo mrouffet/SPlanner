@@ -51,6 +51,8 @@ class USP_ChainTaskInfos : public USP_TaskInfos
 
 	int Index = 0;
 
+	bool bSubHasStarted = false;
+
 public:
 	/**
 	*	Current executed task infos.
