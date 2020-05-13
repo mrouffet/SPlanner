@@ -224,63 +224,63 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSP_Debug, Log, All);
 #define SP_WFILE_NAME L""
 #define SP_WFUNCTION_NAME L""
 
-#define SP_LOG(...)
-#define SP_LOG_SCREEN(...)
-#define SP_LOG_SCREEN_FULL(...)
+#define SP_LOG(...) {}
+#define SP_LOG_SCREEN(...) {}
+#define SP_LOG_SCREEN_FULL(...) {}
 
 
-#define SP_CHECK_FULL(...)
-#define SP_CHECK(...)
+#define SP_CHECK_FULL(...) {}
+#define SP_CHECK(...) {}
 
-#define SP_CHECK_NULLPTR(...)
-#define SP_CHECK_GAMESTATE(...)
-#define SP_CHECK_AUTHORITY(...)
-#define SP_CHECK_OWNER(...)
-
-
-#define SP_RCHECK(...)
-
-#define SP_RCHECK_NULLPTR(...)
-#define SP_RCHECK_GAMESTATE(...)
-#define SP_RCHECK_AUTHORITY(...)
-#define SP_RCHECK_OWNER(...)
+#define SP_CHECK_NULLPTR(...) {}
+#define SP_CHECK_GAMESTATE(...) {}
+#define SP_CHECK_AUTHORITY(...) {}
+#define SP_CHECK_OWNER(...) {}
 
 
-#define SP_CCHECK(...)
+#define SP_RCHECK(...) {}
 
-#define SP_CCHECK_NULLPTR(...)
-#define SP_CCHECK_GAMESTATE(...)
-#define SP_CCHECK_AUTHORITY(...)
-#define SP_CCHECK_OWNER(...)
-
-
-#define SP_SLOG(...)
-#define SP_SLOG_SCREEN(...)
-#define SP_SLOG_SCREEN_FULL(...)
+#define SP_RCHECK_NULLPTR(...) {}
+#define SP_RCHECK_GAMESTATE(...) {}
+#define SP_RCHECK_AUTHORITY(...) {}
+#define SP_RCHECK_OWNER(...) {}
 
 
-#define SP_SCHECK_FULL(...)
-#define SP_SCHECK(...)
+#define SP_CCHECK(...) {}
 
-#define SP_SCHECK_NULLPTR(...)
-#define SP_SCHECK_GAMESTATE(...)
-#define SP_SCHECK_AUTHORITY(...)
-#define SP_SCHECK_OWNER(...)
-
-
-#define SP_SRCHECK(...)
-
-#define SP_SRCHECK_NULLPTR(...)
-#define SP_SRCHECK_GAMESTATE(...)
-#define SP_SRCHECK_AUTHORITY(...)
-#define SP_SRCHECK_OWNER(...)
+#define SP_CCHECK_NULLPTR(...) {}
+#define SP_CCHECK_GAMESTATE(...) {}
+#define SP_CCHECK_AUTHORITY(...) {}
+#define SP_CCHECK_OWNER(...) {}
 
 
-#define SP_SCCHECK(...)
+#define SP_SLOG(...) {}
+#define SP_SLOG_SCREEN(...) {}
+#define SP_SLOG_SCREEN_FULL(...) {}
 
-#define SP_SCCHECK_NULLPTR(...)
-#define SP_SCCHECK_GAMESTATE(...)
-#define SP_SCCHECK_AUTHORITY(...)
-#define SP_SCCHECK_OWNER(...)
+
+#define SP_SCHECK_FULL(...) {}
+#define SP_SCHECK(...) {}
+
+#define SP_SCHECK_NULLPTR(...) {}
+#define SP_SCHECK_GAMESTATE(...) {}
+#define SP_SCHECK_AUTHORITY(...) {}
+#define SP_SCHECK_OWNER(...) {}
+
+
+#define SP_SRCHECK(...) {}
+
+#define SP_SRCHECK_NULLPTR(...) {}
+#define SP_SRCHECK_GAMESTATE(...) {}
+#define SP_SRCHECK_AUTHORITY(...) {}
+#define SP_SRCHECK_OWNER(...) {}
+
+
+#define SP_SCCHECK(...) {}
+
+#define SP_SCCHECK_NULLPTR(...) {}
+#define SP_SCCHECK_GAMESTATE(...) {}
+#define SP_SCCHECK_AUTHORITY(...) {}
+#define SP_SCCHECK_OWNER(...) {}
 
 #endif

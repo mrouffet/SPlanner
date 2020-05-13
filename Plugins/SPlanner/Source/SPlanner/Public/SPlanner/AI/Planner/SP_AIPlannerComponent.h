@@ -78,8 +78,6 @@ protected:
 
 	FSP_PlannerActionSet CreatePlannerActionSet(bool* bCanBeAchievedPtr = nullptr) const override;
 
-	void AskNewPlan(bool bInstantRequest = false) override;
-
 	/**
 	*	Construction plan method.
 	*	Use linear plan construction algorithm.
@@ -181,7 +179,8 @@ public:
 		return Cast<T>(GetPawn());
 	}
 
-	
+	void AskNewPlan(bool bInstantRequest = false) override;
+
 	/** Callback function called when the plan execution failed. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SPlanner|Planner")
 	void OnPlanFailed();

@@ -2,10 +2,12 @@
 
 #include <SPlanner/AI/Task/Impl/ChooseTarget/SP_ChooseTargetTask.h>
 
-#if SP_DEBUG
+#if SP_DEBUG_EDITOR
 	#include <DrawDebugHelpers.h>
 	#include <Kismet/KismetSystemLibrary.h>
 #endif
+
+#include <GameFramework/Pawn.h>
 
 #include <SPlanner/AI/Blackboard/Object/Target/SP_Target.h>
 

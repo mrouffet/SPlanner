@@ -2,10 +2,13 @@
 
 #include <SPlanner/Debug/SP_Debug.h>
 
+#if SP_DEBUG_LOG
 DEFINE_LOG_CATEGORY(LogSP_Debug);
+#endif
 
 void USP_Debug::Log(UObject* Caller, const FString& Str, ESP_DebugVerbosity Verbosity)
 {
+#if SP_DEBUG_LOG
 	SP_SCHECK_NULLPTR(Caller)
 
 	switch (Verbosity)
@@ -24,11 +27,12 @@ void USP_Debug::Log(UObject* Caller, const FString& Str, ESP_DebugVerbosity Verb
 		UE_LOG(LogSP_Debug, Display, TEXT("%s: %s"), *Caller->GetName(), *Str)
 		break;
 	}
-
+#endif
 }
 
 void USP_Debug::LogScreen(UObject* Caller, const FString& Str, ESP_DebugVerbosity Verbosity)
 {
+#if SP_DEBUG_LOG
 	SP_SCHECK_NULLPTR(Caller)
 
 	switch (Verbosity)
@@ -51,10 +55,12 @@ void USP_Debug::LogScreen(UObject* Caller, const FString& Str, ESP_DebugVerbosit
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, Str);
 		break;
 	}
+#endif
 }
 
 void USP_Debug::LogScreenFull(UObject* Caller, const FString& Str, ESP_DebugVerbosity Verbosity, FLinearColor Color, float Time)
 {
+#if SP_DEBUG_LOG
 	SP_SCHECK_NULLPTR(Caller)
 
 	switch (Verbosity)
@@ -77,4 +83,5 @@ void USP_Debug::LogScreenFull(UObject* Caller, const FString& Str, ESP_DebugVerb
 		GEngine->AddOnScreenDebugMessage(-1, Time, Color.ToFColor(true), Str);
 		break;
 	}
+#endif
 }

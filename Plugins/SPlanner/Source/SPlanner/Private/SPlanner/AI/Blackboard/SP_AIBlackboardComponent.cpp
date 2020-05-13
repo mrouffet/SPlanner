@@ -340,6 +340,12 @@ void USP_AIBlackboardComponent::InitializeBlackboard_Implementation()
 	USP_AIBlackboardAsset* const AIBlackboardAsset = Cast<USP_AIBlackboardAsset>(BlackboardAsset);
 	SP_CHECK(AIBlackboardAsset, "AIBlackboardAsset nullptr! Blackboard asset must be of type USP_AIBlackboardAsset.")
 
+#if WITH_EDITOR
+		// Blueprint Editing always return nullptr. Double check for Release in editor config.
+		if (!BlackboardAsset)
+			return;
+#endif
+
 	const TArray<FSP_AIBlackboardEntry>& Entries = AIBlackboardAsset->GetEntries();
 
 	for (int i = 0; i < Entries.Num(); ++i)
