@@ -23,22 +23,22 @@ namespace SP
 	}
 
 
-	bool ActionHandle::ValidatePreCondition() const
+	bool ActionHandle::ValidatePreCondition(void* _userData) const
 	{
 		for (auto cond : preconditions)
 		{
-			if (!cond->Validate())
+			if (!cond->Validate(_userData))
 				return false;
 		}
 
 		return true;
 	}
 
-	bool ActionHandle::ValidatePostCondition() const
+	bool ActionHandle::ValidatePostCondition(void* _userData) const
 	{
 		for (auto cond : postconditions)
 		{
-			if (!cond->Validate())
+			if (!cond->Validate(_userData))
 				return false;
 		}
 

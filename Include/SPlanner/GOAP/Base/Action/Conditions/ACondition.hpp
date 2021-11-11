@@ -12,7 +12,7 @@ namespace SP
 	public:
 		virtual ~ACondition() = default;
 
-		virtual bool Validate() const = 0;
+		virtual bool Validate(void* _userData) const = 0;
 	};
 }
 

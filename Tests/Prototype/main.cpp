@@ -36,10 +36,6 @@ int main()
 {
 	SP::logCallback = LogCallback;
 
-	SP_LOG("Hello, World", Normal);
-
-	SP_CHECK(nullptr, "Invalid I", Infos);
-
 	Init();
 
 	UnInit();
