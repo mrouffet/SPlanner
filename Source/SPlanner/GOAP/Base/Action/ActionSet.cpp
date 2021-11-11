@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include <Collections/Debug>
+
 #include <GOAP/Base/Action/Weights/Generators/AWeightGenerator.hpp>
 
 namespace SP
@@ -22,7 +24,7 @@ namespace SP
 
 	std::vector<const ActionHandle*> ActionSet::Shuffle(AWeightGenerator* _gen) const
 	{
-		// TODO: Check gen nullptr.
+		SP_RCHECK(_gen, "Invalid argument: AWeightGenerator nullptr!", Error, {});
 
 		std::vector<WeightedAction> weightActions;
 		weightActions.reserve(actionHandles.size());

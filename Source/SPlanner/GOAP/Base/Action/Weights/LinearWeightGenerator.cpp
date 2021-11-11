@@ -2,6 +2,8 @@
 
 #include <GOAP/Base/Action/Weights/Generators/LinearWeightGenerator.hpp>
 
+#include <Collections/Debug>
+
 namespace SP
 {
 	LinearWeightGenerator::LinearWeightGenerator(uint32_t _seed) :
@@ -12,11 +14,7 @@ namespace SP
 
 	float LinearWeightGenerator::Generate(const AWeight* _weight)
 	{
-		if (!_weight)
-		{
-			// TODO: Add log.
-			return AWeight::defaultValue;
-		}
+		SP_RCHECK(_weight, "Weight nullptr", Error, AWeight::defaultValue);
 
 		const float random = static_cast<float>(mDist(mEngine));
 
