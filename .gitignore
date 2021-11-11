@@ -1,0 +1,39 @@
+# Copyright (c) 2021 Maxime "mrouffet" ROUFFET. All Rights Reserved.
+
+# Visual Studio cache.
+.vs/
+
+
+# Vim cache.
+*.swp
+
+
+# CMake cache.
+CMakeFiles/
+CMakeCache.txt
+CMakeSettings.json
+Makefile
+*.cmake
+
+
+# Build and Temp files.
+[Bb]uild/
+[Bb]uilds/
+
+[Bb]in/
+
+[Tt]emp/
+[Tt]emps/
+[Tt]emporary/
+
+*.tmp
+
+
+# Log files
+[Ll]ogs/
+
+
+# Documentation generated files
+[Dd]oc/
+html/
+latex/
