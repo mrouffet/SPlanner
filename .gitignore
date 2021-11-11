@@ -34,6 +34,5 @@ Makefile
 
 
 # Documentation generated files
-[Dd]oc/
-html/
-latex/
+Doc/html/
+Doc/latex/
