@@ -10,6 +10,8 @@ namespace SP
 	class AWeight
 	{
 	public:
+		static constexpr float defaultValue = 1.0f;
+
 		virtual ~AWeight() = default;
 
 		virtual float GetWeight() const = 0;

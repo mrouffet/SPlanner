@@ -11,10 +11,14 @@
 
 namespace SP
 {
+	class AWeightGenerator;
+
 	class ActionSet
 	{
 	public:
 		std::vector<ActionHandle> actionHandles;
+
+		std::vector<const ActionHandle*> Shuffle(AWeightGenerator* _gen) const;
 	};
 }
 
