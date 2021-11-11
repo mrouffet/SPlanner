@@ -4,6 +4,7 @@
 
 #define LOG(_str) std::cout << _str << std::endl;
 
+#include <SPlanner/Collections/Debug>
 #include <SPlanner/GOAP/Base/Action/ActionSetMap.hpp>
 using namespace SP;
 
@@ -14,6 +15,9 @@ AGoal idleGoal;
 ActionSet idleSet;
 
 ActionSetMap actionSetMap;
+
+void LogCallback(const SP::Log& _log);
+
 
 void Init()
 {
@@ -26,8 +30,16 @@ void UnInit()
 	actionSetMap.Clear();
 }
 
+
+
 int main()
 {
+	SP::logCallback = LogCallback;
+
+	SP_LOG("Hello, World", Normal);
+
+	SP_CHECK(nullptr, "Invalid I", Infos);
+
 	Init();
 
 	UnInit();
@@ -39,4 +51,30 @@ int main()
 #endif
 
 	return 0;
+}
+
+void LogCallback(const SP::Log& _log)
+{
+	std::string level;
+
+	switch (_log.level)
+	{
+		case LogLevel::Normal:
+			level = "[Normal]";
+			break;
+		case LogLevel::Infos:
+			level = "[Infos]";
+			break;
+		case LogLevel::Warning:
+			level = "[Warning]";
+			break;
+		case LogLevel::Error:
+			level = "[Error]";
+			break;
+		default:
+			level = "[Unknown]";
+			break;
+	}
+
+	LOG(level << " in " << _log.function << " at " << _log.file << ":" << _log.line << ":\n" << _log.message);
 }

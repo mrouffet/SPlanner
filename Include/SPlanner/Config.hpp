@@ -12,19 +12,6 @@
 */
 
 
-#if !defined(NDEBUG) || defined(_DEBUG)
-
-	/// SPlanner Debug preprocessor.
-	#define SP_DEBUG 1
-
-#else
-
-	/// SPlanner Debug preprocessor.
-	#define SP_DEBUG 0
-
-#endif
-
-
 /// SPlanner global namespace
 namespace SP
 {
