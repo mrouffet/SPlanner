@@ -1,6 +1,13 @@
 # Copyright (c) 2021 Maxime "mrouffet" ROUFFET. All Rights Reserved.
 
-# Visual Studio cache.
+# Visual Studio solutions
+
+*.sdf
+*.opensdf
+*.suo
+*.dp
+*.sln
+*.tmp
 .vs/
 
 
@@ -36,3 +43,12 @@ Makefile
 # Documentation generated files
 Doc/html/
 Doc/latex/
+
+
+# UE4 Project directories to ignore
+
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
