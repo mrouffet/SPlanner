@@ -1,18 +1,18 @@
 // Copyright(c) 2021 Maxime "mrouffet" ROUFFET. All Rights Reserved.
 
-#include <GOAP/Base/Action/Weights/Generators/LinearWeightGenerator.hpp>
+#include <GOAP/Base/Action/Weights/Distributions/RandomWeightDistribution.hpp>
 
 #include <Collections/Debug>
 
 namespace SP
 {
-	LinearWeightGenerator::LinearWeightGenerator(uint32_t _seed) :
+	RandomWeightDistribution::RandomWeightDistribution(uint32_t _seed) :
 		mDist{ 0.0, 1.0 }, // Random between 0 and 1.
 		mEngine{ _seed != uint32_t(-1) ? _seed : std::random_device()() } // Use provided seed or generate random seed.
 	{
 	}
 
-	float LinearWeightGenerator::Generate(const AWeight* _weight)
+	float RandomWeightDistribution::Generate(const AWeight* _weight)
 	{
 		SP_RCHECK(_weight, "Weight nullptr", Error, AWeight::defaultValue);
 

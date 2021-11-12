@@ -6,7 +6,7 @@
 
 #include <Collections/Debug>
 
-#include <GOAP/Base/Action/Weights/Generators/AWeightGenerator.hpp>
+#include <GOAP/Base/Action/Weights/Distributions/AWeightDistribution.hpp>
 
 namespace SP
 {
@@ -22,16 +22,16 @@ namespace SP
 		}
 	};
 
-	std::vector<const ActionHandle*> ActionSet::Shuffle(AWeightGenerator* _gen) const
+	std::vector<const ActionHandle*> ActionSet::Shuffle(AWeightDistribution* _dist) const
 	{
-		SP_RCHECK(_gen, "Invalid argument: AWeightGenerator nullptr!", Error, {});
+		SP_RCHECK(_dist, "Invalid argument: AWeightGenerator nullptr!", Error, {});
 
 		std::vector<WeightedAction> weightActions;
 		weightActions.reserve(actionHandles.size());
 		
 		// Generate weight for index.
 		for (size_t i = 0; i < actionHandles.size(); ++i)
-			weightActions.emplace_back(WeightedAction{ i, _gen->Generate(actionHandles[i].weight.get()) });
+			weightActions.emplace_back(WeightedAction{ i, _dist->Generate(actionHandles[i].weight.get()) });
 
 		// Sort by weights.
 		std::sort(weightActions.begin(), weightActions.end());

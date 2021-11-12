@@ -2,14 +2,14 @@
 
 #pragma once
 
-#ifndef SPLANNER_GOAP_AWEIGHT_GENERATOR_GUARD
-#define SPLANNER_GOAP_AWEIGHT_GENERATOR_GUARD
+#ifndef SPLANNER_GOAP_AWEIGHT_DISTRIBUTION_GUARD
+#define SPLANNER_GOAP_AWEIGHT_DISTRIBUTION_GUARD
 
 #include <SPlanner/GOAP/Base/Action/Weights/AWeight.hpp>
 
 namespace SP
 {
-	class AWeightGenerator
+	class AWeightDistribution
 	{
 	public:
 		virtual float Generate(const AWeight* _weight) = 0;
