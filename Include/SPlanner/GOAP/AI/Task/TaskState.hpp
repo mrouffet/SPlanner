@@ -5,7 +5,7 @@
 #ifndef SPLANNER_GOAP_TASK_STATE_GUARD
 #define SPLANNER_GOAP_TASK_STATE_GUARD
 
-namespace SP
+namespace SP::AI
 {
 	enum class TaskState
 	{

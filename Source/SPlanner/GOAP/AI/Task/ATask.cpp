@@ -2,7 +2,7 @@
 
 #include <GOAP/AI/Task/ATask.hpp>
 
-namespace SP
+namespace SP::AI
 {
 	bool ATask::Begin()
 	{

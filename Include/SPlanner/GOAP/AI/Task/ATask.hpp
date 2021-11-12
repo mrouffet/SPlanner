@@ -5,11 +5,13 @@
 #ifndef SPLANNER_GOAP_ATASK_GUARD
 #define SPLANNER_GOAP_ATASK_GUARD
 
+#include <SPlanner/GOAP/Base/Action/AAction.hpp>
+
 #include <SPlanner/GOAP/AI/Task/TaskState.hpp>
 
-namespace SP
+namespace SP::AI
 {
-	class ATask
+	class ATask : public AAction
 	{
 	public:
 		virtual bool Begin();
