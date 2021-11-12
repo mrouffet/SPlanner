@@ -23,7 +23,7 @@ namespace SP
 	}
 
 
-	bool ActionHandle::ValidatePreCondition(void* _userData) const
+	bool ActionHandle::ValidatePreConditions(void* _userData) const
 	{
 		for (auto cond : preconditions)
 		{
@@ -34,7 +34,7 @@ namespace SP
 		return true;
 	}
 
-	bool ActionHandle::ValidatePostCondition(void* _userData) const
+	bool ActionHandle::ValidatePostConditions(void* _userData) const
 	{
 		for (auto cond : postconditions)
 		{

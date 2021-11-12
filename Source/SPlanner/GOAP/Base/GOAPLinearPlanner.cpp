@@ -6,11 +6,11 @@
 
 namespace SP
 {
-	std::vector<AAction*> GOAPLinearPlanner::Generate(const GenInfos& _infos)
+	std::vector<const AAction*> GOAPLinearPlanner::Generate(const GenInfos& _infos)
 	{
-		std::vector<AAction*> result;
+		std::vector<const AAction*> result;
 
-		if (!Generate_Internal(_infos, _outPlan))
+		if (!Generate_Internal(_infos, result))
 		{
 			SP_LOG("Plan Generation Failed!", Warning);
 		}
@@ -18,16 +18,16 @@ namespace SP
 		return result;
 	}
 
-	bool GOAPLinearPlanner::Generate_Internal(const GenInfos& _infos, std::vector<AAction*>& _outPlan, uint32_t _actionIndex, uint32_t _currDepth)
+	bool GOAPLinearPlanner::Generate_Internal(const GenInfos& _infos, std::vector<const AAction*>& _outPlan, uint32_t _actionIndex, uint32_t _currDepth)
 	{
 		if (_currDepth > _infos.maxDepth)
 			return false;
 
-		for (size_t i = _actionIndex; i < _infos.shuffledActions.size(); ++i)
+		for (uint32_t i = _actionIndex; i < (uint32_t)_infos.shuffledActions.size(); ++i)
 		{
-			ActionHandle& action = _infos.shuffledActions[i];
+			const ActionHandle& action = *_infos.shuffledActions[i];
 
-			if (action.ValidatePreCondition(_infos.userData) || action.ValidatePostCondition(_infos.userData))
+			if (action.ValidatePreConditions(_infos.userData) || action.ValidatePostConditions(_infos.userData))
 			{
 				_outPlan.emplace_back(action.action.get());
 

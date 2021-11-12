@@ -11,10 +11,10 @@ namespace SP
 {
 	class GOAPLinearPlanner : public AGOAPPlanner
 	{
-		bool Generate_Internal(const GenInfos& _infos, std::vector<AAction*>& _outPlan, uint32_t _actionIndex = 0u, uint32_t _currDepth = 0u);
+		bool Generate_Internal(const GenInfos& _infos, std::vector<const AAction*>& _outPlan, uint32_t _actionIndex = 0u, uint32_t _currDepth = 0u);
 
 	public:
-		std::vector<AAction*> Generate(const GenInfos& _infos) override final;
+		std::vector<const AAction*> Generate(const GenInfos& _infos) override final;
 	};
 }
 

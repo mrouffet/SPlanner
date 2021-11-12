@@ -21,14 +21,14 @@ namespace SP
 			*	Max planner algorithm depth.
 			*	Set to -1 for maximum depth.
 			*/
-			int maxDepth = -1;
+			uint32_t maxDepth = uint32_t(-1);
 
 			void* userData = nullptr;
 
 			std::vector<ActionHandle*> shuffledActions;
 		};
 
-		virtual std::vector<AAction*> Generate(const GenInfos& _infos) = 0;
+		virtual std::vector<const AAction*> Generate(const GenInfos& _infos) = 0;
 	};
 }
 

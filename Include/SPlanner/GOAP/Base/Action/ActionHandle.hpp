@@ -33,8 +33,8 @@ namespace SP
 
 		~ActionHandle();
 
-		bool ValidatePreCondition(void* _userData) const;
-		bool ValidatePostCondition(void* _userData) const;
+		bool ValidatePreConditions(void* _userData) const;
+		bool ValidatePostConditions(void* _userData) const;
 	};
 }
 
