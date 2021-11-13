@@ -4,8 +4,17 @@
 
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(SPlanner, Log, All);
+
+namespace SP
+{
+	class Log;
+}
+
 class FSPlannerModule : public IModuleInterface
 {
+	static void API_LogCallback(const SP::Log& _log);
+
 public:
 
 	/** IModuleInterface implementation */
