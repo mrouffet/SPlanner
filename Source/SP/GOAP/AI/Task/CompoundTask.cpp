@@ -8,20 +8,20 @@ namespace SP
 {
 	namespace AI
 	{
-		void* CompoundTask::InstantiateData() const
+		TaskData* CompoundTask::InstantiateData() const
 		{
-			return new CompoundTaskData();
+			return new CompoundTaskData{};
 		}
 
-		void CompoundTask::DeleteData(void* _data) const
+		void CompoundTask::DeleteData(TaskData* _data) const
 		{
-			SP_RCHECK(_data, "Nullptr task data.", Error, );
+			SP_RCHECK(_data, "Nullptr task data.", Error,);
 
 			delete static_cast<CompoundTaskData*>(_data);
 		}
 
 
-		bool CompoundTask::Begin(void* _data) const
+		bool CompoundTask::Begin(TaskData* _data) const
 		{
 			if (tasks.empty())
 			{
@@ -32,35 +32,34 @@ namespace SP
 			SP_RCHECK(_data, "Nullptr task data.", Error, false);
 			auto& taskData = *static_cast<CompoundTaskData*>(_data);
 
-			// Begin first task.
+			// Instantiate first task data.
 
 			SP_RCHECK(tasks.front(), "Nullptr task registered", Error, false);
 			ATask& subTask = *tasks.front();
 
 			taskData.subData = subTask.InstantiateData();
-			return subTask.Begin(taskData.subData);
+
+			return true;
 		}
 
-		bool CompoundTask::End(TaskState _state, void* _data) const
+		bool CompoundTask::End(TaskState _state, TaskData* _data) const
 		{
 			SP_RCHECK(_data, "Nullptr task data.", Error, false);
-
 			auto& taskData = *static_cast<CompoundTaskData*>(_data);
 
-			// End last task.
+			if (_state == TaskState::ForceEnd)
+			{
+				SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, false);
+				ATask& subTask = *tasks[taskData.index];
 
-			SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, false);
-			ATask& subTask = *tasks[taskData.index];
-
-			const bool bSubRes = subTask.End(taskData.subState, taskData.subData);
-
-			subTask.DeleteData(taskData.subData);
-
-			return bSubRes;
+				subTask.DeleteData(taskData.subData);
+			}
+			
+			return true;
 		}
 
 
-		TaskState CompoundTask::Tick(float _deltaTime, void* _data) const
+		TaskState CompoundTask::Tick(float _deltaTime, TaskData* _data) const
 		{
 			SP_RCHECK(_data, "Nullptr task data.", Error, TaskState::Failure);
 			auto& taskData = *static_cast<CompoundTaskData*>(_data);
@@ -68,36 +67,30 @@ namespace SP
 			SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, TaskState::Failure);
 			ATask& subTask = *tasks[taskData.index];
 
-			taskData.subState = subTask.Tick(_deltaTime, taskData.subData);
+			const TaskState subState = subTask.Update(_deltaTime, taskData.subData);
 
-			if (taskData.subState != TaskState::Success)
-				return taskData.subState; // Failed or running.
+			if (subState == TaskState::Pending)
+				return TaskState::Pending;
 
-
-			// Last task's tick succeed: call sub task's End() on this.End().
-			if (taskData.index + 1 == tasks.size())
-				return TaskState::Success;
-
-
-			// End sub task.
-			if (!subTask.End(taskData.subState, taskData.subData))
-				return TaskState::Failure;
-
+			// Clean data.
 			subTask.DeleteData(taskData.subData);
 
+			if (subState == TaskState::Success)
+			{
+				// Last task succeeded.
+				if (++taskData.index == tasks.size())
+					return TaskState::Success;
 
-			// Begin next task.
-			++taskData.index;
+				// Prepare next task.
+				SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, TaskState::Failure);
+				ATask& nextSubTask = *tasks[taskData.index];
 
-			SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, TaskState::Failure);
-			ATask& nextSubTask = *tasks[taskData.index];
+				taskData.subData = nextSubTask.InstantiateData();
 
-			taskData.subData = nextSubTask.InstantiateData();
-
-			if (!nextSubTask.Begin(taskData.subData))
+				return TaskState::Pending;
+			}
+			else if (subState & TaskState::Failure)
 				return TaskState::Failure;
-
-			return TaskState::Pending;
 		}
 	}
 }

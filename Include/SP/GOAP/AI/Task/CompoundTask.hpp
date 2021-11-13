@@ -9,33 +9,58 @@
 
 #include <SP/GOAP/AI/Task/ATask.hpp>
 
+/**
+*	\file CompoundTask.hpp
+* 
+*	\brief Compound Task type definition.
+* 
+*	\ingroup AI
+*	\{
+*/
+
 namespace SP
 {
 	namespace AI
 	{
+		/**
+		*	\brief Task composed of sub tasks.
+		*	Hybrid GOAP/HTN (Hierarchical task network) planner.
+		*	Sources:
+		*	https://en.wikipedia.org/wiki/Hierarchical_task_network
+		*	https://youtu.be/5RKDFeQ1Ndk
+		*/
 		class CompoundTask : public ATask
 		{
+		protected:
+			bool Begin(TaskData* _data) const override final;
+			bool End(TaskState _state, TaskData* _data) const override final;
+
+			TaskState Tick(float _deltaTime, TaskData* _data) const override final;
+
 		public:
+			/// Sub tasks composition.
 			std::vector<TaskPtr> tasks;
 
-			void* InstantiateData() const override final;
-			void DeleteData(void* _data) const override final;
-
-			bool Begin(void* _data) const override final;
-			bool End(TaskState _state, void* _data) const override final;
-
-			TaskState Tick(float _deltaTime, void* _data) const override final;
+			TaskData* InstantiateData() const override final;
+			void DeleteData(TaskData* _data) const override final;
 		};
 
-		struct CompoundTaskData
+
+		/**
+		*	\brief Compound Task associated data.
+		*/
+		struct CompoundTaskData : public TaskData
 		{
+			/// Current sub task index to update.
 			size_t index = 0;
 
-			TaskState subState = TaskState::Success;
-
-			void* subData = nullptr;
+			/// Sub task associated data.
+			TaskData* subData = nullptr;
 		};
 	}
 }
+
+
+/** \} */
 
 #endif // GUARD
