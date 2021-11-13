@@ -4,8 +4,8 @@
 
 #define LOG(_str) std::cout << _str << std::endl;
 
-#include <SPlanner/Collections/Debug>
-#include <SPlanner/GOAP/Base/Action/ActionSetMap.hpp>
+#include <SP/Collections/Debug>
+#include <SP/GOAP/Base/Action/ActionSetMap.hpp>
 using namespace SP;
 
 AGoal patrolGoal;

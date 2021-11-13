@@ -5,6 +5,6 @@
 #ifndef SPLANNER_COLLECTIONS_DEBUG_GUARD
 #define SPLANNER_COLLECTIONS_DEBUG_GUARD
 
-#include <SPlanner/Core/Debug/Debug.hpp>
+#include <SP/Core/Debug/Debug.hpp>
 
 #endif // GUARD

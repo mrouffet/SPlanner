@@ -7,8 +7,8 @@
 
 #include <vector>
 
-#include <SPlanner/Abstract/APlanner.hpp>
-#include <SPlanner/GOAP/Base/Action/ActionHandle.hpp>
+#include <SP/Abstract/APlanner.hpp>
+#include <SP/GOAP/Base/Action/ActionHandle.hpp>
 
 namespace SP
 {

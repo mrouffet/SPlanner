@@ -5,7 +5,7 @@
 #ifndef SPLANNER_GOAP_STATIC_WEIGHT_GUARD
 #define SPLANNER_GOAP_STATIC_WEIGHT_GUARD
 
-#include <SPlanner/GOAP/Base/Action/Weights/AWeight.hpp>
+#include <SP/GOAP/Base/Action/Weights/AWeight.hpp>
 
 namespace SP
 {

@@ -5,7 +5,7 @@
 #ifndef SPLANNER_GOAP_AACTION_GUARD
 #define SPLANNER_GOAP_AACTION_GUARD
 
-#include <SPlanner/Abstract/AStep.hpp>
+#include <SP/Abstract/AStep.hpp>
 
 namespace SP
 {

@@ -23,7 +23,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Libs)	# .dll / .so
 
 # Inputs
 
-file(GLOB_RECURSE SOURCES "Source/SPlanner/*")
+file(GLOB_RECURSE SOURCES "Include/SP/*" "Source/SP/*")
 
 
 
@@ -36,7 +36,7 @@ add_library(SPlanner STATIC ${SOURCES})
 ## Include directories
 
 target_include_directories(SPlanner PUBLIC Include)
-target_include_directories(SPlanner PRIVATE Include/SPlanner)
+target_include_directories(SPlanner PRIVATE Include/SP)
 
 
 ## Compile features

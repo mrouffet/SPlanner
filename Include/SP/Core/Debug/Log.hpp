@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <SPlanner/Core/Debug/LogLevel.hpp>
+#include <SP/Core/Debug/LogLevel.hpp>
 
 namespace SP
 {

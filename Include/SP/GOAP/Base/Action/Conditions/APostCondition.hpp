@@ -5,7 +5,7 @@
 #ifndef SPLANNER_GOAP_APOSTCONDITION_GUARD
 #define SPLANNER_GOAP_APOSTCONDITION_GUARD
 
-#include <SPlanner/GOAP/Base/Action/Conditions/ACondition.hpp>
+#include <SP/GOAP/Base/Action/Conditions/ACondition.hpp>
 
 namespace SP
 {

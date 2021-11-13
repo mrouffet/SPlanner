@@ -5,9 +5,9 @@
 #ifndef SPLANNER_GOAP_ATASK_GUARD
 #define SPLANNER_GOAP_ATASK_GUARD
 
-#include <SPlanner/GOAP/Base/Action/AAction.hpp>
+#include <SP/GOAP/Base/Action/AAction.hpp>
 
-#include <SPlanner/GOAP/AI/Task/TaskState.hpp>
+#include <SP/GOAP/AI/Task/TaskState.hpp>
 
 namespace SP::AI
 {

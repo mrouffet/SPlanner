@@ -5,9 +5,9 @@
 #ifndef SPLANNER_CORE_DEBUG_GUARD
 #define SPLANNER_CORE_DEBUG_GUARD
 
-#include <SPlanner/Core/Debug/Log.hpp>
-#include <SPlanner/Core/Debug/FileName.hpp>
-#include <SPlanner/Core/Debug/FuncName.hpp>
+#include <SP/Core/Debug/Log.hpp>
+#include <SP/Core/Debug/FileName.hpp>
+#include <SP/Core/Debug/FuncName.hpp>
 
 namespace SP
 {

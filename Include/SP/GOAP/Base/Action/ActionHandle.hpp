@@ -8,10 +8,10 @@
 #include <memory>
 #include <vector>
 
-#include <SPlanner/GOAP/Base/Action/AAction.hpp>
-#include <SPlanner/GOAP/Base/Action/Conditions/APreCondition.hpp>
-#include <SPlanner/GOAP/Base/Action/Conditions/APostCondition.hpp>
-#include <SPlanner/GOAP/Base/Action/Weights/AWeight.hpp>
+#include <SP/GOAP/Base/Action/AAction.hpp>
+#include <SP/GOAP/Base/Action/Conditions/APreCondition.hpp>
+#include <SP/GOAP/Base/Action/Conditions/APostCondition.hpp>
+#include <SP/GOAP/Base/Action/Weights/AWeight.hpp>
 
 /**
 *	STRIPS based architecture: https://en.wikipedia.org/wiki/Stanford_Research_Institute_Problem_Solver

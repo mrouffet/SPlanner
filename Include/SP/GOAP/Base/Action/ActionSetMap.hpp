@@ -7,8 +7,8 @@
 
 #include <unordered_map>
 
-#include <SPlanner/GOAP/Base/Goal/AGoal.hpp>
-#include <SPlanner/GOAP/Base/Action/ActionSet.hpp>
+#include <SP/GOAP/Base/Goal/AGoal.hpp>
+#include <SP/GOAP/Base/Action/ActionSet.hpp>
 
 namespace SP
 {
