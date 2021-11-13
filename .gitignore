@@ -52,3 +52,7 @@ DerivedDataCache/
 Intermediate/
 Saved/
 Build/
+
+# UE 4 Plugin setup files. 
+Wrappers/Unreal Engine/Plugins/SPlanner/Source/SPlanner/Public/SP
+Wrappers/Unreal Engine/Plugins/SPlanner/Source/SPlanner/Private/SP
