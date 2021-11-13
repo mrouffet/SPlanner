@@ -27,7 +27,7 @@ namespace SP
 		T ComputeMedian() const;
 
 	public:
-		std::vector<std::shared_ptr<AParam<T>>> params;
+		std::vector<ParamPtr<T>> params;
 
 		ArrayComputeMethod method = ArrayComputeMethod::Average;
 

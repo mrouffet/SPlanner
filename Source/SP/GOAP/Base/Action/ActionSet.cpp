@@ -31,7 +31,7 @@ namespace SP
 		
 		// Generate weight for index.
 		for (size_t i = 0; i < actionHandles.size(); ++i)
-			weightActions.emplace_back(WeightedAction{ i, _dist->Generate(actionHandles[i].weight) });
+			weightActions.emplace_back(WeightedAction{ i, _dist->Generate(actionHandles[i].weight.get()) });
 
 		// Sort by weights.
 		std::sort(weightActions.begin(), weightActions.end());

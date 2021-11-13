@@ -6,17 +6,8 @@ namespace SP
 {
 	ActionHandle::~ActionHandle()
 	{
-		if (action)
-		{
-			delete action;
-			action = nullptr;
-		}
-
-		if (weight)
-		{
-			delete weight;
-			weight = nullptr;
-		}
+		action = nullptr;
+		weight = nullptr;
 
 
 		for (auto cond : preconditions)

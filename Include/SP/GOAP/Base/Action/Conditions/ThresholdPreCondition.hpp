@@ -7,16 +7,28 @@
 
 #include <SP/GOAP/Base/Action/Conditions/APreCondition.hpp>
 
+#include <SP/Collections/Debug>
+#include <SP/Misc/Param/AParam.hpp>
+
 namespace SP
 {
+	template <typename T = float>
 	class ThresholdPreCondition : public APreCondition
 	{
-	protected:
-		bool Validate_Internal(void* _userData) const override final;
-
 	public:
-		float value = 1.0f;
-		float threshold = 0.5f;
+		ParamPtr<T> value;
+		ParamPtr<T> threshold;
+
+	protected:
+		bool Validate_Internal(void* _userData) const override final
+		{
+			(void)_userData;
+
+			SP_RCHECK(value, "Invalid value nullptr", Error, false);
+			SP_RCHECK(threshold, "Invalid threshold nullptr", Error, false);
+
+			return value->Get() > threshold->Get();
+		}
 	};
 }
 

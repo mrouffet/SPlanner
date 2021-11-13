@@ -22,8 +22,8 @@ namespace SP
 	class ActionHandle
 	{
 	public:
-		AAction* action = nullptr;
-		AWeight* weight = nullptr;
+		std::shared_ptr<AAction> action = nullptr;
+		std::shared_ptr<AWeight> weight = nullptr;
 
 		std::vector<const APreCondition*> preconditions;
 		std::vector<const APostCondition*> postconditions;
