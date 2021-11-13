@@ -1,0 +1,10 @@
+// Copyright(c) 2021 Maxime "mrouffet" ROUFFET. All Rights Reserved.
+
+#pragma once
+
+#ifndef SPLANNER_COLLECTIONS_DEBUG_GUARD
+#define SPLANNER_COLLECTIONS_DEBUG_GUARD
+
+#include <SP/Core/Debug/Debug.hpp>
+
+#endif // GUARD
