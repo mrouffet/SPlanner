@@ -15,7 +15,9 @@ namespace SP
 
 			Failure = 1,
 
-			Pending = 2,
+			Pending,
+
+			ForceEnd,
 		};
 	}
 }
