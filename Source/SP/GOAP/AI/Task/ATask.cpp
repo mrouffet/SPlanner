@@ -2,15 +2,36 @@
 
 #include <GOAP/AI/Task/ATask.hpp>
 
-namespace SP::AI
-{
-	bool ATask::Begin()
-	{
-		return true;
-	}
+#include <Collections/Debug>
 
-	bool ATask::End()
+namespace SP
+{
+	namespace AI
 	{
-		return true;
+		void* ATask::InstantiateData() const
+		{
+			return nullptr;
+		}
+		
+		void ATask::DeleteData(void* _data) const
+		{
+			(void)_data;
+		}
+
+
+		bool ATask::Begin(void* _data) const
+		{
+			(void)_data;
+
+			return true;
+		}
+
+		bool ATask::End(TaskState _state, void* _data) const
+		{
+			(void)_state;
+			(void)_data;
+
+			return true;
+		}
 	}
 }

@@ -5,16 +5,19 @@
 #ifndef SPLANNER_GOAP_TASK_STATE_GUARD
 #define SPLANNER_GOAP_TASK_STATE_GUARD
 
-namespace SP::AI
+namespace SP
 {
-	enum class TaskState
+	namespace AI
 	{
-		Success = 0,
+		enum class TaskState
+		{
+			Success = 0,
 
-		Failure = 1,
+			Failure = 1,
 
-		Pending = 2,
-	};
+			Pending = 2,
+		};
+	}
 }
 
 #endif // GUARD
