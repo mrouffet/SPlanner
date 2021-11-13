@@ -9,10 +9,16 @@ namespace SP
 {
 	class ACondition
 	{
+	protected:
+		virtual bool Validate_Internal(void* _userData) const = 0;
+
 	public:
+		/// Should reverse condition.
+		bool bReverse = false;
+
 		virtual ~ACondition() = default;
 
-		virtual bool Validate(void* _userData) const = 0;
+		bool Validate(void* _userData) const;
 	};
 }
 
