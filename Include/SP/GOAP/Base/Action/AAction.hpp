@@ -12,6 +12,7 @@ namespace SP
 	class AAction : public AStep
 	{
 	public:
+		virtual ~AAction() = default;
 	};
 }
 

@@ -29,7 +29,7 @@ namespace SP
 
 			if (action.ValidatePreConditions(_infos.userData) || action.ValidatePostConditions(_infos.userData))
 			{
-				_outPlan.emplace_back(action.action.get());
+				_outPlan.emplace_back(action.action);
 
 				if (action.bAchievePlan ||									// Check if action achieve plan.
 					Generate_Internal(_infos, _outPlan, i + 1, _currDepth)) // Check if plan with this action can be achieved.

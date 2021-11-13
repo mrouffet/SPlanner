@@ -7,7 +7,7 @@
 
 #include <random>
 
-#include <SP/GOAP/Base/Action/Weights/Distributions/AWeightDistribution.hpp>
+#include <SP/GOAP/Base/Action/Weight/AWeightDistribution.hpp>
 
 namespace SP
 {

@@ -1,6 +1,6 @@
 // Copyright(c) 2021 Maxime "mrouffet" ROUFFET. All Rights Reserved.
 
-#include <GOAP/Base/Action/Weights/Distributions/RandomWeightDistribution.hpp>
+#include <GOAP/Base/Action/Weight/RandomWeightDistribution.hpp>
 
 #include <Collections/Debug>
 
@@ -14,10 +14,10 @@ namespace SP
 
 	float RandomWeightDistribution::Generate(const AWeight* _weight)
 	{
-		SP_RCHECK(_weight, "Weight nullptr", Error, AWeight::defaultValue);
+		SP_RCHECK(_weight, "Weight nullptr", Error, gDefaultWeight);
 
 		const float random = static_cast<float>(mDist(mEngine));
 
-		return random * _weight->GetWeight();
+		return random * _weight->Get();
 	}
 }

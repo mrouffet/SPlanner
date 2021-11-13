@@ -5,17 +5,13 @@
 #ifndef SPLANNER_GOAP_AWEIGHT_GUARD
 #define SPLANNER_GOAP_AWEIGHT_GUARD
 
+#include <SP/Misc/Param/AParam.hpp>
+
 namespace SP
 {
-	class AWeight
-	{
-	public:
-		static constexpr float defaultValue = 1.0f;
+	using AWeight = AParam<float>;
 
-		virtual ~AWeight() = default;
-
-		virtual float GetWeight() const = 0;
-	};
+	static constexpr float gDefaultWeight = 1.0f;
 }
 
 #endif // GUARD

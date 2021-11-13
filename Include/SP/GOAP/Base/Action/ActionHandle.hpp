@@ -5,13 +5,12 @@
 #ifndef SPLANNER_GOAP_ACTION_HANDLE_GUARD
 #define SPLANNER_GOAP_ACTION_HANDLE_GUARD
 
-#include <memory>
 #include <vector>
 
 #include <SP/GOAP/Base/Action/AAction.hpp>
+#include <SP/GOAP/Base/Action/Weight/AWeight.hpp>
 #include <SP/GOAP/Base/Action/Conditions/APreCondition.hpp>
 #include <SP/GOAP/Base/Action/Conditions/APostCondition.hpp>
-#include <SP/GOAP/Base/Action/Weights/AWeight.hpp>
 
 /**
 *	STRIPS based architecture: https://en.wikipedia.org/wiki/Stanford_Research_Institute_Problem_Solver
@@ -23,8 +22,8 @@ namespace SP
 	class ActionHandle
 	{
 	public:
-		std::shared_ptr<const AAction> action = nullptr;
-		std::shared_ptr<const AWeight> weight = nullptr;
+		AAction* action = nullptr;
+		AWeight* weight = nullptr;
 
 		std::vector<const APreCondition*> preconditions;
 		std::vector<const APostCondition*> postconditions;

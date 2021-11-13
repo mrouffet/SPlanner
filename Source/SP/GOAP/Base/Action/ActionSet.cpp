@@ -6,7 +6,7 @@
 
 #include <Collections/Debug>
 
-#include <GOAP/Base/Action/Weights/Distributions/AWeightDistribution.hpp>
+#include <GOAP/Base/Action/Weight/AWeightDistribution.hpp>
 
 namespace SP
 {
@@ -31,7 +31,7 @@ namespace SP
 		
 		// Generate weight for index.
 		for (size_t i = 0; i < actionHandles.size(); ++i)
-			weightActions.emplace_back(WeightedAction{ i, _dist->Generate(actionHandles[i].weight.get()) });
+			weightActions.emplace_back(WeightedAction{ i, _dist->Generate(actionHandles[i].weight) });
 
 		// Sort by weights.
 		std::sort(weightActions.begin(), weightActions.end());

@@ -1,6 +1,6 @@
 // Copyright(c) 2021 Maxime "mrouffet" ROUFFET. All Rights Reserved.
 
-#include <GOAP/Base/Action/Weights/Distributions/LinearWeightDistribution.hpp>
+#include <GOAP/Base/Action/Weight/LinearWeightDistribution.hpp>
 
 #include <Collections/Debug>
 
@@ -8,8 +8,8 @@ namespace SP
 {
 	float LinearWeightDistribution::Generate(const AWeight* _weight)
 	{
-		SP_RCHECK(_weight, "Weight nullptr", Error, AWeight::defaultValue);
+		SP_RCHECK(_weight, "Weight nullptr", Error, gDefaultWeight);
 
-		return _weight->GetWeight();
+		return _weight->Get();
 	}
 }
