@@ -7,12 +7,27 @@
 
 #include <SP/Misc/Param/AParam.hpp>
 
+/**
+*	\file StaticParam.hpp
+* 
+*	\brief Static parameter type definition.
+* 
+*	\ingroup Misc
+*	\{
+*/
+
 namespace SP
 {
+	/**
+	*	Static Parameter Handle.
+	* 
+	*	\tparam T	Type of parameter to handle.
+	*/
 	template <typename T>
 	class StaticParam : public AParam<T>
 	{
 	public:
+		/// Handled value.
 		T value = T();
 
 		T Get() const override final
@@ -21,5 +36,7 @@ namespace SP
 		}
 	};
 }
+
+/** \} */
 
 #endif // GUARD

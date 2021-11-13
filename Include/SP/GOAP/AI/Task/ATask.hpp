@@ -106,6 +106,8 @@ namespace SP
 			void Terminate(TaskData* _data);
 		};
 
+
+		/// Alias for task ptr (should always be shared).
 		using TaskPtr = std::shared_ptr<ATask>;
 	}
 }

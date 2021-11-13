@@ -9,8 +9,20 @@
 
 #include <SP/Core/Debug/LogLevel.hpp>
 
+/**
+*	\file Log.hpp
+*
+*	\brief SPlanner Log type definition.
+*
+*	\ingroup Debug
+*	\{
+*/
+
 namespace SP
 {
+	/**
+	*	SPlanner Log type.
+	*/
 	class Log
 	{
 	public:
@@ -30,5 +42,7 @@ namespace SP
 		std::string message;
 	};
 }
+
+/** \} */
 
 #endif // GUARD

@@ -6,11 +6,23 @@
 #define SPLANNER_CORE_FUNC_NAME_GUARD
 
 /**
+*	\file FuncName.hpp
+* 
+*	\brief Get current function name preprocessor definition.
+* 
 *	From MIT Licenced project Sapphire Suite Engine:
 *	https://github.com/SapphireSuite/Engine/blob/dev/Include/SA/Core/Debug/Debug.hpp
+* 
+*	\ingroup Debug
+*	\{
 */
 
-#if defined(_MSC_VER)
+#if defined(DOXYGEN)
+
+	/// Preprocessor for current function name.
+	#define __SP_FUNC_NAME
+
+#elif defined(_MSC_VER)
 
 	#define __SP_FUNC_NAME __FUNCSIG__
 
@@ -23,5 +35,8 @@
 	#define __SP_FUNC_NAME __FUNCTION__
 
 #endif
+
+
+/** \} */
 
 #endif // GUARD

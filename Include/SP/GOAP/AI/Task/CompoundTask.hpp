@@ -14,6 +14,10 @@
 * 
 *	\brief Compound Task type definition.
 * 
+*	Sources:
+*	https://en.wikipedia.org/wiki/Hierarchical_task_network
+*	https://youtu.be/5RKDFeQ1Ndk
+* 
 *	\ingroup AI
 *	\{
 */
@@ -25,9 +29,6 @@ namespace SP
 		/**
 		*	\brief Task composed of sub tasks.
 		*	Hybrid GOAP/HTN (Hierarchical task network) planner.
-		*	Sources:
-		*	https://en.wikipedia.org/wiki/Hierarchical_task_network
-		*	https://youtu.be/5RKDFeQ1Ndk
 		*/
 		class CompoundTask : public ATask
 		{

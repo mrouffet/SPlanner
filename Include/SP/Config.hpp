@@ -30,4 +30,28 @@ namespace SP
 	/// \endcond Internal
 }
 
+
+/**
+*	\defgroup Debug Debug
+*	SPlanner Debug tools.
+*/
+
+
+/**
+*	\defgroup Misc Miscellaneous
+*	SPlanner Miscellaneous tools.
+*/
+
+
+/**
+*	\defgroup GOAP Goal Oriented Action Planning
+*	SPlanner GOAP (Goal Oriented Action Planning) tools.
+*/
+
+/**
+*	\defgroup AI AI
+*	SPlanner AI specific tools.
+*	\ingroup GOAP
+*/
+
 #endif // GUARD
