@@ -32,13 +32,13 @@ protected:
 
 
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task")
-	bool Begin(USP_TaskData* _data) const;
+	bool Begin(USP_TaskData* Data) const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task")
-	bool End(ESP_TaskState _state, USP_TaskData* _data) const;
+	bool End(ESP_TaskState State, USP_TaskData* Data) const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "SPlanner|Task")
-	ESP_TaskState Tick(float _deltaTime, USP_TaskData* _data) const;
+	ESP_TaskState Tick(float DeltaTime, USP_TaskData* Data) const;
 
 
 	bool Begin(SP::AI::TaskData* _data) const override final;
@@ -46,6 +46,8 @@ protected:
 	SP::AI::TaskState Tick(float _deltaTime, SP::AI::TaskData* _data) const override final;
 
 public:
+	USP_Task(const FObjectInitializer& ObjectInitializer);
+	
 	SP::AI::TaskData* InstantiateData() const override final;
 	void DeleteData(SP::AI::TaskData* _data) const override final;
 };
