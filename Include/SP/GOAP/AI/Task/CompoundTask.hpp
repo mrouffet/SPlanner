@@ -32,15 +32,15 @@ namespace SP
 		*/
 		class CompoundTask : public ATask
 		{
-		protected:
+		public:
+			/// Sub tasks composition.
+			std::vector<ATask*> tasks;
+
+			// Public for easy wrapping.
 			bool Begin(TaskData* _data) const override final;
 			bool End(TaskState _state, TaskData* _data) const override final;
 
 			TaskState Tick(float _deltaTime, TaskData* _data) const override final;
-
-		public:
-			/// Sub tasks composition.
-			std::vector<TaskPtr> tasks;
 
 			TaskData* InstantiateData() const override final;
 			void DeleteData(TaskData* _data) const override final;
