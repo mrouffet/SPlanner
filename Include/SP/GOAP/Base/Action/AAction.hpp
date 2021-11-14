@@ -7,13 +7,27 @@
 
 #include <SP/Abstract/AStep.hpp>
 
+/**
+*	\file AAction.hpp
+* 
+*	\brief GOAP Action base type.
+* 
+*	\ingroup GOAP
+*	\{
+*/
+
 namespace SP
 {
+	/**
+	*	GOAP planner's action base type.
+	*/
 	class AAction : public AStep
 	{
 	public:
 		virtual ~AAction() = default;
 	};
 }
+
+/** \} */
 
 #endif // GUARD

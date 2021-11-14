@@ -34,7 +34,7 @@ namespace SP
 	/// API log callback.
 	static void (*logCallback)(const Log& _log) = nullptr;
 
-#if SP_DEBUG || defined(DDOXYGEN)
+#if SP_DEBUG || defined(DOXYGEN)
 
 	/// \cond Internal
 

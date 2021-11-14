@@ -17,7 +17,7 @@
 *	\{
 */
 
-#if defined(DOXYGEN)
+#if DOXYGEN
 
 	/// Preprocessor for current function name.
 	#define __SP_FUNC_NAME

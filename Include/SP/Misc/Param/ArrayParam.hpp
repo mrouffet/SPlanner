@@ -32,6 +32,11 @@ namespace SP
 		Median
 	};
 
+	/**
+	*	Array of parameters
+	* 
+	*	\tparam T	Parameter type.
+	*/
 	template <typename T>
 	class ArrayParam : public AParam<T>
 	{
