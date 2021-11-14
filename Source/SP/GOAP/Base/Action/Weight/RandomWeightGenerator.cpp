@@ -7,8 +7,8 @@
 namespace SP
 {
 	RandomWeightDistribution::RandomWeightDistribution(uint32_t _seed) :
-		mDist{ 0.0, 1.0 }, // Random between 0 and 1.
-		mEngine{ _seed != uint32_t(-1) ? _seed : std::random_device()() } // Use provided seed or generate random seed.
+		mEngine{ _seed != uint32_t(-1) ? _seed : std::random_device()() }, // Use provided seed or generate random seed.
+		mDist{ 0.0, 1.0 } // Random between 0 and 1.
 	{
 	}
 
