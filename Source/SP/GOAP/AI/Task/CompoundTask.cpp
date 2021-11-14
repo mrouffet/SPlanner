@@ -44,16 +44,16 @@ namespace SP
 
 		bool CompoundTask::End(TaskState _state, TaskData* _data) const
 		{
+			(void)_state;
+
 			SP_RCHECK(_data, "Nullptr task data.", Error, false);
 			auto& taskData = *static_cast<CompoundTaskData*>(_data);
 
-			if (_state == TaskState::ForceEnd)
-			{
-				SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, false);
-				ATask& subTask = *tasks[taskData.index];
+			// Clean last task.
+			SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, false);
+			ATask& subTask = *tasks[taskData.index];
 
-				subTask.DeleteData(taskData.subData);
-			}
+			subTask.DeleteData(taskData.subData);
 			
 			return true;
 		}
@@ -69,28 +69,26 @@ namespace SP
 
 			const TaskState subState = subTask.Update(_deltaTime, taskData.subData);
 
-			if (subState == TaskState::Pending)
-				return TaskState::Pending;
-
-			// Clean data.
-			subTask.DeleteData(taskData.subData);
-
 			if (subState == TaskState::Success)
 			{
 				// Last task succeeded.
-				if (++taskData.index == tasks.size())
+				if (taskData.index + 1 == tasks.size())
 					return TaskState::Success;
 
+				// Clean data.
+				subTask.DeleteData(taskData.subData);
+
 				// Prepare next task.
+				++taskData.index;
 				SP_RCHECK(tasks[taskData.index], "Nullptr task registered", Error, TaskState::Failure);
 				ATask& nextSubTask = *tasks[taskData.index];
 
 				taskData.subData = nextSubTask.InstantiateData();
-
-				return TaskState::Pending;
 			}
 			else if (subState & TaskState::Failure)
 				return TaskState::Failure;
+
+			return TaskState::Pending;
 		}
 	}
 }
