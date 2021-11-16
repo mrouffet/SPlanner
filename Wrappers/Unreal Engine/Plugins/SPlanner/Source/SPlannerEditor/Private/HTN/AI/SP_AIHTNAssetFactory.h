@@ -12,6 +12,8 @@ class SPLANNEREDITOR_API USP_AIHTNAssetFactory : public USP_AIPlannerAssetFactor
 	GENERATED_BODY()
 
 public:
+	static TSharedPtr<FSlateStyleSet> StyleSet;
+
 	USP_AIHTNAssetFactory(const FObjectInitializer& ObjectInitializer);
 
 	UObject* FactoryCreateNew(UClass* InClass,

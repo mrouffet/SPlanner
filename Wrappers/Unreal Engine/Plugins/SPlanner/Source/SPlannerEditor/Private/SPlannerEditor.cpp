@@ -2,8 +2,13 @@
 
 #include "SPlannerEditor.h"
 
+#include <Styling/SlateStyleRegistry.h>
+
 #include <GOAP/AI/SP_AssetTypeActions_AIGOAPAsset.h>
+#include <GOAP/AI/SP_AIGOAPAssetFactory.h>
+
 #include <HTN/AI/SP_AssetTypeActions_AIHTNAsset.h>
+#include <HTN/AI/SP_AIHTNAssetFactory.h>
 
 DEFINE_LOG_CATEGORY(SPlannerEditor);
 
@@ -16,12 +21,19 @@ void FSPlannerEditorModule::StartupModule()
 		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 
 		RegisterAssetTypeAction(AssetTools, MakeShareable(new FSP_AssetTypeActions_AIGOAPAsset));
+		FSlateStyleRegistry::RegisterSlateStyle(*USP_AIGOAPAssetFactory::StyleSet.Get());
+
 		RegisterAssetTypeAction(AssetTools, MakeShareable(new FSP_AssetTypeActions_AIHTNAsset));
+		FSlateStyleRegistry::RegisterSlateStyle(*USP_AIHTNAssetFactory::StyleSet.Get());
 	}
 }
 
 void FSPlannerEditorModule::ShutdownModule()
 {
+	FSlateStyleRegistry::UnRegisterSlateStyle(*USP_AIGOAPAssetFactory::StyleSet.Get());
+	FSlateStyleRegistry::UnRegisterSlateStyle(*USP_AIHTNAssetFactory::StyleSet.Get());
+
+
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
 		// Unregister our custom created assets from the AssetTools

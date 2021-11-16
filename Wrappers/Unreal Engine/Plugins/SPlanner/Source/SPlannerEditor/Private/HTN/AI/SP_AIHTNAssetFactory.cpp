@@ -4,6 +4,8 @@
 
 #include <HTN/AI/SP_AIHTNAsset.h>
 
+TSharedPtr<class FSlateStyleSet> USP_AIHTNAssetFactory::StyleSet = MakeSlyteSet("SP_AIHTNAsset", "Resources/AI/HTNAssetIcon.png", FVector2D(512, 512));
+
 USP_AIHTNAssetFactory::USP_AIHTNAssetFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SupportedClass = USP_AIHTNAsset::StaticClass();

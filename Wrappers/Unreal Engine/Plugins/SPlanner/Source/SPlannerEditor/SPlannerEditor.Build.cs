@@ -35,6 +35,8 @@ public class SPlannerEditor : ModuleRules
 				"Core",
 				"CoreUObject",
 
+				"SlateCore",
+
 				"UnrealEd",
 
 				"SPlanner"

@@ -4,6 +4,8 @@
 
 #include <GOAP/AI/SP_AIGOAPAsset.h>
 
+TSharedPtr<class FSlateStyleSet> USP_AIGOAPAssetFactory::StyleSet = MakeSlyteSet("SP_AIGOAPAsset", "Resources/AI/GOAPAssetIcon.png", FVector2D(512, 512));
+
 USP_AIGOAPAssetFactory::USP_AIGOAPAssetFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	SupportedClass = USP_AIGOAPAsset::StaticClass();
