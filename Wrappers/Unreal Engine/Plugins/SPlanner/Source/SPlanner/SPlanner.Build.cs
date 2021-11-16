@@ -26,7 +26,6 @@ public class SPlanner : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
 			}
 		);
 			
@@ -34,10 +33,12 @@ public class SPlanner : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Engine",
+				"Core",
 				"CoreUObject",
 
-				//"AIModule",
+				"Engine",
+
+				"AIModule",
 				//"NavigationSystem",
 			}
 		);
