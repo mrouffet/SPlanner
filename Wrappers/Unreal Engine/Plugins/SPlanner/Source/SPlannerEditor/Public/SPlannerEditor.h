@@ -8,6 +8,10 @@ DECLARE_LOG_CATEGORY_EXTERN(SPlannerEditor, Log, All);
 
 class FSPlannerEditorModule : public IModuleInterface
 {
+	TArray<TSharedPtr<IAssetTypeActions>> CreatedAssetTypeActions;
+
+	void RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action);
+
 public:
 
 	/** IModuleInterface implementation */
