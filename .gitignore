@@ -1,0 +1,21 @@
+# UE5 Project directories to ignore
+
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# Visual Studio solutions
+
+*.sdf
+*.opensdf
+*.suo
+*.dp
+*.sln
+*.tmp
+.vs/*
+
+# Build folders
+
+[Bb][Ii][Nn]/
