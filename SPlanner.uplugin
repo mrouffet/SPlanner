@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "SPlanner",
+	"Description": "Action-Planning algorithm plugin for Unreal Engine",
+	"Category": "Action-Planning",
+	"CreatedBy": "Maxime ROUFFET",
+	"CreatedByURL": "https://github.com/mrouffet/SPlanner",
+	"DocsURL": "https://github.com/mrouffet/SPlanner/wiki",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault": true,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+
+	"Modules": [
+		{
+			"Name": "SPlanner",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SPlannerEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+	]
+}
